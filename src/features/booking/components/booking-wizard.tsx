@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useBooking } from "../hooks/use-booking";
-import { bookingService } from "../services/booking-service";
+import { getAvailableSpecialistsAction } from "../actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -63,7 +63,7 @@ export function BookingWizard() {
 
   useEffect(() => {
     if (bookingData.specialty) {
-      bookingService.getAvailableSpecialists(bookingData.specialty).then(setSpecialists);
+      getAvailableSpecialistsAction(bookingData.specialty).then(setSpecialists);
     }
   }, [bookingData.specialty]);
 

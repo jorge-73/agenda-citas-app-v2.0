@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { bookingService } from "../services/booking-service";
+import { 
+  getAvailableDatesAction, 
+  getAvailableTimeSlotsAction, 
+  createBookingAction 
+} from "../actions";
 import { BookingStep, CreateBookingInput, TimeSlot } from "../types";
 
 export function useBooking() {
@@ -32,10 +36,8 @@ export function useBooking() {
     setIsLoading(true);
     setError(null);
     try {
-      const today = new Date();
-      const endDate = addDays(today, 60);
-      const dates = await bookingService.getAvailableDates(specialistId, today, endDate);
-      setAvailableDates(dates);
+      const dates = await getAvailableDatesAction(specialistId);
+      setAvailableDates(dates.map((d) => new Date(d)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar fechas");
     } finally {
@@ -47,7 +49,7 @@ export function useBooking() {
     setIsLoading(true);
     setError(null);
     try {
-      const slots = await bookingService.getAvailableTimeSlots(specialistId, date);
+      const slots = await getAvailableTimeSlotsAction(specialistId, date);
       setAvailableSlots(slots);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar horarios");
@@ -72,7 +74,7 @@ export function useBooking() {
         time: bookingData.time!,
       };
 
-      const booking = await bookingService.createBooking(input);
+      const booking = await createBookingAction(input);
       return booking;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Error al crear reserva";
@@ -108,5 +110,3 @@ export function useBooking() {
     resetBooking,
   };
 }
-
-import { addDays } from "date-fns";
