@@ -58,31 +58,39 @@ model VerificationToken {
 }
 
 model Specialist {
-  id           String         @id @default(cuid())
-  userId       String         @unique
-  specialty    String
-  license      String?
-  phone        String?
-  bio          String?
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointments Appointment[]
-  schedules    Schedule[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id                    String        @id @default(cuid())
+  userId                String        @unique
+  specialty             String
+  license               String?
+  phone                 String?
+  bio                   String?
+  consultationDuration  Int           @default(30)
+  price                 Float?
+  isAvailable           Boolean       @default(true)
+  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments          Appointment[]
+  schedules             Schedule[]
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
 }
 
 model Patient {
-  id               String         @id @default(cuid())
-  userId           String         @unique
-  phone            String?
-  document         String?
-  birthDate        DateTime?
-  address          String?
-  emergencyContact String?
-  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointments     Appointment[]
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  id                 String        @id @default(cuid())
+  userId             String        @unique
+  phone              String?
+  document           String?
+  birthDate          DateTime?
+  address            String?
+  emergencyContact   String?
+  bloodType          String?
+  allergies          String?
+  medicalConditions String?
+  insurance          String?
+  insuranceNumber    String?
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments       Appointment[]
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 }
 
 model Appointment {
@@ -122,4 +130,24 @@ model BlockedDate {
   reason      String?
   isRecurring Boolean   @default(false)
   createdAt   DateTime  @default(now())
+}
+
+model Booking {
+  id               String   @id @default(cuid())
+  patientName      String
+  patientLastname  String
+  patientEmail     String
+  patientPhone     String
+  patientId        String?
+  specialistId     String
+  specialty        String
+  reason           String?
+  status           String   @default("PENDING")
+  date             DateTime
+  time             String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([specialistId])
+  @@index([date])
 }
