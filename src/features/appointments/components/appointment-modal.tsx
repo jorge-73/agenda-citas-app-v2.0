@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format, addMinutes } from "date-fns";
 import { es } from "date-fns/locale";
-import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { AppointmentStatus, APPOINTMENT_STATUS_LABELS } from "../types";
 import { toast } from "sonner";
+import { getPatientsList, getSpecialistsList, createAppointment, updateAppointment } from "../actions";
 
 const appointmentSchema = z.object({
   patientId: z.string().min(1, "Seleccione un paciente"),
@@ -52,8 +52,8 @@ export function AppointmentModal({
   isEdit = false,
 }: AppointmentModalProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [patients, setPatients] = useState<any[]>([]);
-  const [specialists, setSpecialists] = useState<any[]>([]);
+  const [patients, setPatients] = useState<{ id: string; name: string; email: string }[]>([]);
+  const [specialists, setSpecialists] = useState<{ id: string; name: string; specialty: string }[]>([]);
 
   const {
     register,
@@ -77,14 +77,8 @@ export function AppointmentModal({
   useEffect(() => {
     async function fetchData() {
       const [patientsData, specialistsData] = await Promise.all([
-        db.patient.findMany({
-          include: { user: true },
-          orderBy: { user: { name: "asc" } },
-        }),
-        db.specialist.findMany({
-          include: { user: true },
-          orderBy: { user: { name: "asc" } },
-        }),
+        getPatientsList(),
+        getSpecialistsList(),
       ]);
       setPatients(patientsData);
       setSpecialists(specialistsData);
@@ -114,29 +108,23 @@ export function AppointmentModal({
       const endDateTime = addMinutes(startDateTime, 30);
 
       if (isEdit && initialData?.id) {
-        await db.appointment.update({
-          where: { id: initialData.id },
-          data: {
-            patientId: data.patientId,
-            specialistId: data.specialistId,
-            startTime: startDateTime,
-            endTime: endDateTime,
-            reason: data.reason,
-            notes: data.notes,
-          },
+        await updateAppointment(initialData.id, {
+          patientId: data.patientId,
+          specialistId: data.specialistId,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          reason: data.reason,
+          notes: data.notes,
         });
         toast.success("Cita actualizada correctamente");
       } else {
-        await db.appointment.create({
-          data: {
-            patientId: data.patientId,
-            specialistId: data.specialistId,
-            startTime: startDateTime,
-            endTime: endDateTime,
-            reason: data.reason,
-            notes: data.notes,
-            status: "PENDING",
-          },
+        await createAppointment({
+          patientId: data.patientId,
+          specialistId: data.specialistId,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          reason: data.reason,
+          notes: data.notes,
         });
         toast.success("Cita creada correctamente");
       }
@@ -172,7 +160,7 @@ export function AppointmentModal({
               <SelectContent>
                 {patients.map((patient) => (
                   <SelectItem key={patient.id} value={patient.id}>
-                    {patient.user?.name || "Paciente"}
+                    {patient.name || "Paciente"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -194,7 +182,7 @@ export function AppointmentModal({
               <SelectContent>
                 {specialists.map((specialist) => (
                   <SelectItem key={specialist.id} value={specialist.id}>
-                    {specialist.user?.name || specialist.specialty}
+                    {specialist.name || specialist.specialty}
                   </SelectItem>
                 ))}
               </SelectContent>

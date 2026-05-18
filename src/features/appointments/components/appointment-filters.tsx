@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Filter, X } from "lucide-react";
 import { AppointmentStatus, APPOINTMENT_STATUS_LABELS } from "../types";
+import { getSpecialistsList } from "../actions";
 
 interface AppointmentFiltersProps {
   filters: {
@@ -17,16 +17,19 @@ interface AppointmentFiltersProps {
   onFilterChange: (filters: any) => void;
 }
 
+interface SpecialistData {
+  id: string;
+  name: string;
+  specialty: string;
+}
+
 export function AppointmentFilters({ filters, onFilterChange }: AppointmentFiltersProps) {
-  const [specialists, setSpecialists] = useState<any[]>([]);
+  const [specialists, setSpecialists] = useState<SpecialistData[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     async function fetchSpecialists() {
-      const data = await db.specialist.findMany({
-        include: { user: true },
-        orderBy: { user: { name: "asc" } },
-      });
+      const data = await getSpecialistsList();
       setSpecialists(data);
     }
     fetchSpecialists();
@@ -84,7 +87,7 @@ export function AppointmentFilters({ filters, onFilterChange }: AppointmentFilte
                 <SelectItem value="all">Todos</SelectItem>
                 {specialists.map((specialist) => (
                   <SelectItem key={specialist.id} value={specialist.id}>
-                    {specialist.user?.name || specialist.specialty}
+                    {specialist.name || specialist.specialty}
                   </SelectItem>
                 ))}
               </SelectContent>
