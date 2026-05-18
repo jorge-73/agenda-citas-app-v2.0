@@ -12,9 +12,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { AppointmentStatus, APPOINTMENT_STATUS_LABELS } from "../types";
+import { AppointmentStatus } from "../types";
 import { toast } from "sonner";
 import { getPatientsList, getSpecialistsList, createAppointment, updateAppointment } from "../actions";
+import { Calendar, Clock, User, Stethoscope, FileText, ScrollText, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const appointmentSchema = z.object({
   patientId: z.string().min(1, "Seleccione un paciente"),
@@ -140,94 +142,173 @@ export function AppointmentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{isEdit ? "Editar Cita" : "Nueva Cita"}</DialogTitle>
-          <DialogDescription>
-            {isEdit ? "Actualiza los datos de la cita" : "Programa una nueva cita médica"}
+      <DialogContent className="max-w-md gap-0 p-0 overflow-hidden">
+        {/* Header with gradient */}
+        <DialogHeader className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 pb-8">
+          <DialogTitle className="text-xl font-bold">
+            {isEdit ? "Editar Cita" : "Nueva Cita"}
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            {isEdit ? "Actualiza los datos de la cita médica" : "Programa una nueva cita médica"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="patientId">Paciente</Label>
-            <Select
-              value={watch("patientId")}
-              onValueChange={(value) => setValue("patientId", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar paciente" />
-              </SelectTrigger>
-              <SelectContent>
-                {patients.map((patient) => (
-                  <SelectItem key={patient.id} value={patient.id}>
-                    {patient.name || "Paciente"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.patientId && (
-              <p className="text-sm text-red-500">{errors.patientId.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="specialistId">Especialista</Label>
-            <Select
-              value={watch("specialistId")}
-              onValueChange={(value) => setValue("specialistId", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar especialista" />
-              </SelectTrigger>
-              <SelectContent>
-                {specialists.map((specialist) => (
-                  <SelectItem key={specialist.id} value={specialist.id}>
-                    {specialist.name || specialist.specialty}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.specialistId && (
-              <p className="text-sm text-red-500">{errors.specialistId.message}</p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+        
+        {/* Form Content */}
+        <div className="p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Patient Selection */}
             <div className="space-y-2">
-              <Label htmlFor="date">Fecha</Label>
-              <Input type="date" {...register("date")} />
-              {errors.date && (
-                <p className="text-sm text-red-500">{errors.date.message}</p>
+              <Label htmlFor="patientId" className="text-sm font-medium flex items-center gap-2">
+                <User className="w-4 h-4 text-muted-foreground" />
+                Paciente
+              </Label>
+              <Select
+                value={watch("patientId")}
+                onValueChange={(value) => setValue("patientId", value)}
+              >
+                <SelectTrigger className={cn(
+                  "h-11",
+                  errors.patientId && "border-destructive focus:border-destructive"
+                )}>
+                  <SelectValue placeholder="Seleccionar paciente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {patients.map((patient) => (
+                    <SelectItem key={patient.id} value={patient.id}>
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        {patient.name || "Paciente"}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.patientId && (
+                <p className="text-sm text-destructive">{errors.patientId.message}</p>
               )}
             </div>
+
+            {/* Specialist Selection */}
             <div className="space-y-2">
-              <Label htmlFor="startTime">Hora</Label>
-              <Input type="time" {...register("startTime")} />
-              {errors.startTime && (
-                <p className="text-sm text-red-500">{errors.startTime.message}</p>
+              <Label htmlFor="specialistId" className="text-sm font-medium flex items-center gap-2">
+                <Stethoscope className="w-4 h-4 text-muted-foreground" />
+                Especialista
+              </Label>
+              <Select
+                value={watch("specialistId")}
+                onValueChange={(value) => setValue("specialistId", value)}
+              >
+                <SelectTrigger className={cn(
+                  "h-11",
+                  errors.specialistId && "border-destructive focus:border-destructive"
+                )}>
+                  <SelectValue placeholder="Seleccionar especialista" />
+                </SelectTrigger>
+                <SelectContent>
+                  {specialists.map((specialist) => (
+                    <SelectItem key={specialist.id} value={specialist.id}>
+                      <div className="flex items-center gap-2">
+                        <Stethoscope className="w-4 h-4" />
+                        {specialist.name} - {specialist.specialty}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.specialistId && (
+                <p className="text-sm text-destructive">{errors.specialistId.message}</p>
               )}
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="reason">Motivo de consulta</Label>
-            <Input placeholder="Ej: Control mensual" {...register("reason")} />
-          </div>
+            {/* Date and Time */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="date" className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  Fecha
+                </Label>
+                <Input 
+                  type="date" 
+                  {...register("date")}
+                  className={cn(
+                    "h-11",
+                    errors.date && "border-destructive focus:border-destructive"
+                  )}
+                />
+                {errors.date && (
+                  <p className="text-sm text-destructive">{errors.date.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="startTime" className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-muted-foreground" />
+                  Hora
+                </Label>
+                <Input 
+                  type="time" 
+                  {...register("startTime")}
+                  className={cn(
+                    "h-11",
+                    errors.startTime && "border-destructive focus:border-destructive"
+                  )}
+                />
+                {errors.startTime && (
+                  <p className="text-sm text-destructive">{errors.startTime.message}</p>
+                )}
+              </div>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notas adicionales</Label>
-            <Textarea placeholder="Notas adicionales..." {...register("notes")} />
-          </div>
+            {/* Reason */}
+            <div className="space-y-2">
+              <Label htmlFor="reason" className="text-sm font-medium flex items-center gap-2">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                Motivo de consulta
+              </Label>
+              <Input 
+                placeholder="Ej: Control mensual" 
+                {...register("reason")}
+                className="h-11"
+              />
+            </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Guardando..." : isEdit ? "Actualizar" : "Crear Cita"}
-            </Button>
-          </DialogFooter>
-        </form>
+            {/* Notes */}
+            <div className="space-y-2">
+              <Label htmlFor="notes" className="text-sm font-medium flex items-center gap-2">
+                <ScrollText className="w-4 h-4 text-muted-foreground" />
+                Notas adicionales
+              </Label>
+              <Textarea 
+                placeholder="Notas adicionales para la cita..." 
+                {...register("notes")}
+                className="min-h-[80px] resize-none"
+              />
+            </div>
+
+            {/* Footer Actions */}
+            <DialogFooter className="gap-2 mt-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="flex-1"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Guardando...
+                  </>
+                ) : isEdit ? "Actualizar" : "Crear Cita"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
