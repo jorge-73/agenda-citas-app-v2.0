@@ -6,9 +6,12 @@ import { useRouter } from "next/navigation";
 import { useBooking } from "../hooks/use-booking";
 import { getAvailableSpecialistsAction } from "../actions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -17,14 +20,13 @@ import {
   Clock, 
   User, 
   Stethoscope,
-  Heart,
   Mail,
-  Phone
+  Phone,
+  Loader2
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
-import { SPECIALTY_ICONS } from "../types";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
@@ -41,6 +43,22 @@ const SPECIALTIES = [
   "Gastroenterología", "Ginecología", "Neurología", "Oftalmología",
   "Ortopedia", "Pediatría", "Psiquiatría", "Urología", "Oncología",
 ];
+
+const SPECIALTY_ICONS: Record<string, string> = {
+  "Medicina General": "🩺",
+  "Cardiología": "❤️",
+  "Dermatología": "🧴",
+  "Endocrinología": "⚖️",
+  "Gastroenterología": "🫁",
+  "Ginecología": "👶",
+  "Neurología": "🧠",
+  "Oftalmología": "👁️",
+  "Ortopedia": "🦴",
+  "Pediatría": "🧒",
+  "Psiquiatría": "💭",
+  "Urología": "🔬",
+  "Oncología": "🎗️",
+};
 
 export function BookingWizard() {
   const router = useRouter();
@@ -128,8 +146,9 @@ export function BookingWizard() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
+      {/* Premium Progress Steps */}
+      <div className="mb-10">
+        <div className="flex items-center justify-between mb-4">
           {STEPS.map((step) => (
             <div
               key={step.id}
@@ -140,9 +159,9 @@ export function BookingWizard() {
             >
               <div
                 className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
+                  "w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300",
                   currentStep >= step.id
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-muted text-muted-foreground"
                 )}
               >
@@ -151,42 +170,43 @@ export function BookingWizard() {
               {step.id < 6 && (
                 <div
                   className={cn(
-                    "flex-1 h-1 mx-2 rounded",
-                    currentStep > step.id ? "bg-primary" : "bg-muted"
+                    "flex-1 h-1 mx-2 rounded-full transition-all duration-300",
+                    currentStep > step.id ? "bg-primary" : "bg-border"
                   )}
                 />
               )}
             </div>
           ))}
         </div>
-        <Progress value={progress} className="h-2" />
-        <p className="text-center mt-2 text-sm text-muted-foreground">
-          Paso {currentStep} de 6: {STEPS[currentStep - 1].title}
+        <Progress value={progress} className="h-1.5" />
+        <p className="text-center mt-3 text-sm text-muted-foreground font-medium">
+          Paso {currentStep} de {STEPS.length}: <span className="text-foreground">{STEPS[currentStep - 1].title}</span>
         </p>
       </div>
 
       <AnimatePresence mode="wait">
+        {/* Step 1: Specialties */}
         {currentStep === 1 && (
           <motion.div
             key="step1"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
           >
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Selecciona una especialidad</h2>
+            <Card className="border-border/50 shadow-lg">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl">Selecciona una especialidad</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {SPECIALTIES.map((specialty) => (
                     <button
                       key={specialty}
                       onClick={() => handleSpecialtySelect(specialty)}
-                      className="p-4 rounded-lg border hover:border-primary hover:bg-primary/5 transition-colors text-left"
+                      className="p-4 rounded-xl border border-border/50 hover:border-primary hover:bg-primary/5 transition-all duration-200 text-left group"
                     >
-                      <span className="text-2xl block mb-2">
-                        {SPECIALTY_ICONS[specialty] || "🏥"}
-                      </span>
-                      <span className="text-sm font-medium">{specialty}</span>
+                      <span className="text-3xl block mb-3">{SPECIALTY_ICONS[specialty] || "🏥"}</span>
+                      <span className="text-sm font-medium group-hover:text-primary transition-colors">{specialty}</span>
                     </button>
                   ))}
                 </div>
@@ -195,44 +215,50 @@ export function BookingWizard() {
           </motion.div>
         )}
 
+        {/* Step 2: Professionals */}
         {currentStep === 2 && (
           <motion.div
             key="step2"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
           >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Button variant="ghost" size="sm" onClick={prevStep}>
+            <Card className="border-border/50 shadow-lg">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
                     <ArrowLeft className="w-4 h-4" />
                   </Button>
-                  <h2 className="text-xl font-semibold">Selecciona un profesional</h2>
+                  <CardTitle className="text-xl">Selecciona un profesional</CardTitle>
                 </div>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-3">
                   {specialists.map((specialist) => (
                     <button
                       key={specialist.id}
                       onClick={() => handleSpecialistSelect(specialist)}
-                      className="w-full p-4 rounded-lg border hover:border-primary hover:bg-primary/5 transition-colors text-left flex items-center gap-4"
+                      className="w-full p-4 rounded-xl border border-border/50 hover:border-primary hover:bg-primary/5 transition-all duration-200 text-left flex items-center gap-4 group"
                     >
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="w-6 h-6 text-primary" />
+                      <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <User className="w-7 h-7 text-primary" />
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{specialist.user?.name}</p>
+                      <div className="flex-1 text-left">
+                        <p className="font-semibold text-foreground">{specialist.user?.name}</p>
                         <p className="text-sm text-muted-foreground">{specialist.specialty}</p>
                       </div>
                       {specialist.price && (
-                        <Badge variant="secondary">${specialist.price}</Badge>
+                        <Badge variant="secondary" className="font-medium">
+                          ${specialist.price}
+                        </Badge>
                       )}
                     </button>
                   ))}
                   {specialists.length === 0 && (
-                    <p className="text-center py-8 text-muted-foreground">
-                      No hay profesionales disponibles para esta especialidad
-                    </p>
+                    <div className="text-center py-12 text-muted-foreground">
+                      <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>No hay profesionales disponibles para esta especialidad</p>
+                    </div>
                   )}
                 </div>
               </CardContent>
@@ -240,22 +266,25 @@ export function BookingWizard() {
           </motion.div>
         )}
 
+        {/* Step 3: Date */}
         {currentStep === 3 && (
           <motion.div
             key="step3"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
           >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Button variant="ghost" size="sm" onClick={prevStep}>
+            <Card className="border-border/50 shadow-lg">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
                     <ArrowLeft className="w-4 h-4" />
                   </Button>
-                  <h2 className="text-xl font-semibold">Selecciona una fecha</h2>
+                  <CardTitle className="text-xl">Selecciona una fecha</CardTitle>
                 </div>
-                <div className="grid grid-cols-7 gap-2">
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-7 gap-2 mb-4">
                   {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((day) => (
                     <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
                       {day}
@@ -268,22 +297,25 @@ export function BookingWizard() {
                         key={index}
                         onClick={() => handleDateSelect(date)}
                         className={cn(
-                          "p-3 rounded-lg text-center hover:bg-primary/10 transition-colors",
-                          isSelected && "bg-primary text-primary-foreground"
+                          "p-3 rounded-lg text-center text-sm font-medium transition-all duration-200 hover:scale-105",
+                          isSelected 
+                            ? "bg-primary text-primary-foreground shadow-md" 
+                            : "bg-muted/50 hover:bg-primary/10 hover:text-foreground"
                         )}
                       >
-                        <span className="text-sm font-medium">{format(date, "d")}</span>
+                        {format(date, "d")}
                       </button>
                     );
                   })}
                 </div>
                 {availableDates.length === 0 && (
-                  <p className="text-center py-8 text-muted-foreground">
-                    No hay fechas disponibles en los próximos 60 días
-                  </p>
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Calendar className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                    <p>No hay fechas disponibles en los próximos 60 días</p>
+                  </div>
                 )}
                 {selectedDate && (
-                  <Button onClick={nextStep} className="w-full mt-4">
+                  <Button onClick={nextStep} className="w-full mt-4" size="lg">
                     Continuar <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 )}
@@ -292,32 +324,35 @@ export function BookingWizard() {
           </motion.div>
         )}
 
+        {/* Step 4: Time */}
         {currentStep === 4 && (
           <motion.div
             key="step4"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
           >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Button variant="ghost" size="sm" onClick={prevStep}>
+            <Card className="border-border/50 shadow-lg">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
                     <ArrowLeft className="w-4 h-4" />
                   </Button>
-                  <h2 className="text-xl font-semibold">Selecciona un horario</h2>
+                  <CardTitle className="text-xl">Selecciona un horario</CardTitle>
                 </div>
-                <div className="grid grid-cols-4 gap-2">
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {availableSlots.map((slot) => (
                     <button
                       key={slot.time}
                       onClick={() => slot.available && handleTimeSelect(slot.time)}
                       disabled={!slot.available}
                       className={cn(
-                        "p-3 rounded-lg text-center text-sm font-medium transition-colors",
+                        "p-3 rounded-lg text-center text-sm font-medium transition-all duration-200",
                         slot.available
-                          ? "hover:bg-primary/10 border"
-                          : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                          ? "bg-muted/50 hover:bg-primary/10 hover:text-foreground border border-transparent hover:border-primary cursor-pointer hover:scale-105"
+                          : "bg-muted/30 text-muted-foreground/50 cursor-not-allowed opacity-50 line-through"
                       )}
                     >
                       {slot.time}
@@ -325,82 +360,91 @@ export function BookingWizard() {
                   ))}
                 </div>
                 {availableSlots.length === 0 && (
-                  <p className="text-center py-8 text-muted-foreground">
-                    Selecciona una fecha para ver los horarios disponibles
-                  </p>
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Clock className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                    <p>Selecciona una fecha para ver los horarios disponibles</p>
+                  </div>
                 )}
               </CardContent>
             </Card>
           </motion.div>
         )}
 
+        {/* Step 5: Patient Data */}
         {currentStep === 5 && (
           <motion.div
             key="step5"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
           >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Button variant="ghost" size="sm" onClick={prevStep}>
+            <Card className="border-border/50 shadow-lg">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
                     <ArrowLeft className="w-4 h-4" />
                   </Button>
-                  <h2 className="text-xl font-semibold">Tus datos de contacto</h2>
+                  <CardTitle className="text-xl">Tus datos de contacto</CardTitle>
                 </div>
-                <form onSubmit={handlePatientDataSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handlePatientDataSubmit} className="space-y-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Nombre *</label>
-                      <input
+                      <Label htmlFor="name">Nombre *</Label>
+                      <Input
+                        id="name"
                         name="name"
                         required
-                        className="w-full p-2 rounded-md border"
                         placeholder="Tu nombre"
+                        className="h-11"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Apellido *</label>
-                      <input
+                      <Label htmlFor="lastname">Apellido *</Label>
+                      <Input
+                        id="lastname"
                         name="lastname"
                         required
-                        className="w-full p-2 rounded-md border"
                         placeholder="Tu apellido"
+                        className="h-11"
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Email *</label>
-                      <input
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
                         name="email"
                         type="email"
                         required
-                        className="w-full p-2 rounded-md border"
                         placeholder="tu@email.com"
+                        className="h-11"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Teléfono *</label>
-                      <input
+                      <Label htmlFor="phone">Teléfono *</Label>
+                      <Input
+                        id="phone"
                         name="phone"
                         type="tel"
                         required
-                        className="w-full p-2 rounded-md border"
-                        placeholder="+1234567890"
+                        placeholder="+52 123 456 7890"
+                        className="h-11"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Motivo de consulta</label>
-                    <textarea
+                    <Label htmlFor="reason">Motivo de consulta</Label>
+                    <Textarea
+                      id="reason"
                       name="reason"
-                      className="w-full p-2 rounded-md border min-h-[80px]"
+                      className="min-h-[100px] resize-none"
                       placeholder="Describe brevemente tu motivo de consulta..."
                     />
                   </div>
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full" size="lg">
                     Revisar reserva <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </form>
@@ -409,62 +453,85 @@ export function BookingWizard() {
           </motion.div>
         )}
 
+        {/* Step 6: Confirmation */}
         {currentStep === 6 && (
           <motion.div
             key="step6"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
           >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Button variant="ghost" size="sm" onClick={prevStep}>
+            <Card className="border-border/50 shadow-lg">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
                     <ArrowLeft className="w-4 h-4" />
                   </Button>
-                  <h2 className="text-xl font-semibold">Confirmar reserva</h2>
+                  <CardTitle className="text-xl">Confirmar reserva</CardTitle>
                 </div>
-                
-                <div className="space-y-4 border-t pt-4">
-                  <div className="flex items-center gap-3">
-                    <Stethoscope className="w-5 h-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4 bg-muted/30 rounded-xl p-5">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Stethoscope className="w-5 h-5 text-primary" />
+                    </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Especialidad</p>
-                      <p className="font-medium">{bookingData.specialty}</p>
+                      <p className="font-semibold text-foreground">{bookingData.specialty}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-muted-foreground" />
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <User className="w-5 h-5 text-primary" />
+                    </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Profesional</p>
-                      <p className="font-medium">
-                        {specialists.find(s => s.id === bookingData.specialistId)?.user?.name}
+                      <p className="font-semibold text-foreground">
+                        {specialists.find(s => s.id === bookingData.specialistId)?.user?.name || "Profesional"}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Calendar className="w-5 h-5 text-primary" />
+                    </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Fecha y hora</p>
-                      <p className="font-medium">
+                      <p className="font-semibold text-foreground">
                         {bookingData.date && format(bookingData.date, "EEEE d 'de' MMMM", { locale: es })} a las {bookingData.time}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <Mail className="w-5 h-5 text-muted-foreground" />
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Mail className="w-5 h-5 text-primary" />
+                    </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Contacto</p>
-                      <p className="font-medium">{bookingData.patientEmail} - {bookingData.patientPhone}</p>
+                      <p className="font-semibold text-foreground">{bookingData.patientEmail}</p>
+                      <p className="text-sm text-muted-foreground">{bookingData.patientPhone}</p>
                     </div>
                   </div>
                 </div>
 
-                <Button onClick={handleConfirm} disabled={isLoading} className="w-full mt-6">
-                  {isLoading ? "Confirmando..." : "Confirmar reserva"}
+                <Button 
+                  onClick={handleConfirm} 
+                  disabled={isLoading} 
+                  className="w-full mt-6" 
+                  size="lg"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Confirmando...
+                    </>
+                  ) : (
+                    "Confirmar reserva"
+                  )}
                 </Button>
               </CardContent>
             </Card>
