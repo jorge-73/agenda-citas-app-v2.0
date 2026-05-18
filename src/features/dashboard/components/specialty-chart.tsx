@@ -24,6 +24,27 @@ const COLORS = [
 ];
 
 export function SpecialtyChart({ data, isLoading }: SpecialtyChartProps) {
+  if (data.length === 0 && !isLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base font-medium">Citas por Especialidad</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px] flex items-center justify-center text-muted-foreground">
+              No hay datos de especialidades
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
+
   const chartData = data.map(d => ({
     name: d.label,
     value: d.value
