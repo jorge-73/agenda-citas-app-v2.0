@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { User, LogOut, Settings, ChevronDown, Loader2 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
-import { signOut } from "@/lib/auth";
+import { logoutAction } from "@/features/auth/actions";
 
 interface NavbarProps {
   user?: {
@@ -27,15 +26,12 @@ interface NavbarProps {
 }
 
 export function Navbar({ user }: NavbarProps) {
-  const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await signOut({ redirect: false });
-      router.push("/login");
-      router.refresh();
+      await logoutAction();
     } catch (error) {
       console.error("Error logging out:", error);
       setIsLoggingOut(false);
