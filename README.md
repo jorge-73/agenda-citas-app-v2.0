@@ -1,36 +1,154 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CitasMed - Sistema de Gestión de Citas Médicas
 
-## Getting Started
+Sistema profesional de gestión de citas médicas construido con Next.js 15, TypeScript y arquitectura moderna.
 
-First, run the development server:
+## 🚀 Características
+
+- **Autenticación segura** con NextAuth.js y JWT
+- **Gestión de usuarios** con roles (Admin, Especialista, Recepcionista, Paciente)
+- **Dashboard profesional** con estadísticas en tiempo real
+- **Diseño premium** inspirado en Linear, Stripe y Vercel
+- **Dark/Light mode** con next-themes
+- **TypeScript** estricto con validaciones Zod
+- **Responsive** para todos los dispositivos
+
+## 🛠️ Tech Stack
+
+### Frontend
+- Next.js 15 (App Router)
+- TypeScript
+- TailwindCSS 4
+- shadcn/ui (Radix UI)
+- Framer Motion
+- React Hook Form + Zod
+- Zustand (state management)
+- Lucide Icons
+
+### Backend
+- Next.js Server Actions
+- Prisma ORM
+- SQLite (desarrollo) / PostgreSQL (producción)
+- NextAuth.js v5
+
+## 📁 Estructura del Proyecto
+
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── (auth)/            # Rutas de autenticación
+│   │   ├── login/
+│   │   ├── register/
+│   │   └── forgot-password/
+│   ├── (dashboard)/       # Dashboard protegido
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── api/
+│   │   └── auth/[...nextauth]/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
+├── components/
+│   ├── ui/               # Componentes base shadcn
+│   ├── layout/           # Sidebar, Navbar, etc.
+│   └── providers.tsx     # ThemeProvider
+├── features/             # Arquitectura feature-based
+│   ├── auth/
+│   ├── dashboard/
+│   ├── appointments/
+│   ├── patients/
+│   ├── specialists/
+│   └── settings/
+├── lib/                  # Utilidades y configuración
+│   ├── auth.ts          # NextAuth config
+│   ├── db.ts            # Prisma client
+│   └── utils.ts         # Helpers
+├── schemas/              # Zod schemas
+├── store/                # Zustand stores
+├── types/               # TypeScript types
+└── prisma/              # Prisma schema y seed
+    └── schema.prisma
+```
+
+## 🏃‍♂️ Inicio Rápido
+
+### Prerrequisitos
+- Node.js 18+
+- npm o yarn
+
+### Instalación
+
+```bash
+# Clonar el repositorio
+git clone <repo-url>
+cd agenda-citas-app-v2.0
+
+# Instalar dependencias
+npm install
+
+# Generar Prisma Client
+npx prisma generate
+
+# Crear base de datos
+npx prisma db push
+
+# Ejecutar seed (opcional)
+npm run db:seed
+```
+
+### Variables de Entorno
+
+Crear `.env`:
+
+```env
+DATABASE_URL="file:./dev.db"
+NEXTAUTH_SECRET="your-secret-key-here"
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+### Ejecutar Desarrollo
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 👤 Usuarios de Prueba
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| Admin | admin@citamed.com | admin123 |
+| Especialista | doctor@citamed.com | doctor123 |
+| Recepcionista | recepcion@citamed.com | recep123 |
 
-## Learn More
+## 📝 Scripts Disponibles
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev          # Iniciar desarrollo
+npm run build        # Construir producción
+npm run start        # Iniciar producción
+npm run lint         # Lint code
+npm run db:seed      # Ejecutar seed
+npm run db:studio    # Abrir Prisma Studio
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔄 Base de Datos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### SQLite (Desarrollo)
+```bash
+npx prisma db push
+```
 
-## Deploy on Vercel
+### PostgreSQL (Producción)
+Cambiar `provider = "sqlite"` a `"postgresql"` en `prisma/schema.prisma`:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 Licencia
+
+MIT License - feel free to use this project.

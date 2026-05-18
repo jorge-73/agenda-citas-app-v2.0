@@ -1,0 +1,125 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  role          String    @default("PATIENT")
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  patient       Patient?
+  specialist    Specialist?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Specialist {
+  id           String         @id @default(cuid())
+  userId       String         @unique
+  specialty    String
+  license      String?
+  phone        String?
+  bio          String?
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+  schedules    Schedule[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Patient {
+  id               String         @id @default(cuid())
+  userId           String         @unique
+  phone            String?
+  document         String?
+  birthDate        DateTime?
+  address          String?
+  emergencyContact String?
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments     Appointment[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model Appointment {
+  id            String   @id @default(cuid())
+  patientId     String
+  specialistId  String
+  startTime     DateTime
+  endTime       DateTime
+  status        String   @default("PENDING")
+  reason        String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  specialist    Specialist @relation(fields: [specialistId], references: [id])
+
+  @@index([startTime])
+  @@index([specialistId])
+  @@index([patientId])
+}
+
+model Schedule {
+  id           String     @id @default(cuid())
+  specialistId String
+  dayOfWeek    Int        // 0 = domingo, 6 = sábado
+  startTime    String     // "08:00"
+  endTime      String     // "18:00"
+  isActive     Boolean    @default(true)
+  specialist   Specialist @relation(fields: [specialistId], references: [id])
+
+  @@unique([specialistId, dayOfWeek])
+}
+
+model BlockedDate {
+  id          String    @id @default(cuid())
+  date        DateTime
+  reason      String?
+  isRecurring Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
