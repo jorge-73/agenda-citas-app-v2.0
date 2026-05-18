@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { User, LogOut, Settings, ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { User, LogOut, Settings, ChevronDown, Loader2 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { signOut } from "@/lib/auth";
 
 interface NavbarProps {
   user?: {
@@ -25,6 +27,21 @@ interface NavbarProps {
 }
 
 export function Navbar({ user }: NavbarProps) {
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut({ redirect: false });
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Error logging out:", error);
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <header className="flex h-16 items-center gap-4 border-b border-border bg-background px-6">
       <div className="flex flex-1 items-center justify-between">
@@ -73,13 +90,17 @@ export function Navbar({ user }: NavbarProps) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild className="cursor-pointer">
-              <form action="/api/auth/signout" method="POST" className="w-full">
-                <button type="submit" className="flex w-full items-center text-destructive hover:text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Cerrar sesión
-                </button>
-              </form>
+            <DropdownMenuItem 
+              className="cursor-pointer text-destructive focus:text-destructive"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <LogOut className="mr-2 h-4 w-4" />
+              )}
+              {isLoggingOut ? "Cerrando..." : "Cerrar sesión"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
