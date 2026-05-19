@@ -1,6 +1,6 @@
 # CitasMed - Sistema de Gestión de Citas Médicas
 
-Sistema profesional de gestión de citas médicas construido con Next.js 15, TypeScript y arquitectura moderna.
+Sistema profesional de gestión de citas médicas construido con Next.js 16.2.6, TypeScript y arquitectura moderna.
 
 ## 🚀 Características
 
@@ -15,12 +15,12 @@ Sistema profesional de gestión de citas médicas construido con Next.js 15, Typ
 ## 🛠️ Tech Stack
 
 ### Frontend
-- Next.js 15 (App Router)
+- Next.js 16.2.6 (App Router)
 - TypeScript
 - TailwindCSS 4
 - shadcn/ui (Radix UI)
 - Framer Motion
-- React Hook Form + Zod
+- React Hook Form + Zod 4.4.3
 - Zustand (state management)
 - Lucide Icons
 
@@ -39,6 +39,11 @@ src/
 │   │   ├── login/
 │   │   ├── register/
 │   │   └── forgot-password/
+│   ├── (public)/           # Rutas públicas (sin autenticación)
+│   │   ├── home/          # Página de inicio
+│   │   ├── booking/       # Reserva de citas
+│   │   └── booking/
+│   │       └── confirmation/ # Confirmación de reserva
 │   ├── (dashboard)/       # Dashboard protegido
 │   │   ├── layout.tsx
 │   │   └── page.tsx
@@ -52,12 +57,14 @@ src/
 │   ├── layout/           # Sidebar, Navbar, etc.
 │   └── providers.tsx     # ThemeProvider
 ├── features/             # Arquitectura feature-based
-│   ├── auth/
-│   ├── dashboard/
-│   ├── appointments/
-│   ├── patients/
-│   ├── specialists/
-│   └── settings/
+│   ├── auth/              # Autenticación y Server Actions
+│   ├── booking/           # Reservas públicas (sin autenticación)
+│   ├── dashboard/         # Dashboard con estadísticas
+│   ├── appointments/      # Gestión de citas
+│   ├── patients/          # Gestión de pacientes
+│   ├── schedules/         # Horarios de especialistas
+│   ├── specialists/       # Gestión de especialistas
+│   └── settings/          # Configuración del sistema
 ├── lib/                  # Utilidades y configuración
 │   ├── auth.ts          # NextAuth config
 │   ├── db.ts            # Prisma client
@@ -120,6 +127,20 @@ Abrir [http://localhost:3000](http://localhost:3000)
 | Admin | admin@citamed.com | admin123 |
 | Especialista | doctor@citamed.com | doctor123 |
 | Recepcionista | recepcion@citamed.com | recep123 |
+
+*El rol Recepcionista está disponible en los datos de prueba pero requiere configuración adicional en el esquema.*
+
+## 🗄️ Modelos de Base de Datos
+
+| Modelo | Descripción |
+|--------|-------------|
+| User | Usuarios del sistema (Admin, Especialista, Paciente) |
+| Specialist | Datos del especialista (especialidad, licencia, precio) |
+| Patient | Datos del paciente (teléfono, documento, historial médico) |
+| Appointment | Citas programadas entre paciente y especialista |
+| Schedule | Horarios disponibles por especialista |
+| BlockedDate | Fechas bloqueadas (días festivos) |
+| Booking | Reservas públicas sin cuenta de usuario |
 
 ## 📝 Scripts Disponibles
 
