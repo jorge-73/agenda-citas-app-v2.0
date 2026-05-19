@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Clock } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AppointmentWithDetails } from "../services/dashboard-service";
@@ -40,10 +40,10 @@ export function TodayAppointments({ appointments, isLoading }: TodayAppointments
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.7 }}
     >
-      <Card className="h-full">
-        <CardHeader className="pb-3">
+      <div className="rounded-2xl border border-border/60 bg-card h-full">
+        <div className="p-6 pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-medium">Citas de Hoy</CardTitle>
+            <h3 className="text-base font-semibold">Citas de Hoy</h3>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-yellow-500" />
@@ -55,8 +55,8 @@ export function TodayAppointments({ appointments, isLoading }: TodayAppointments
               </span>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="p-6 pt-0">
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">Cargando...</div>
           ) : appointments.length === 0 ? (
@@ -97,8 +97,8 @@ export function TodayAppointments({ appointments, isLoading }: TodayAppointments
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }

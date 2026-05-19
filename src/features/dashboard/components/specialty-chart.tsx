@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { ChartDataPoint } from "../services/dashboard-service";
 
 interface SpecialtyChartProps {
@@ -31,16 +31,16 @@ export function SpecialtyChart({ data, isLoading }: SpecialtyChartProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-medium">Citas por Especialidad</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="rounded-2xl border border-border/60 bg-card">
+          <div className="p-6 pb-2 flex flex-row items-center justify-between">
+            <h3 className="text-base font-semibold">Citas por Especialidad</h3>
+          </div>
+          <div className="p-6">
             <div className="h-[280px] flex items-center justify-center text-muted-foreground">
               No hay datos de especialidades
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </motion.div>
     );
   }
@@ -58,14 +58,14 @@ export function SpecialtyChart({ data, isLoading }: SpecialtyChartProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
     >
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-base font-medium">Citas por Especialidad</CardTitle>
+      <div className="rounded-2xl border border-border/60 bg-card">
+        <div className="p-6 pb-2 flex flex-row items-center justify-between">
+          <h3 className="text-base font-semibold">Citas por Especialidad</h3>
           <span className="text-sm text-muted-foreground">
             Total: {total}
           </span>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="p-6 pt-2">
           <div className="h-[280px]">
             {isLoading ? (
               <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -111,8 +111,8 @@ export function SpecialtyChart({ data, isLoading }: SpecialtyChartProps) {
               </ResponsiveContainer>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }

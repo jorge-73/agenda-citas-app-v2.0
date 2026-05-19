@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar, User, ClipboardList, Stethoscope } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { cn } from "@/lib/utils";
 import { ActivityItem } from "../services/dashboard-service";
 
@@ -34,11 +34,11 @@ export function RecentActivity({ activities, isLoading }: RecentActivityProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.6 }}
     >
-      <Card className="h-full">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-medium">Actividad Reciente</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="rounded-2xl border border-border/60 bg-card h-full">
+        <div className="p-6 pb-3">
+          <h3 className="text-base font-semibold">Actividad Reciente</h3>
+        </div>
+        <div className="p-6 pt-0">
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">Cargando...</div>
           ) : activities.length === 0 ? (
@@ -76,8 +76,8 @@ export function RecentActivity({ activities, isLoading }: RecentActivityProps) {
               })}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }

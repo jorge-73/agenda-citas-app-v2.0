@@ -4,16 +4,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { registerSchema } from "@/schemas/auth-schema";
+import { registerSchema, type RegisterInput } from "@/schemas/auth-schema";
 import { registerAction } from "@/features/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
-import { z } from "zod";
 
-type RegisterFormData = z.infer<typeof registerSchema>;
+import { useState } from "react";
+import { HeartPulse, User, Mail, Lock, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -23,20 +22,12 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
-  } = useForm<RegisterFormData>({
+  } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      role: "PATIENT",
-    },
   });
 
-  const onSubmit = async (data: RegisterFormData) => {
+  const onSubmit = async (data: RegisterInput) => {
     setIsLoading(true);
     setError(null);
 
@@ -52,97 +43,131 @@ export default function RegisterPage() {
   };
 
   return (
-    <Card className="shadow-lg">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">
-          Crear cuenta
-        </CardTitle>
-        <CardDescription className="text-center">
-          Completa tus datos para registrarte en el sistema
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && (
-            <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md border border-red-200">
-              {error}
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-violet-500/10 rounded-full blur-3xl" />
+      </div>
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-md"
+      >
+        <div className="text-center mb-8">
+          <Link href="/home" className="inline-flex items-center gap-3 mb-6">
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/25">
+              <HeartPulse className="h-6 w-6 text-primary-foreground" />
             </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="name">Nombre completo</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Juan Pérez"
-              {...register("name")}
-            />
-            {errors.name && (
-              <p className="text-sm text-red-500">{errors.name.message}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="correo@ejemplo.com"
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              {...register("password")}
-            />
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              {...register("confirmPassword")}
-            />
-            {errors.confirmPassword && (
-              <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="role">Tipo de cuenta</Label>
-            <select
-              id="role"
-              className="flex h-9 w-full rounded-md border border-zinc-200 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950"
-              {...register("role")}
-              defaultValue="PATIENT"
-            >
-              <option value="PATIENT">Paciente</option>
-              <option value="SPECIALIST">Especialista</option>
-              <option value="RECEPTIONIST">Recepcionista</option>
-            </select>
-            {errors.role && (
-              <p className="text-sm text-red-500">{errors.role.message}</p>
-            )}
-          </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Creando cuenta..." : "Crear cuenta"}
-          </Button>
-        </form>
-        <div className="mt-4 text-center text-sm">
-          <span className="text-muted-foreground">¿Ya tienes cuenta? </span>
-          <Link href="/login" className="text-primary hover:underline">
-            Inicia sesión
           </Link>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Crear cuenta</h1>
+          <p className="text-muted-foreground">Ingresa tus datos para registrarte</p>
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="rounded-2xl border border-border/60 bg-card p-8 shadow-xl shadow-primary/5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 text-sm text-rose-600 bg-rose-50 dark:bg-rose-500/10 rounded-xl border border-rose-200 dark:border-rose-500/20"
+                >
+                  {error}
+                </motion.div>
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium">Nombre completo</Label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="name"
+                    placeholder="Juan Pérez"
+                    className="pl-11 h-12"
+                    {...register("name")}
+                  />
+                </div>
+                {errors.name && (
+                  <p className="text-sm text-rose-500">{errors.name.message}</p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="correo@ejemplo.com"
+                    className="pl-11 h-12"
+                    {...register("email")}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-sm text-rose-500">{errors.email.message}</p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">Contraseña</Label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-11 h-12"
+                    {...register("password")}
+                  />
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-rose-500">{errors.password.message}</p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirmar contraseña</Label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-11 h-12"
+                    {...register("confirmPassword")}
+                  />
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-sm text-rose-500">{errors.confirmPassword.message}</p>
+                )}
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base shadow-lg shadow-primary/20" 
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creando cuenta...
+                  </>
+                ) : (
+                  "Crear cuenta"
+                )}
+              </Button>
+            </form>
+            
+            <div className="mt-6 text-center text-sm">
+              <span className="text-muted-foreground">¿Ya tienes cuenta? </span>
+              <Link href="/login" className="text-primary font-medium hover:underline">
+                Iniciar sesión
+              </Link>
+            </div>
+          </div>
+      </motion.div>
+    </div>
   );
 }

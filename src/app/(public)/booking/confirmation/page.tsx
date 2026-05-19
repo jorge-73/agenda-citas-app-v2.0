@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { CheckCircle2, Calendar, Clock, User, Mail, Phone, ArrowLeft, Home, HeartPulse, Stethoscope } from "lucide-react";
@@ -74,7 +74,7 @@ export default async function ConfirmationPage({
       <main className="py-12 px-4">
         <div className="max-w-lg mx-auto">
           {/* Success Card */}
-          <Card className="border-border/50 shadow-xl overflow-hidden">
+          <div className="rounded-2xl border border-border/50 bg-card shadow-xl overflow-hidden">
             <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-8 pb-6">
               <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg">
                 <CheckCircle2 className="w-10 h-10 text-primary-foreground" />
@@ -89,7 +89,7 @@ export default async function ConfirmationPage({
               </p>
             </div>
             
-            <CardContent className="p-6">
+            <div className="p-6">
               {/* Booking Details */}
               <div className="space-y-4 mb-6">
                 <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-xl">
@@ -167,8 +167,8 @@ export default async function ConfirmationPage({
                   </Link>
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Confirmation ID */}
           <div className="text-center mt-6">

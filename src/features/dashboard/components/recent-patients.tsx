@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { User, Mail, Phone } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { RecentPatient } from "../services/dashboard-service";
 
 interface RecentPatientsProps {
@@ -19,11 +19,11 @@ export function RecentPatients({ patients, isLoading }: RecentPatientsProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.8 }}
     >
-      <Card className="h-full">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-medium">Pacientes Recientes</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="rounded-2xl border border-border/60 bg-card h-full">
+        <div className="p-6 pb-3">
+          <h3 className="text-base font-semibold">Pacientes Recientes</h3>
+        </div>
+        <div className="p-6 pt-0">
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">Cargando...</div>
           ) : patients.length === 0 ? (
@@ -72,8 +72,8 @@ export function RecentPatients({ patients, isLoading }: RecentPatientsProps) {
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }

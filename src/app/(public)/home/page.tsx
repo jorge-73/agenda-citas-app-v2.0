@@ -27,34 +27,36 @@ import {
 } from "lucide-react";
 
 const SPECIALTIES = [
-  { name: "Medicina General", icon: Stethoscope, description: "Atención primaria" },
-  { name: "Cardiología", icon: Heart, description: "Corazón y circulación" },
-  { name: "Neurología", icon: Brain, description: "Sistema nervioso" },
-  { name: "Oftalmología", icon: Eye, description: "Salud visual" },
-  { name: "Pediatría", icon: Baby, description: "Niños y adolescentes" },
-  { name: "Dermatología", icon: Activity, description: "Piel y cabello" },
+  { name: "Medicina General", icon: Stethoscope, description: "Atención primaria y preventiva para toda la familia" },
+  { name: "Cardiología", icon: Heart, description: "Diagnóstico y tratamiento de enfermedades cardiovasculares" },
+  { name: "Neurología", icon: Brain, description: "Trastornos del sistema nervioso y cerebro" },
+  { name: "Oftalmología", icon: Eye, description: "Cirugías oculares y cuidado de la visión" },
+  { name: "Pediatría", icon: Baby, description: "Atención especializada para niños y adolescentes" },
+  { name: "Dermatología", icon: Activity, description: "Tratamientos para piel, cabello y uñas" },
+  { name: "Ginecología", icon: HeartPulse, description: "Salud femenina y atención prenatal" },
+  { name: "Ortopedia", icon: Award, description: "Lesiones óseas, articulaciones y músculos" },
 ];
 
 const FEATURES = [
   {
     icon: Calendar,
     title: "Reserva Online 24/7",
-    description: "Agenda tu cita en cualquier momento, desde cualquier dispositivo",
+    description: "Agenda tu cita médica en cualquier momento del día desde tu computadora, tablet o teléfono. Sin llamadas, sin filas, sin complicaciones.",
   },
   {
     icon: Clock,
     title: "Horarios Flexibles",
-    description: "Encuentra horarios disponibles que se adapten a tu agenda",
+    description: "Tenemos disponibilidad desde las 8:00 AM hasta las 8:00 PM, incluyendo fines de semana. Elige el horario que mejor se adapte a tu rutina diaria.",
   },
   {
     icon: Shield,
     title: "Confirmación Inmediata",
-    description: "Recibe confirmación instantánea de tu reserva",
+    description: "Recibe tu comprobante de cita al instante por email y SMS. Incluye recordatorios automáticos 24 horas antes de tu cita.",
   },
   {
     icon: ClipboardList,
     title: "Historial Digital",
-    description: "Accede a tu historial médico en cualquier momento",
+    description: "Accede a tu expediente médico completo en cualquier momento: diagnósticos, tratamientos, recetas y resultados de estudios.",
   },
 ];
 
@@ -69,23 +71,30 @@ const TESTIMONIALS = [
   {
     name: "María García",
     role: "Paciente",
-    content: "Excelente atención. Pude reservar mi cita en minutos y el especialista fue muy profesional.",
+    content: "Excelente plataforma. Pude agendar una cita con el cardiólogo en menos de 10 minutos desde mi teléfono. El sistema me permitió elegir el horario exacto que me convenía y recibí la confirmación al instante. Totalmente recomendado.",
     rating: 5,
     avatar: "MG"
   },
   {
     name: "Carlos Rodríguez",
     role: "Paciente",
-    content: "Sistema muy intuitivo. Me encantó poder elegir el horario que más me convenía.",
+    content: "Como padre de tres niños, siempre era difícil encontrar tiempo para llevar al pediatra. Esta aplicación me permite agendar citas para toda la familia en un solo lugar. El recordatorio automático me ha salvado de varias citas perdidas.",
     rating: 5,
     avatar: "CR"
   },
   {
     name: "Ana Martínez",
     role: "Paciente",
-    content: "La mejor experiencia en atención médica. Todo el proceso fue rápido y sin complicaciones.",
+    content: "La mejor inversión que he hecho en mi salud. El proceso de reserva es intuitivo, los doctores son profesionales de primer nivel y tener mi historial médico digital me ha ahorrado muchos dolores de cabeza. No puedo imaginar volver al método tradicional.",
     rating: 5,
     avatar: "AM"
+  },
+  {
+    name: "Roberto Sánchez",
+    role: "Paciente",
+    content: "Tuve una emergencia dental y gracias a la disponibilidad de horarios pude conseguir una cita el mismo día. El sistema me mostró todos los dentistas disponibles cerca de mi ubicación. Experiencia 10/10.",
+    rating: 5,
+    avatar: "RS"
   },
 ];
 
@@ -93,6 +102,7 @@ const CONTACT_INFO = [
   { icon: Phone, label: "Teléfono", value: "+52 (55) 1234-5678" },
   { icon: Mail, label: "Email", value: "contacto@citamed.com" },
   { icon: MapPin, label: "Dirección", value: "Av. Principal 123, Ciudad de México" },
+  { icon: Clock, label: "Horario", value: "Lun-Vie: 8AM-8PM | Sáb-Dom: 9AM-5PM" },
 ];
 
 export default function PublicLandingPage() {
@@ -226,18 +236,16 @@ export default function PublicLandingPage() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {SPECIALTIES.map((specialty) => (
-                <Card 
+                <div 
                   key={specialty.name} 
-                  className="group hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer border-border/50"
+                  className="rounded-2xl border border-border/50 bg-card p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                 >
-                  <CardContent className="p-6 text-center">
-                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-                      <specialty.icon className="w-7 h-7 text-primary" />
-                    </div>
-                    <p className="font-semibold text-sm mb-1">{specialty.name}</p>
-                    <p className="text-xs text-muted-foreground">{specialty.description}</p>
-                  </CardContent>
-                </Card>
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+                    <specialty.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <p className="font-semibold text-sm mb-1">{specialty.name}</p>
+                  <p className="text-xs text-muted-foreground">{specialty.description}</p>
+                </div>
               ))}
             </div>
           </div>
@@ -256,17 +264,13 @@ export default function PublicLandingPage() {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {FEATURES.map((feature) => (
-                <Card key={feature.title} className="border-border/50 hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-4">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                      <feature.icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <CardTitle className="text-lg">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
+                <div key={feature.title} className="rounded-2xl border border-border/50 bg-card p-6 hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                    <feature.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                </div>
               ))}
             </div>
           </div>
@@ -283,10 +287,9 @@ export default function PublicLandingPage() {
                 Miles de pacientes confían en nosotros para su atención médica
               </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {TESTIMONIALS.map((testimonial) => (
-                <Card key={testimonial.name} className="border-border/50">
-                  <CardContent className="p-6">
+                <div key={testimonial.name} className="rounded-2xl border border-border/50 bg-card p-6">
                     <div className="flex gap-1 mb-4">
                       {[...Array(testimonial.rating)].map((_, i) => (
                         <Star key={i} className="w-4 h-4 fill-amber-500 text-amber-500" />
@@ -304,8 +307,7 @@ export default function PublicLandingPage() {
                         <p className="text-xs text-muted-foreground">{testimonial.role}</p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                </div>
               ))}
             </div>
           </div>
@@ -314,8 +316,7 @@ export default function PublicLandingPage() {
         {/* CTA Section */}
         <section className="py-20 bg-primary/5">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/10 to-primary/5">
-              <CardContent className="p-8 md:p-12 text-center">
+            <div className="rounded-2xl border-0 shadow-xl bg-gradient-to-br from-primary/10 to-primary/5 p-8 md:p-12 text-center">
                 <h2 className="text-3xl font-bold tracking-tight text-foreground mb-4">
                   ¿Necesitas una cita médica?
                 </h2>
@@ -329,8 +330,7 @@ export default function PublicLandingPage() {
                     Reservar Ahora
                   </Button>
                 </Link>
-              </CardContent>
-            </Card>
+            </div>
           </div>
         </section>
 
@@ -345,17 +345,15 @@ export default function PublicLandingPage() {
                 Estamos aquí para ayudarte. Contáctanos por cualquiera de estos medios.
               </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {CONTACT_INFO.map((contact) => (
-                <Card key={contact.label} className="border-border/50">
-                  <CardContent className="p-6 text-center">
+                <div key={contact.label} className="rounded-2xl border border-border/50 bg-card p-6 text-center">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <contact.icon className="w-6 h-6 text-primary" />
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">{contact.label}</p>
-                    <p className="font-medium">{contact.value}</p>
-                  </CardContent>
-                </Card>
+                    <p className="font-medium break-words">{contact.value}</p>
+                </div>
               ))}
             </div>
           </div>
@@ -374,9 +372,13 @@ export default function PublicLandingPage() {
                   </div>
                   <span className="text-xl font-semibold text-foreground">CitasMed</span>
                 </div>
-                <p className="text-sm text-muted-foreground max-w-xs">
+                <p className="text-sm text-muted-foreground max-w-xs mb-4">
                   Sistema de gestión de citas médicas moderno y eficiente. 
-                  Tu salud a un clic de distancia.
+                  Tu salud a un clic de distancia. Comprometidos con tu bienestar 
+                  y el de tu familia desde hace más de 10 años.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Síguenos en nuestras redes sociales para consejos de salud y nuevas actualizaciones.
                 </p>
               </div>
               
@@ -386,6 +388,7 @@ export default function PublicLandingPage() {
                   <li><Link href="/booking" className="hover:text-foreground transition-colors">Reservar Cita</Link></li>
                   <li><Link href="/login" className="hover:text-foreground transition-colors">Iniciar Sesión</Link></li>
                   <li><Link href="#specialties" className="hover:text-foreground transition-colors">Especialidades</Link></li>
+                  <li><Link href="#features" className="hover:text-foreground transition-colors">Servicios</Link></li>
                   <li><Link href="#contact" className="hover:text-foreground transition-colors">Contacto</Link></li>
                 </ul>
               </div>
@@ -396,6 +399,7 @@ export default function PublicLandingPage() {
                   <li><Link href="#" className="hover:text-foreground transition-colors">Términos de uso</Link></li>
                   <li><Link href="#" className="hover:text-foreground transition-colors">Política de privacidad</Link></li>
                   <li><Link href="#" className="hover:text-foreground transition-colors">Aviso legal</Link></li>
+                  <li><Link href="#" className="hover:text-foreground transition-colors">Cookies</Link></li>
                 </ul>
               </div>
             </div>

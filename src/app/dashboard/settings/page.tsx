@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,14 +52,12 @@ export default function SettingsPage() {
         </TabsList>
 
         <TabsContent value="profile">
-          <Card>
-            <CardHeader>
-              <CardTitle>Información del Perfil</CardTitle>
-              <CardDescription>
-                Actualiza tu información personal
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="rounded-2xl border border-border/50 bg-card">
+            <div className="p-6 pb-2">
+              <h3 className="text-lg font-semibold">Información del Perfil</h3>
+              <p className="text-sm text-muted-foreground">Actualiza tu información personal</p>
+            </div>
+            <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nombre</Label>
@@ -91,19 +89,17 @@ export default function SettingsPage() {
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="notifications">
-          <Card>
-            <CardHeader>
-              <CardTitle>Configuración de Notificaciones</CardTitle>
-              <CardDescription>
-                Administra cómo recibes notificaciones
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+          <div className="rounded-2xl border border-border/50 bg-card">
+            <div className="p-6 pb-2">
+              <h3 className="text-lg font-semibold">Configuración de Notificaciones</h3>
+              <p className="text-sm text-muted-foreground">Administra cómo recibes notificaciones</p>
+            </div>
+            <div className="p-6 space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Notificaciones de correo</Label>
@@ -144,19 +140,17 @@ export default function SettingsPage() {
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="appearance">
-          <Card>
-            <CardHeader>
-              <CardTitle>Apariencia</CardTitle>
-              <CardDescription>
-                Personaliza la apariencia del sistema
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+          <div className="rounded-2xl border border-border/50 bg-card">
+            <div className="p-6 pb-2">
+              <h3 className="text-lg font-semibold">Apariencia</h3>
+              <p className="text-sm text-muted-foreground">Personaliza la apariencia del sistema</p>
+            </div>
+            <div className="p-6 space-y-6">
               <div className="space-y-2">
                 <Label>Tema</Label>
                 <Select defaultValue="system">
@@ -187,19 +181,17 @@ export default function SettingsPage() {
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="security">
-          <Card>
-            <CardHeader>
-              <CardTitle>Seguridad</CardTitle>
-              <CardDescription>
-                Configura las opciones de seguridad
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+          <div className="rounded-2xl border border-border/50 bg-card">
+            <div className="p-6 pb-2">
+              <h3 className="text-lg font-semibold">Seguridad</h3>
+              <p className="text-sm text-muted-foreground">Configura las opciones de seguridad</p>
+            </div>
+            <div className="p-6 space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Contraseña actual</Label>
@@ -235,8 +227,8 @@ export default function SettingsPage() {
                   <Button variant="outline" size="sm">Ver sesiones</Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -1,413 +1,407 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useBooking } from "../hooks/use-booking";
-import { getAvailableSpecialistsAction } from "../actions";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { 
-  ArrowLeft, 
-  ArrowRight, 
-  Check, 
+  Stethoscope, 
+  User, 
   Calendar, 
   Clock, 
-  User, 
-  Stethoscope,
-  Mail,
-  Phone,
-  Loader2
+  CheckCircle2,
+  ArrowRight,
+  ArrowLeft,
+  Loader2,
+  Sparkles,
+  Star,
+  Mail
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { es } from "date-fns/locale";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { createBookingAction } from "@/features/booking/actions";
 
 const STEPS = [
-  { id: 1, title: "Especialidad" },
-  { id: 2, title: "Profesional" },
-  { id: 3, title: "Fecha" },
-  { id: 4, title: "Horario" },
-  { id: 5, title: "Datos" },
-  { id: 6, title: "Confirmar" },
+  { id: 1, title: "Especialidad", icon: Stethoscope },
+  { id: 2, title: "Profesional", icon: User },
+  { id: 3, title: "Fecha y Hora", icon: Calendar },
+  { id: 4, title: "Confirmación", icon: CheckCircle2 },
 ];
 
 const SPECIALTIES = [
-  "Medicina General", "Cardiología", "Dermatología", "Endocrinología",
-  "Gastroenterología", "Ginecología", "Neurología", "Oftalmología",
-  "Ortopedia", "Pediatría", "Psiquiatría", "Urología", "Oncología",
+  { id: "1", name: "Medicina General", icon: "🩺" },
+  { id: "2", name: "Cardiología", icon: "❤️" },
+  { id: "3", name: "Neurología", icon: "🧠" },
+  { id: "4", name: "Oftalmología", icon: "👁️" },
+  { id: "5", name: "Pediatría", icon: "👶" },
+  { id: "6", name: "Dermatología", icon: "✨" },
 ];
 
-const SPECIALTY_ICONS: Record<string, string> = {
-  "Medicina General": "🩺",
-  "Cardiología": "❤️",
-  "Dermatología": "🧴",
-  "Endocrinología": "⚖️",
-  "Gastroenterología": "🫁",
-  "Ginecología": "👶",
-  "Neurología": "🧠",
-  "Oftalmología": "👁️",
-  "Ortopedia": "🦴",
-  "Pediatría": "🧒",
-  "Psiquiatría": "💭",
-  "Urología": "🔬",
-  "Oncología": "🎗️",
-};
+const MOCK_SPECIALISTS = [
+  { id: "1", name: "Dr. Juan Pérez", specialty: "Medicina General", rating: 4.9, experience: "15 años" },
+  { id: "2", name: "Dra. María García", specialty: "Medicina General", rating: 4.8, experience: "10 años" },
+  { id: "3", name: "Dr. Carlos López", specialty: "Cardiología", rating: 4.9, experience: "20 años" },
+  { id: "4", name: "Dra. Ana Martínez", specialty: "Neurología", rating: 4.7, experience: "12 años" },
+];
 
 export function BookingWizard() {
   const router = useRouter();
-  const {
-    currentStep,
-    bookingData,
-    isLoading,
-    availableDates,
-    availableSlots,
-    updateBookingData,
-    nextStep,
-    prevStep,
-    loadAvailableDates,
-    loadAvailableSlots,
-    submitBooking,
-  } = useBooking();
-
-  const [specialists, setSpecialists] = useState<any[]>([]);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedSpecialty, setSelectedSpecialty] = useState<typeof SPECIALTIES[0] | null>(null);
+  const [selectedSpecialist, setSelectedSpecialist] = useState<typeof MOCK_SPECIALISTS[0] | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [patientData, setPatientData] = useState({
+    name: "",
+    lastname: "",
+    email: "",
+    phone: "",
+    reason: ""
+  });
 
-  useEffect(() => {
-    if (bookingData.specialty) {
-      getAvailableSpecialistsAction(bookingData.specialty).then(setSpecialists);
+  const availableDates = Array.from({ length: 14 }, (_, i) => addDays(new Date(), i + 1));
+  
+  const availableTimes = [
+    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+    "12:00", "12:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
+  ];
+
+  const canProceed = () => {
+    switch (currentStep) {
+      case 1: return !!selectedSpecialty;
+      case 2: return !!selectedSpecialist;
+      case 3: return !!selectedDate && !!selectedTime;
+      case 4: return patientData.name && patientData.email && patientData.phone;
+      default: return false;
     }
-  }, [bookingData.specialty]);
-
-  useEffect(() => {
-    if (bookingData.specialistId) {
-      loadAvailableDates(bookingData.specialistId);
-    }
-  }, [bookingData.specialistId, loadAvailableDates]);
-
-  useEffect(() => {
-    if (bookingData.specialistId && selectedDate) {
-      loadAvailableSlots(bookingData.specialistId, selectedDate);
-    }
-  }, [bookingData.specialistId, selectedDate, loadAvailableSlots]);
-
-  const handleSpecialtySelect = (specialty: string) => {
-    updateBookingData({ specialty });
-    nextStep();
   };
 
-  const handleSpecialistSelect = (specialist: any) => {
-    updateBookingData({ 
-      specialistId: specialist.id,
-      specialty: specialist.specialty 
-    });
-    nextStep();
+  const nextStep = () => {
+    if (currentStep < 4) setCurrentStep(currentStep + 1);
   };
 
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-    updateBookingData({ date });
-  };
-
-  const handleTimeSelect = (time: string) => {
-    updateBookingData({ time });
-    nextStep();
-  };
-
-  const handlePatientDataSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    updateBookingData({
-      patientName: formData.get("name") as string,
-      patientLastname: formData.get("lastname") as string,
-      patientEmail: formData.get("email") as string,
-      patientPhone: formData.get("phone") as string,
-      reason: formData.get("reason") as string,
-    });
-    nextStep();
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
   const handleConfirm = async () => {
+    if (!selectedSpecialty || !selectedSpecialist || !selectedDate || !selectedTime || !patientData.name || !patientData.lastname || !patientData.email || !patientData.phone) {
+      toast.error("Por favor completa todos los campos requeridos");
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      const booking = await submitBooking();
+      const booking = await createBookingAction({
+        patientName: patientData.name,
+        patientLastname: patientData.lastname,
+        patientEmail: patientData.email,
+        patientPhone: patientData.phone,
+        specialistId: selectedSpecialist.id,
+        specialty: selectedSpecialty.name,
+        reason: patientData.reason,
+        date: selectedDate,
+        time: selectedTime,
+      });
+
       router.push(`/booking/confirmation?id=${booking.id}`);
     } catch (error) {
-      toast.error("Error al confirmar la reserva");
+      toast.error(error instanceof Error ? error.message : "Error al crear la reserva");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const progress = (currentStep / 6) * 100;
-
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Premium Progress Steps */}
-      <div className="mb-10">
-        <div className="flex items-center justify-between mb-4">
-          {STEPS.map((step) => (
-            <div
-              key={step.id}
-              className={cn(
-                "flex items-center",
-                step.id < 6 ? "flex-1" : ""
-              )}
+    <div className="space-y-10">
+      {/* Progress Steps */}
+      <div className="flex items-center justify-center">
+        {STEPS.map((s, index) => (
+          <div key={s.id} className="flex items-center">
+            <motion.div 
+              className="flex flex-col items-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
             >
-              <div
-                className={cn(
-                  "w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300",
-                  currentStep >= step.id
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "bg-muted text-muted-foreground"
-                )}
+              <div 
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                  currentStep >= s.id 
+                    ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25" 
+                    : "bg-muted/60 text-muted-foreground"
+                }`}
               >
-                {currentStep > step.id ? <Check className="w-4 h-4" /> : step.id}
+                {currentStep > s.id ? (
+                  <CheckCircle2 className="w-6 h-6" />
+                ) : (
+                  <s.icon className="w-5 h-5" />
+                )}
               </div>
-              {step.id < 6 && (
-                <div
-                  className={cn(
-                    "flex-1 h-1 mx-2 rounded-full transition-all duration-300",
-                    currentStep > step.id ? "bg-primary" : "bg-border"
-                  )}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <Progress value={progress} className="h-1.5" />
-        <p className="text-center mt-3 text-sm text-muted-foreground font-medium">
-          Paso {currentStep} de {STEPS.length}: <span className="text-foreground">{STEPS[currentStep - 1].title}</span>
-        </p>
+              <span className={`text-xs mt-3 font-medium ${currentStep >= s.id ? "text-foreground" : "text-muted-foreground"}`}>
+                {s.title}
+              </span>
+            </motion.div>
+            {index < STEPS.length - 1 && (
+              <motion.div 
+                className={`w-20 h-0.5 mx-3 rounded-full ${currentStep > s.id ? "bg-primary" : "bg-muted"}`}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: currentStep > s.id ? 1 : 0 }}
+                transition={{ duration: 0.3 }}
+              />
+            )}
+          </div>
+        ))}
       </div>
 
       <AnimatePresence mode="wait">
-        {/* Step 1: Specialties */}
-        {currentStep === 1 && (
-          <motion.div
-            key="step1"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Card className="border-border/50 shadow-lg">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-xl">Selecciona una especialidad</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {SPECIALTIES.map((specialty) => (
-                    <button
-                      key={specialty}
-                      onClick={() => handleSpecialtySelect(specialty)}
-                      className="p-4 rounded-xl border border-border/50 hover:border-primary hover:bg-primary/5 transition-all duration-200 text-left group"
+        <motion.div
+          key={currentStep}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Step 1: Specialties */}
+          {currentStep === 1 && (
+            <div className="rounded-2xl border border-border/60 bg-card hover:shadow-xl transition-shadow duration-300">
+              <div className="p-6 pb-8 text-center">
+                <Badge variant="soft" className="w-fit mx-auto mb-3">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Paso 1
+                </Badge>
+                <h3 className="text-2xl font-semibold">Selecciona una especialidad</h3>
+                <p className="text-base mt-2 text-muted-foreground">
+                  Elige el tipo de atención médica que necesitas
+                </p>
+              </div>
+              <div className="p-6 pt-0">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {SPECIALTIES.map((specialty, index) => (
+                    <motion.button
+                      key={specialty.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => {
+                        setSelectedSpecialty(specialty);
+                        nextStep();
+                      }}
+                      className={`p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
+                        selectedSpecialty?.id === specialty.id
+                          ? "border-primary bg-primary/10 shadow-lg shadow-primary/10"
+                          : "border-border/60 hover:border-primary/50 hover:shadow-md bg-card/60"
+                      }`}
                     >
-                      <span className="text-3xl block mb-3">{SPECIALTY_ICONS[specialty] || "🏥"}</span>
-                      <span className="text-sm font-medium group-hover:text-primary transition-colors">{specialty}</span>
-                    </button>
+                      <div className="flex items-center gap-4">
+                        <div className="text-4xl">{specialty.icon}</div>
+                        <div>
+                          <p className="font-semibold">{specialty.name}</p>
+                        </div>
+                      </div>
+                    </motion.button>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+              </div>
+            </div>
+          )}
 
-        {/* Step 2: Professionals */}
-        {currentStep === 2 && (
-          <motion.div
-            key="step2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Card className="border-border/50 shadow-lg">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
-                    <ArrowLeft className="w-4 h-4" />
-                  </Button>
-                  <CardTitle className="text-xl">Selecciona un profesional</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {specialists.map((specialist) => (
-                    <button
+          {/* Step 2: Specialists */}
+          {currentStep === 2 && (
+            <div className="rounded-2xl border border-border/60 bg-card hover:shadow-xl transition-shadow duration-300">
+              <div className="p-6 pb-8 text-center">
+                <Badge variant="soft" className="w-fit mx-auto mb-3">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Paso 2
+                </Badge>
+                <h3 className="text-2xl font-semibold">Selecciona un profesional</h3>
+                <p className="text-base mt-2 text-muted-foreground">
+                  Elige el especialista que te atenderá
+                </p>
+              </div>
+              <div className="p-6 pt-0">
+                <div className="space-y-4">
+                  {MOCK_SPECIALISTS.map((specialist, index) => (
+                    <motion.button
                       key={specialist.id}
-                      onClick={() => handleSpecialistSelect(specialist)}
-                      className="w-full p-4 rounded-xl border border-border/50 hover:border-primary hover:bg-primary/5 transition-all duration-200 text-left flex items-center gap-4 group"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => {
+                        setSelectedSpecialist(specialist);
+                        nextStep();
+                      }}
+                      className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
+                        selectedSpecialist?.id === specialist.id
+                          ? "border-primary bg-primary/10 shadow-lg shadow-primary/10"
+                          : "border-border/60 hover:border-primary/50 hover:shadow-md bg-card/60"
+                      }`}
                     >
-                      <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                        <User className="w-7 h-7 text-primary" />
-                      </div>
-                      <div className="flex-1 text-left">
-                        <p className="font-semibold text-foreground">{specialist.user?.name}</p>
-                        <p className="text-sm text-muted-foreground">{specialist.specialty}</p>
-                      </div>
-                      {specialist.price && (
-                        <Badge variant="secondary" className="font-medium">
-                          ${specialist.price}
-                        </Badge>
-                      )}
-                    </button>
-                  ))}
-                  {specialists.length === 0 && (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>No hay profesionales disponibles para esta especialidad</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
-        {/* Step 3: Date */}
-        {currentStep === 3 && (
-          <motion.div
-            key="step3"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Card className="border-border/50 shadow-lg">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
-                    <ArrowLeft className="w-4 h-4" />
-                  </Button>
-                  <CardTitle className="text-xl">Selecciona una fecha</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-7 gap-2 mb-4">
-                  {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((day) => (
-                    <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
-                      {day}
-                    </div>
-                  ))}
-                  {availableDates.map((date, index) => {
-                    const isSelected = selectedDate && format(date, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => handleDateSelect(date)}
-                        className={cn(
-                          "p-3 rounded-lg text-center text-sm font-medium transition-all duration-200 hover:scale-105",
-                          isSelected 
-                            ? "bg-primary text-primary-foreground shadow-md" 
-                            : "bg-muted/50 hover:bg-primary/10 hover:text-foreground"
+                      <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-xl font-bold text-primary">
+                          {specialist.name.charAt(0)}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-lg">{specialist.name}</p>
+                          <p className="text-sm text-muted-foreground">{specialist.specialty}</p>
+                          <div className="flex items-center gap-3 mt-2">
+                            <div className="flex items-center gap-1">
+                              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                              <span className="text-sm font-medium">{specialist.rating}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">•</span>
+                            <span className="text-xs text-muted-foreground">{specialist.experience}</span>
+                          </div>
+                        </div>
+                        {selectedSpecialist?.id === specialist.id && (
+                          <CheckCircle2 className="w-6 h-6 text-primary" />
                         )}
-                      >
-                        {format(date, "d")}
-                      </button>
-                    );
-                  })}
-                </div>
-                {availableDates.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Calendar className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                    <p>No hay fechas disponibles en los próximos 60 días</p>
-                  </div>
-                )}
-                {selectedDate && (
-                  <Button onClick={nextStep} className="w-full mt-4" size="lg">
-                    Continuar <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
-        {/* Step 4: Time */}
-        {currentStep === 4 && (
-          <motion.div
-            key="step4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Card className="border-border/50 shadow-lg">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
-                    <ArrowLeft className="w-4 h-4" />
-                  </Button>
-                  <CardTitle className="text-xl">Selecciona un horario</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {availableSlots.map((slot) => (
-                    <button
-                      key={slot.time}
-                      onClick={() => slot.available && handleTimeSelect(slot.time)}
-                      disabled={!slot.available}
-                      className={cn(
-                        "p-3 rounded-lg text-center text-sm font-medium transition-all duration-200",
-                        slot.available
-                          ? "bg-muted/50 hover:bg-primary/10 hover:text-foreground border border-transparent hover:border-primary cursor-pointer hover:scale-105"
-                          : "bg-muted/30 text-muted-foreground/50 cursor-not-allowed opacity-50 line-through"
-                      )}
-                    >
-                      {slot.time}
-                    </button>
+                      </div>
+                    </motion.button>
                   ))}
                 </div>
-                {availableSlots.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Clock className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                    <p>Selecciona una fecha para ver los horarios disponibles</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+              </div>
+            </div>
+          )}
 
-        {/* Step 5: Patient Data */}
-        {currentStep === 5 && (
-          <motion.div
-            key="step5"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Card className="border-border/50 shadow-lg">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
-                    <ArrowLeft className="w-4 h-4" />
-                  </Button>
-                  <CardTitle className="text-xl">Tus datos de contacto</CardTitle>
+          {/* Step 3: Date & Time */}
+          {currentStep === 3 && (
+            <div className="rounded-2xl border border-border/60 bg-card hover:shadow-xl transition-shadow duration-300">
+              <div className="p-6 pb-8 text-center">
+                <Badge variant="soft" className="w-fit mx-auto mb-3">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Paso 3
+                </Badge>
+                <h3 className="text-2xl font-semibold">Selecciona fecha y hora</h3>
+                <p className="text-base mt-2 text-muted-foreground">
+                  Elige el horario disponible que más te convenga
+                </p>
+              </div>
+              <div className="p-6 pt-0 space-y-8">
+                <div>
+                  <p className="font-semibold mb-4 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-primary" />
+                    Fecha disponible
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {availableDates.slice(0, 7).map((date, index) => (
+                      <motion.button
+                        key={date.toISOString()}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.03 }}
+                        onClick={() => setSelectedDate(date)}
+                        className={`px-5 py-3 rounded-xl border-2 transition-all duration-300 ${
+                          selectedDate?.toDateString() === date.toDateString()
+                            ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                            : "border-border/60 hover:border-primary/50 hover:shadow-md bg-card/60"
+                        }`}
+                      >
+                        <span className="font-medium">{format(date, "EEE d", { locale: es })}</span>
+                      </motion.button>
+                    ))}
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handlePatientDataSubmit} className="space-y-5">
+                
+                {selectedDate && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <p className="font-semibold mb-4 flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-primary" />
+                      Horarios disponibles
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      {availableTimes.map((time, index) => (
+                        <motion.button
+                          key={time}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.02 }}
+                          onClick={() => setSelectedTime(time)}
+                          className={`px-5 py-3 rounded-xl border-2 transition-all duration-300 ${
+                            selectedTime === time
+                              ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                              : "border-border/60 hover:border-primary/50 hover:shadow-md bg-card/60"
+                          }`}
+                        >
+                          <span className="font-medium">{time}</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Confirmation */}
+          {currentStep === 4 && (
+            <div className="rounded-2xl border border-border/60 bg-card hover:shadow-xl transition-shadow duration-300">
+              <div className="p-6 pb-8 text-center">
+                <Badge variant="soft" className="w-fit mx-auto mb-3">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Paso 4
+                </Badge>
+                <h3 className="text-2xl font-semibold">Confirmar cita</h3>
+                <p className="text-base mt-2 text-muted-foreground">
+                  Revisa los detalles y completa tus datos
+                </p>
+              </div>
+              <div className="p-6 pt-0 space-y-8">
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/5 via-muted/30 to-transparent border border-border/60">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-border/40">
+                      <span className="text-muted-foreground">Especialidad</span>
+                      <span className="font-semibold">{selectedSpecialty?.name}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-border/40">
+                      <span className="text-muted-foreground">Profesional</span>
+                      <span className="font-semibold">{selectedSpecialist?.name}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-border/40">
+                      <span className="text-muted-foreground">Fecha</span>
+                      <span className="font-semibold">
+                        {selectedDate && format(selectedDate, "EEEE d 'de' MMMM", { locale: es })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-muted-foreground">Hora</span>
+                      <span className="font-semibold">{selectedTime}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Nombre *</Label>
                       <Input
                         id="name"
-                        name="name"
-                        required
+                        value={patientData.name}
+                        onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
+                        className="h-12"
                         placeholder="Tu nombre"
-                        className="h-11"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="lastname">Apellido *</Label>
                       <Input
                         id="lastname"
-                        name="lastname"
-                        required
+                        value={patientData.lastname}
+                        onChange={(e) => setPatientData({ ...patientData, lastname: e.target.value })}
+                        className="h-12"
                         placeholder="Tu apellido"
-                        className="h-11"
                       />
                     </div>
                   </div>
@@ -416,128 +410,91 @@ export function BookingWizard() {
                       <Label htmlFor="email">Email *</Label>
                       <Input
                         id="email"
-                        name="email"
                         type="email"
-                        required
+                        value={patientData.email}
+                        onChange={(e) => setPatientData({ ...patientData, email: e.target.value })}
+                        className="h-12"
                         placeholder="tu@email.com"
-                        className="h-11"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Teléfono *</Label>
                       <Input
                         id="phone"
-                        name="phone"
                         type="tel"
-                        required
+                        value={patientData.phone}
+                        onChange={(e) => setPatientData({ ...patientData, phone: e.target.value })}
+                        className="h-12"
                         placeholder="+52 123 456 7890"
-                        className="h-11"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="reason">Motivo de consulta</Label>
+                    <Label htmlFor="reason">Motivo de consulta <span className="text-muted-foreground">(opcional)</span></Label>
                     <Textarea
                       id="reason"
-                      name="reason"
-                      className="min-h-[100px] resize-none"
-                      placeholder="Describe brevemente tu motivo de consulta..."
+                      value={patientData.reason}
+                      onChange={(e) => setPatientData({ ...patientData, reason: e.target.value })}
+                      className="min-h-[100px]"
+                      placeholder="Describe brevemente tus síntomas"
                     />
                   </div>
-                  <Button type="submit" className="w-full" size="lg">
-                    Revisar reserva <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
-        {/* Step 6: Confirmation */}
-        {currentStep === 6 && (
-          <motion.div
-            key="step6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Card className="border-border/50 shadow-lg">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" size="icon" onClick={prevStep} className="hover:bg-muted">
-                    <ArrowLeft className="w-4 h-4" />
-                  </Button>
-                  <CardTitle className="text-xl">Confirmar reserva</CardTitle>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 bg-muted/30 rounded-xl p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Stethoscope className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Especialidad</p>
-                      <p className="font-semibold text-foreground">{bookingData.specialty}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <User className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Profesional</p>
-                      <p className="font-semibold text-foreground">
-                        {specialists.find(s => s.id === bookingData.specialistId)?.user?.name || "Profesional"}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Calendar className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Fecha y hora</p>
-                      <p className="font-semibold text-foreground">
-                        {bookingData.date && format(bookingData.date, "EEEE d 'de' MMMM", { locale: es })} a las {bookingData.time}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Mail className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Contacto</p>
-                      <p className="font-semibold text-foreground">{bookingData.patientEmail}</p>
-                      <p className="text-sm text-muted-foreground">{bookingData.patientPhone}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={handleConfirm} 
-                  disabled={isLoading} 
-                  className="w-full mt-6" 
-                  size="lg"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Confirmando...
-                    </>
-                  ) : (
-                    "Confirmar reserva"
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+              </div>
+            </div>
+          )}
+        </motion.div>
       </AnimatePresence>
+
+      {/* Navigation */}
+      <motion.div 
+        className="flex justify-between pt-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={prevStep}
+          disabled={currentStep === 1}
+          className="px-6"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Atrás
+        </Button>
+        
+        {currentStep === 4 ? (
+          <Button 
+            size="lg"
+            onClick={handleConfirm} 
+            disabled={isLoading || !canProceed()}
+            className="px-8 shadow-lg shadow-primary/20"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Confirmando...
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                Confirmar Cita
+              </>
+            )}
+          </Button>
+        ) : (
+          <Button 
+            size="lg"
+            onClick={nextStep} 
+            disabled={!canProceed()}
+            className="px-8"
+          >
+            Siguiente
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        )}
+      </motion.div>
     </div>
   );
 }

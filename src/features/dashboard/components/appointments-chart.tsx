@@ -1,149 +1,179 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  Legend
-} from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartDataPoint } from "../services/dashboard-service";
+import { useState } from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from "recharts";
+
+
+interface ChartData {
+  date: string;
+  appointments?: number;
+  bookings?: number;
+  value?: number;
+  label?: string;
+}
 
 interface AppointmentsChartProps {
-  appointmentsData: ChartDataPoint[];
-  bookingsData: ChartDataPoint[];
+  appointmentsData: ChartData[];
+  bookingsData: ChartData[];
   isLoading?: boolean;
 }
 
-export function AppointmentsChart({ 
-  appointmentsData, 
-  bookingsData,
-  isLoading 
-}: AppointmentsChartProps) {
-  const combinedData = appointmentsData.map((apt, index) => ({
-    date: apt.date,
-    label: apt.label,
-    citas: apt.value,
-    reservas: bookingsData[index]?.value || 0
+export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }: AppointmentsChartProps) {
+  const [activeView, setActiveView] = useState<"bar" | "line">("bar");
+
+  const combinedData = appointmentsData.map((item, index) => ({
+    date: item.date,
+    appointments: item.appointments ?? item.value ?? 0,
+    bookings: bookingsData[index]?.bookings ?? bookingsData[index]?.value ?? 0,
   }));
 
-  const totalCitas = appointmentsData.reduce((sum, d) => sum + d.value, 0);
-  const totalReservas = bookingsData.reduce((sum, d) => sum + d.value, 0);
+  const colors = {
+    appointments: "#10b981",
+    bookings: "#06b6d4",
+    grid: "oklch(var(--border) / 0.5)",
+    text: "oklch(var(--muted-foreground))",
+  };
 
-  const hasData = appointmentsData.length > 0 || bookingsData.length > 0;
-
-  if (!hasData && !isLoading) {
+  if (isLoading) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-medium">Citas y Reservas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              No hay datos disponibles para el período seleccionado
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      <div className="rounded-2xl border border-border/60 bg-card">
+        <div className="p-6 pb-2">
+          <h3 className="text-lg font-semibold">Citas y Reservas</h3>
+          <p className="text-sm text-muted-foreground">Comparación de citas vs reservas online</p>
+        </div>
+        <div className="p-6 h-[300px] flex items-center justify-center">
+          <div className="text-muted-foreground">Cargando...</div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
-    >
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-base font-medium">Citas y Reservas</CardTitle>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[--primary]" />
-              Citas: {totalCitas}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              Reservas: {totalReservas}
-            </span>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                Cargando...
-              </div>
+    <div className="rounded-2xl border border-border/60 bg-card hover:shadow-lg transition-shadow duration-300">
+      <div className="p-6 pb-2 flex flex-row items-center justify-between">
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold">Citas y Reservas</h3>
+          <p className="text-sm text-muted-foreground">Comparación de citas vs reservas online</p>
+        </div>
+        <div className="flex gap-1 p-1 bg-muted/60 rounded-xl">
+          <button
+            onClick={() => setActiveView("bar")}
+            className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all duration-200 ${
+              activeView === "bar" 
+                ? "bg-card shadow-sm text-foreground" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Barras
+          </button>
+          <button
+            onClick={() => setActiveView("line")}
+            className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-all duration-200 ${
+              activeView === "line" 
+                ? "bg-card shadow-sm text-foreground" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Línea
+          </button>
+        </div>
+      </div>
+      <div className="p-6 pt-2">
+        <div className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            {activeView === "bar" ? (
+              <BarChart data={combinedData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 11, fill: colors.text }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 11, fill: colors.text }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    borderRadius: "12px", 
+                    border: "1px solid oklch(var(--border))",
+                    background: "oklch(var(--card))",
+                    boxShadow: "0 4px 12px oklch(var(--foreground) / 0.1)"
+                  }}
+                  cursor={{ fill: "oklch(var(--muted) / 0.5)" }}
+                />
+                <Legend 
+                  wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                  iconType="circle"
+                  iconSize={8}
+                />
+                <Bar 
+                  dataKey="appointments" 
+                  name="Citas" 
+                  fill={colors.appointments} 
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={40}
+                />
+                <Bar 
+                  dataKey="bookings" 
+                  name="Reservas" 
+                  fill={colors.bookings} 
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={40}
+                />
+              </BarChart>
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={combinedData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorCitas" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="oklch(var(--primary))" stopOpacity={0.25}/>
-                      <stop offset="95%" stopColor="oklch(var(--primary))" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorReservas" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.25}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(var(--border))" />
-                  <XAxis 
-                    dataKey="label" 
-                    tick={{ fontSize: 11 }}
-                    tickLine={false}
-                    axisLine={false}
-                    stroke="oklch(var(--muted-foreground))"
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 11 }}
-                    tickLine={false}
-                    axisLine={false}
-                    stroke="oklch(var(--muted-foreground))"
-                    width={30}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      borderRadius: 8, 
-                      border: "1px solid oklch(var(--border))",
-                      backgroundColor: "oklch(var(--card))",
-                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)"
-                    }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="citas" 
-                    stroke="oklch(var(--primary))" 
-                    fillOpacity={1} 
-                    fill="url(#colorCitas)"
-                    strokeWidth={2}
-                    name="Citas"
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="reservas" 
-                    stroke="#10b981" 
-                    fillOpacity={1} 
-                    fill="url(#colorReservas)"
-                    strokeWidth={2}
-                    name="Reservas"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <LineChart data={combinedData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 11, fill: colors.text }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 11, fill: colors.text }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    borderRadius: "12px", 
+                    border: "1px solid oklch(var(--border))",
+                    background: "oklch(var(--card))",
+                    boxShadow: "0 4px 12px oklch(var(--foreground) / 0.1)"
+                  }}
+                />
+                <Legend 
+                  wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
+                  iconType="circle"
+                  iconSize={8}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="appointments" 
+                  name="Citas"
+                  stroke={colors.appointments} 
+                  strokeWidth={3}
+                  dot={{ fill: colors.appointments, strokeWidth: 0, r: 4, stroke: colors.appointments }}
+                  activeDot={{ r: 6, stroke: colors.appointments, strokeWidth: 2, fill: "oklch(var(--card))" }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="bookings" 
+                  name="Reservas"
+                  stroke={colors.bookings} 
+                  strokeWidth={3}
+                  dot={{ fill: colors.bookings, strokeWidth: 0, r: 4, stroke: colors.bookings }}
+                  activeDot={{ r: 6, stroke: colors.bookings, strokeWidth: 2, fill: "oklch(var(--card))" }}
+                />
+              </LineChart>
             )}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
   );
 }

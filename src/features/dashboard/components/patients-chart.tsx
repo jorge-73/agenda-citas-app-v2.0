@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { ChartDataPoint } from "../services/dashboard-service";
 
 interface PatientsChartProps {
@@ -34,16 +34,16 @@ export function PatientsChart({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-medium">Pacientes y Reservas</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="rounded-2xl border border-border/60 bg-card">
+          <div className="p-6 pb-2 flex flex-row items-center justify-between">
+            <h3 className="text-base font-semibold">Pacientes y Reservas</h3>
+          </div>
+          <div className="p-6">
             <div className="h-[250px] flex items-center justify-center text-muted-foreground">
               No hay datos disponibles
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </motion.div>
     );
   }
@@ -64,9 +64,9 @@ export function PatientsChart({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-base font-medium">Pacientes y Reservas</CardTitle>
+      <div className="rounded-2xl border border-border/60 bg-card">
+        <div className="p-6 pb-2 flex flex-row items-center justify-between">
+          <h3 className="text-base font-semibold">Pacientes y Reservas</h3>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-purple-500" />
@@ -77,8 +77,8 @@ export function PatientsChart({
               Reservas: {totalReservas}
             </span>
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="p-6 pt-2">
           <div className="h-[250px]">
             {isLoading ? (
               <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -131,8 +131,8 @@ export function PatientsChart({
               </ResponsiveContainer>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }

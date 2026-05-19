@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
+
 import { MoreHorizontal, Search, Plus, Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn, getInitials } from "@/lib/utils";
@@ -135,11 +135,9 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-muted-foreground">
-          Cargando especialistas...
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border border-border/60 bg-card py-12 text-center text-muted-foreground">
+        Cargando especialistas...
+      </div>
     );
   }
 
@@ -163,8 +161,7 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
         )}
       </div>
 
-      <Card>
-        <CardContent className="p-0">
+      <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
           <table className="w-full">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -203,8 +200,7 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
               )}
             </tbody>
           </table>
-        </CardContent>
-      </Card>
+        </div>
 
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
