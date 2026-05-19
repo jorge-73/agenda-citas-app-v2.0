@@ -29,7 +29,7 @@ const CommandInput = React.forwardRef<
     <Command.Input
       ref={ref}
       className={cn(
-        "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-zinc-500 disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-11 w-full rounded-xl bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
       {...props}
@@ -69,7 +69,7 @@ const CommandGroup = React.forwardRef<
   <Command.Group
     ref={ref}
     className={cn(
-      "overflow-hidden p-1 text-zinc-950 [&_cmdk-group-heading]:px-2 [&_cmdk-group-heading]:py-1.5 [&_cmdk-group-heading]:text-xs [&_cmdk-group-heading]:font-medium [&_cmdk-group-heading]:text-zinc-500",
+      "overflow-hidden p-1 text-foreground [&_cmdk-group-heading]:px-2 [&_cmdk-group-heading]:py-1.5 [&_cmdk-group-heading]:text-xs [&_cmdk-group-heading]:font-medium [&_cmdk-group-heading]:text-muted-foreground",
       className
     )}
     {...props}
@@ -83,7 +83,7 @@ const CommandSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <Command.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-zinc-200", className)}
+    className={cn("-mx-1 my-1 h-px bg-border/60", className)}
     {...props}
   />
 ));
@@ -96,7 +96,7 @@ const CommandItem = React.forwardRef<
   <Command.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-zinc-100 aria-selected:text-zinc-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-default select-none items-center rounded-lg px-2 py-2 text-sm outline-none aria-selected:bg-accent/10 aria-selected:text-accent data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}
@@ -111,7 +111,7 @@ const CommandShortcut = ({
   return (
     <span
       className={cn(
-        "ml-auto text-xs tracking-widest text-zinc-500",
+        "ml-auto text-xs tracking-widest text-muted-foreground",
         className
       )}
       {...props}

@@ -82,7 +82,7 @@ function Calendar({
         {weekDays.map((day) => (
           <div
             key={day}
-            className="text-center text-xs font-medium text-zinc-500 py-2"
+            className="text-center text-xs font-medium text-muted-foreground py-2"
           >
             {day}
           </div>
@@ -105,11 +105,11 @@ function Calendar({
                 !isCurrentMonth && "text-zinc-300",
                 isDisabled && "opacity-50 cursor-not-allowed",
                 isSelected &&
-                  "bg-zinc-900 text-white hover:bg-zinc-900",
+                  "bg-primary text-primary-foreground hover:bg-primary/90",
                 !isSelected &&
                   !isDisabled &&
-                  "hover:bg-zinc-100",
-                !isSelected && isCurrentMonth && "text-zinc-700"
+                  "hover:bg-accent/10",
+                !isSelected && isCurrentMonth && "text-foreground"
               )}
             >
               {format(day, "d")}
