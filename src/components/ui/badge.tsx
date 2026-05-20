@@ -3,18 +3,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-200",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground shadow-md shadow-primary/20",
-        secondary: "border-transparent bg-secondary/60 text-secondary-foreground",
-        destructive: "border-transparent bg-destructive/90 text-destructive-foreground shadow-md shadow-destructive/20",
-        success: "border-transparent bg-emerald-500/20 text-emerald-600 dark:text-emerald-400",
-        warning: "border-transparent bg-amber-500/20 text-amber-600 dark:text-amber-400",
-        info: "border-transparent bg-sky-500/20 text-sky-600 dark:text-sky-400",
-        outline: "text-foreground/80 border-border/60",
-        soft: "border-transparent bg-primary/10 text-primary",
+        default: "bg-primary text-primary-foreground shadow-sm shadow-primary/20",
+        secondary: "bg-secondary/60 text-secondary-foreground",
+        destructive: "bg-destructive/90 text-destructive-foreground shadow-sm shadow-destructive/20",
+        success: "bg-green-500/15 text-green-600 dark:text-green-400",
+        warning: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+        info: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
+        outline: "border border-border/60 text-foreground/80",
+        soft: "bg-primary/10 text-primary",
+        subtle: "bg-muted/50 text-muted-foreground",
       },
     },
     defaultVariants: {
