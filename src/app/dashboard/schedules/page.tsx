@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 
 import { Button } from "@/components/ui/button";
@@ -59,7 +59,7 @@ export default function SchedulesPage() {
         description="Configura los horarios de disponibilidad de los especialistas"
         icon={Clock}
         actions={
-          <Button onClick={() => setIsModalOpen(true)}>
+          <Button onClick={() => setIsModalOpen(true)} className="rounded-xl">
             <Plus className="h-4 w-4 mr-2" />
             Agregar Horario
           </Button>
@@ -72,18 +72,18 @@ export default function SchedulesPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {specialists.map((specialist) => (
             <div key={specialist.id} className="rounded-2xl border border-border/50 bg-card">
-              <div className="p-6 pb-2">
+              <div className="p-5 pb-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold">{specialist.name || "Especialista"}</h3>
+                    <h3 className="text-base font-semibold">{specialist.name || "Especialista"}</h3>
                     <p className="text-sm text-muted-foreground">{specialist.specialty}</p>
                   </div>
-                  <Badge variant="outline">
+                  <Badge variant="secondary" className="text-xs">
                     {specialist.schedules.length} días
                   </Badge>
                 </div>
               </div>
-              <div className="p-6 pt-2">
+              <div className="p-5 pt-2">
                 {specialist.schedules.length > 0 ? (
                   <div className="space-y-2">
                     {weekDays.map((day) => {
@@ -103,16 +103,16 @@ export default function SchedulesPage() {
                           </span>
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3 text-muted-foreground" />
-                              <span className="font-medium">
+                              <Clock className="h-3 w-3 text-muted-foreground/60" />
+                              <span className="font-medium text-foreground/80">
                                 {schedule.startTime} - {schedule.endTime}
                               </span>
                             </div>
                             <button
                               onClick={() => handleDeleteSchedule(schedule.id)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
+                              className="opacity-0 group-hover:opacity-100 transition-all text-destructive/60 hover:text-destructive"
                             >
-                              <Trash2 className="h-3 w-3" />
+                              <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           </div>
                         </div>
@@ -120,18 +120,18 @@ export default function SchedulesPage() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-sm text-muted-foreground text-center py-4">
+                  <div className="text-sm text-muted-foreground text-center py-3">
                     Sin horarios configurados
                   </div>
                 )}
 
                 <Button
                   variant="outline"
-                  className="w-full mt-4"
+                  className="w-full mt-4 rounded-xl"
                   size="sm"
                   onClick={() => setIsModalOpen(true)}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-3.5 w-3.5 mr-2" />
                   Agregar horario
                 </Button>
               </div>
@@ -143,7 +143,7 @@ export default function SchedulesPage() {
       {specialists.length === 0 && !isLoading && (
         <div className="rounded-2xl border border-border/50 bg-card py-12 text-center">
           <div className="p-6">
-            <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <Clock className="h-12 w-12 mx-auto text-muted-foreground/40 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Sin especialistas</h3>
             <p className="text-muted-foreground">
               No hay especialistas registrados en el sistema.

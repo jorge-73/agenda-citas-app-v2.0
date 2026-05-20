@@ -1,18 +1,14 @@
 "use client";
 
-import { subDays } from "date-fns";
 import { DateRangeSelector } from "@/features/dashboard/components/date-range-selector";
-import type { DateRange } from "@/features/dashboard/hooks/use-dashboard-stats";
 import { StatsCards } from "@/features/dashboard/components/stats-cards";
 import { AppointmentsChart } from "@/features/dashboard/components/appointments-chart";
 import { RevenueChart } from "@/features/dashboard/components/revenue-chart";
-import { PatientsChart } from "@/features/dashboard/components/patients-chart";
-import { SpecialtyChart } from "@/features/dashboard/components/specialty-chart";
 import { TodayAppointments } from "@/features/dashboard/components/today-appointments";
 import { RecentPatients } from "@/features/dashboard/components/recent-patients";
 import { RecentActivity } from "@/features/dashboard/components/recent-activity";
+import { SpecialtyChart } from "@/features/dashboard/components/specialty-chart";
 import { useDashboardStats } from "@/features/dashboard/hooks/use-dashboard-stats";
-import { Loader2 } from "lucide-react";
 
 export function DashboardClient() {
   const {
@@ -27,7 +23,6 @@ export function DashboardClient() {
     recentPatients,
     recentActivity,
     isLoading,
-    refetch
   } = useDashboardStats();
 
   return (

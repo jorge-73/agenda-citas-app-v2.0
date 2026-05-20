@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Calendar,
@@ -64,25 +64,34 @@ export function Sidebar() {
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className="flex flex-col h-full bg-sidebar border-r border-sidebar-border"
       >
+        {/* Logo */}
         <div className="flex h-16 items-center border-b border-sidebar-border px-3">
-          <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm">
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-sm shadow-primary/20"
+            >
               <HeartPulse className="h-5 w-5 text-primary-foreground" />
-            </div>
-            {!collapsed && (
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="font-semibold text-sm whitespace-nowrap text-sidebar-foreground"
-              >
-                CitasMed
-              </motion.span>
-            )}
+            </motion.div>
+            <AnimatePresence mode="wait">
+              {!collapsed && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.15 }}
+                  className="font-semibold text-sm whitespace-nowrap text-sidebar-foreground"
+                >
+                  CitasMed
+                </motion.span>
+              )}
+            </AnimatePresence>
           </Link>
         </div>
 
-        <nav className="flex-1 gap-1 p-3 overflow-y-auto">
+        {/* Navigation */}
+        <nav className="flex-1 gap-1.5 p-3 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -93,30 +102,43 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
+                  "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium",
+                  "transition-all duration-200 ease-out",
                   isActive
-                    ? "text-sidebar-primary"
-                    : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                    ? "text-sidebar-primary bg-primary/10"
+                    : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                 )}
               >
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active"
-                    className="absolute inset-0 bg-primary/12 rounded-lg"
+                    className="absolute inset-0 bg-primary/8 rounded-xl"
                     initial={false}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
-                <Icon className={cn("h-5 w-5 shrink-0", isActive && "text-sidebar-primary")} />
-                {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="whitespace-nowrap"
-                  >
-                    {item.title}
-                  </motion.span>
-                )}
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative z-10"
+                >
+                  <Icon className={cn(
+                    "h-5 w-5 shrink-0",
+                    isActive ? "text-sidebar-primary" : "text-sidebar-foreground/60"
+                  )} />
+                </motion.div>
+                <AnimatePresence mode="wait">
+                  {!collapsed && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="relative z-10 whitespace-nowrap"
+                    >
+                      {item.title}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </Link>
             );
 
@@ -135,12 +157,14 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="border-t border-sidebar-border p-3">
+        {/* Footer */}
+        <div className="border-t border-sidebar-border p-3 space-y-3">
           <Button
             variant="ghost"
             size="sm"
             className={cn(
-              "w-full justify-center text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
+              "w-full justify-center text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
+              "transition-all duration-200",
               collapsed && "px-2"
             )}
             onClick={() => setCollapsed(!collapsed)}
@@ -154,17 +178,21 @@ export function Sidebar() {
               </>
             )}
           </Button>
-          {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mt-3 rounded-lg bg-sidebar-accent/50 p-3"
-            >
-              <p className="text-xs text-sidebar-foreground/60">Panel de Administración</p>
-              <p className="text-xs font-medium text-sidebar-foreground/80 mt-1">Versión 1.0.0</p>
-            </motion.div>
-          )}
+          
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="rounded-xl bg-sidebar-accent/30 p-3"
+              >
+                <p className="text-xs text-sidebar-foreground/50">Panel de Administración</p>
+                <p className="text-xs font-medium text-sidebar-foreground/70 mt-1">Versión 1.0.0</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.aside>
     </TooltipProvider>

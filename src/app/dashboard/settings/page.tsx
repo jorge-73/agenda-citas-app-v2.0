@@ -32,22 +32,22 @@ export default function SettingsPage() {
       />
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="profile" className="gap-2">
-            <User className="h-4 w-4" />
-            Perfil
+        <TabsList className="grid grid-cols-4 w-full max-w-lg">
+          <TabsTrigger value="profile" className="gap-2 text-xs">
+            <User className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Perfil</span>
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="h-4 w-4" />
-            Notificaciones
+          <TabsTrigger value="notifications" className="gap-2 text-xs">
+            <Bell className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Notif.</span>
           </TabsTrigger>
-          <TabsTrigger value="appearance" className="gap-2">
-            <Palette className="h-4 w-4" />
-            Apariencia
+          <TabsTrigger value="appearance" className="gap-2 text-xs">
+            <Palette className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Apariencia</span>
           </TabsTrigger>
-          <TabsTrigger value="security" className="gap-2">
-            <Shield className="h-4 w-4" />
-            Seguridad
+          <TabsTrigger value="security" className="gap-2 text-xs">
+            <Shield className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Seguridad</span>
           </TabsTrigger>
         </TabsList>
 
@@ -57,25 +57,25 @@ export default function SettingsPage() {
               <h3 className="text-lg font-semibold">Información del Perfil</h3>
               <p className="text-sm text-muted-foreground">Actualiza tu información personal</p>
             </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="p-6 space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nombre</Label>
-                  <Input id="name" placeholder="Tu nombre" defaultValue="Admin User" />
+                  <Input id="name" placeholder="Tu nombre" defaultValue="Admin User" className="rounded-xl" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="tu@email.com" defaultValue="admin@citamed.com" />
+                  <Input id="email" type="email" placeholder="tu@email.com" defaultValue="admin@citamed.com" className="rounded-xl" />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Teléfono</Label>
-                <Input id="phone" placeholder="+1234567890" />
+                <Input id="phone" placeholder="+1234567890" className="rounded-xl" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="timezone">Zona Horaria</Label>
                 <Select defaultValue="america-mexico_city">
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="Selecciona zona horaria" />
                   </SelectTrigger>
                   <SelectContent>
@@ -85,7 +85,7 @@ export default function SettingsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleSave} disabled={isLoading}>
+              <Button onClick={handleSave} disabled={isLoading} className="rounded-xl">
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
@@ -99,44 +99,22 @@ export default function SettingsPage() {
               <h3 className="text-lg font-semibold">Configuración de Notificaciones</h3>
               <p className="text-sm text-muted-foreground">Administra cómo recibes notificaciones</p>
             </div>
-            <div className="p-6 space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Notificaciones de correo</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recibe notificaciones por correo electrónico
-                  </p>
+            <div className="p-6 space-y-4">
+              {[
+                { label: "Notificaciones de correo", desc: "Recibe notificaciones por correo electrónico", checked: true },
+                { label: "Recordatorios de citas", desc: "Recibe recordatorios antes de las citas", checked: true },
+                { label: "Notificaciones de nuevas reservas", desc: "Recibe alertas cuando hay nuevas reservas online", checked: true },
+                { label: "Reporte semanal", desc: "Recibe un resumen semanal de actividad", checked: false },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/30 transition-colors">
+                  <div className="space-y-0.5">
+                    <Label className="text-sm font-medium">{item.label}</Label>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                  <Switch defaultChecked={item.checked} />
                 </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Recordatorios de citas</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recibe recordatorios antes de las citas
-                  </p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Notificaciones de nuevas reservas</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recibe alertas cuando hay nuevas reservas online
-                  </p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Reporte semanal</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recibe un resumen semanal de actividad
-                  </p>
-                </div>
-                <Switch />
-              </div>
-              <Button onClick={handleSave} disabled={isLoading}>
+              ))}
+              <Button onClick={handleSave} disabled={isLoading} className="rounded-xl">
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
@@ -150,11 +128,11 @@ export default function SettingsPage() {
               <h3 className="text-lg font-semibold">Apariencia</h3>
               <p className="text-sm text-muted-foreground">Personaliza la apariencia del sistema</p>
             </div>
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-5">
               <div className="space-y-2">
                 <Label>Tema</Label>
-                <Select defaultValue="system">
-                  <SelectTrigger>
+                <Select defaultValue="light">
+                  <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="Selecciona tema" />
                   </SelectTrigger>
                   <SelectContent>
@@ -167,7 +145,7 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label>Idioma</Label>
                 <Select defaultValue="es-MX">
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="Selecciona idioma" />
                   </SelectTrigger>
                   <SelectContent>
@@ -177,7 +155,7 @@ export default function SettingsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleSave} disabled={isLoading}>
+              <Button onClick={handleSave} disabled={isLoading} className="rounded-xl">
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
@@ -192,39 +170,35 @@ export default function SettingsPage() {
               <p className="text-sm text-muted-foreground">Configura las opciones de seguridad</p>
             </div>
             <div className="p-6 space-y-6">
-              <div className="space-y-4">
+              <div className="space-y-4 p-4 bg-muted/30 rounded-xl">
                 <div className="space-y-2">
                   <Label>Contraseña actual</Label>
-                  <Input type="password" placeholder="••••••••" />
+                  <Input type="password" placeholder="••••••••" className="rounded-xl" />
                 </div>
                 <div className="space-y-2">
                   <Label>Nueva contraseña</Label>
-                  <Input type="password" placeholder="••••••••" />
+                  <Input type="password" placeholder="••••••••" className="rounded-xl" />
                 </div>
                 <div className="space-y-2">
                   <Label>Confirmar contraseña</Label>
-                  <Input type="password" placeholder="••••••••" />
+                  <Input type="password" placeholder="••••••••" className="rounded-xl" />
                 </div>
-                <Button>Cambiar contraseña</Button>
+                <Button className="rounded-xl">Cambiar contraseña</Button>
               </div>
               <div className="border-t pt-4 space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/30 transition-colors">
                   <div className="space-y-0.5">
-                    <Label>Autenticación de dos factores</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Añade una capa extra de seguridad
-                    </p>
+                    <Label className="text-sm font-medium">Autenticación de dos factores</Label>
+                    <p className="text-xs text-muted-foreground">Añade una capa extra de seguridad</p>
                   </div>
                   <Switch />
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/30 transition-colors">
                   <div className="space-y-0.5">
-                    <Label>Sesiones activas</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Gestiona tus sesiones activas
-                    </p>
+                    <Label className="text-sm font-medium">Sesiones activas</Label>
+                    <p className="text-xs text-muted-foreground">Gestiona tus sesiones activas</p>
                   </div>
-                  <Button variant="outline" size="sm">Ver sesiones</Button>
+                  <Button variant="outline" size="sm" className="rounded-xl">Ver sesiones</Button>
                 </div>
               </div>
             </div>

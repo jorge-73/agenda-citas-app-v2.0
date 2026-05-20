@@ -33,7 +33,6 @@ export default function AppointmentsPage() {
 
   const handleFilterChange = (newFilters: AppointmentFiltersState) => {
     setFilters(newFilters);
-    console.log("Filters:", newFilters);
   };
 
   return (
@@ -43,12 +42,10 @@ export default function AppointmentsPage() {
         description="Gestiona las citas médicas del sistema"
         icon={Calendar}
         actions={
-          <div className="flex gap-2">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nueva Cita
-            </Button>
-          </div>
+          <Button className="rounded-xl">
+            <Plus className="h-4 w-4 mr-2" />
+            Nueva Cita
+          </Button>
         }
       />
 

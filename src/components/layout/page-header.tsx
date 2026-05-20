@@ -24,13 +24,16 @@ export function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <div className={cn("flex items-center justify-between mb-6", className)}>
+    <div className={cn(
+      "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6",
+      className
+    )}>
       <div>
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+          <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
             {breadcrumbs.map((item, index) => (
-              <span key={index} className="flex items-center gap-1">
-                {index > 0 && <span>/</span>}
+              <span key={index} className="flex items-center gap-1.5">
+                {index > 0 && <span className="text-border/60">/</span>}
                 {item.href ? (
                   <a
                     href={item.href}
@@ -47,17 +50,23 @@ export function PageHeader({
         )}
         <div className="flex items-center gap-3">
           {Icon && (
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Icon className="h-5 w-5 text-primary" />
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
           )}
-          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">{title}</h1>
         </div>
         {description && (
-          <p className="text-muted-foreground mt-1">{description}</p>
+          <p className="text-sm text-muted-foreground mt-1.5 line-clamp-1 sm:line-clamp-none">
+            {description}
+          </p>
         )}
       </div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+      {actions && (
+        <div className="flex items-center gap-2 shrink-0">
+          {actions}
+        </div>
+      )}
     </div>
   );
 }
