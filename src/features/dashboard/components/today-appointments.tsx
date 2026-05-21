@@ -40,7 +40,7 @@ export function TodayAppointments({ appointments, isLoading }: TodayAppointments
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.7 }}
     >
-      <div className="rounded-2xl border border-border/60 bg-card h-full">
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm h-full">
         <div className="p-6 pb-3">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold">Citas de Hoy</h3>
@@ -71,7 +71,7 @@ export function TodayAppointments({ appointments, isLoading }: TodayAppointments
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.03 }}
-                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-xl border bg-card hover:bg-accent/50 hover:shadow-sm transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">

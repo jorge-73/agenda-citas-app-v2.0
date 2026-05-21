@@ -62,7 +62,7 @@ export function AppointmentFilters({ filters, onFilterChange }: AppointmentFilte
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-72" align="start">
+      <PopoverContent className="w-72 rounded-2xl border-border/50 shadow-xl" align="start">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Filtros</h3>

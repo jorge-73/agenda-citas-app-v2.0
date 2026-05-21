@@ -36,7 +36,7 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-border/60 bg-card">
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm">
         <div className="p-6 pb-2">
           <h3 className="text-lg font-semibold">Citas y Reservas</h3>
           <p className="text-sm text-muted-foreground">Comparación de citas vs reservas online</p>
@@ -49,7 +49,7 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
   }
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card hover:shadow-lg transition-shadow duration-300">
+    <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
       <div className="p-6 pb-2 flex flex-row items-center justify-between">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold">Citas y Reservas</h3>
@@ -97,10 +97,12 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
                 />
                 <Tooltip 
                   contentStyle={{ 
-                    borderRadius: "12px", 
+                    borderRadius: "16px", 
                     border: "1px solid oklch(var(--border))",
-                    background: "oklch(var(--card))",
-                    boxShadow: "0 4px 12px oklch(var(--foreground) / 0.1)"
+                    background: "oklch(var(--card) / 0.85)",
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
                   }}
                   cursor={{ fill: "oklch(var(--muted) / 0.5)" }}
                 />
@@ -109,17 +111,27 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
                   iconType="circle"
                   iconSize={8}
                 />
+                <defs>
+                  <linearGradient id="appointmentsGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={colors.appointments} stopOpacity={1} />
+                    <stop offset="100%" stopColor={colors.appointments} stopOpacity={0.6} />
+                  </linearGradient>
+                  <linearGradient id="bookingsGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={colors.bookings} stopOpacity={1} />
+                    <stop offset="100%" stopColor={colors.bookings} stopOpacity={0.6} />
+                  </linearGradient>
+                </defs>
                 <Bar 
                   dataKey="appointments" 
                   name="Citas" 
-                  fill={colors.appointments} 
+                  fill="url(#appointmentsGrad)" 
                   radius={[6, 6, 0, 0]}
                   maxBarSize={40}
                 />
                 <Bar 
                   dataKey="bookings" 
                   name="Reservas" 
-                  fill={colors.bookings} 
+                  fill="url(#bookingsGrad)" 
                   radius={[6, 6, 0, 0]}
                   maxBarSize={40}
                 />
@@ -140,10 +152,12 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
                 />
                 <Tooltip 
                   contentStyle={{ 
-                    borderRadius: "12px", 
+                    borderRadius: "16px", 
                     border: "1px solid oklch(var(--border))",
-                    background: "oklch(var(--card))",
-                    boxShadow: "0 4px 12px oklch(var(--foreground) / 0.1)"
+                    background: "oklch(var(--card) / 0.85)",
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
                   }}
                 />
                 <Legend 
@@ -151,6 +165,16 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
                   iconType="circle"
                   iconSize={8}
                 />
+                <defs>
+                  <linearGradient id="appointmentsLineGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={colors.appointments} stopOpacity={0.15} />
+                    <stop offset="100%" stopColor={colors.appointments} stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="bookingsLineGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={colors.bookings} stopOpacity={0.15} />
+                    <stop offset="100%" stopColor={colors.bookings} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
                 <Line 
                   type="monotone" 
                   dataKey="appointments" 

@@ -19,7 +19,7 @@ export function RecentPatients({ patients, isLoading }: RecentPatientsProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.8 }}
     >
-      <div className="rounded-2xl border border-border/60 bg-card h-full">
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm h-full hover:shadow-xl hover:border-primary/10 transition-all duration-300">
         <div className="p-6 pb-3">
           <h3 className="text-base font-semibold">Pacientes Recientes</h3>
         </div>
@@ -38,7 +38,7 @@ export function RecentPatients({ patients, isLoading }: RecentPatientsProps) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.03 }}
-                  className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-xl border bg-card hover:bg-accent/50 hover:shadow-sm transition-all duration-200"
                 >
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <User className="h-5 w-5 text-primary" />

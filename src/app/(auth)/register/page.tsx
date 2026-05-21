@@ -6,19 +6,38 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerSchema, type RegisterInput } from "@/schemas/auth-schema";
 import { registerAction } from "@/features/auth/actions";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { useState } from "react";
 import { HeartPulse, User, Mail, Lock, Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const passwordRequirements = [
   { label: "Mínimo 8 caracteres", test: (p: string) => p.length >= 8 },
   { label: "Una letra mayúscula", test: (p: string) => /[A-Z]/.test(p) },
   { label: "Un número", test: (p: string) => /\d/.test(p) },
 ];
+
+function Orb({ className, delay = 0 }: { className: string; delay?: number }) {
+  return (
+    <motion.div
+      className={cn("absolute rounded-full blur-3xl pointer-events-none", className)}
+      animate={{
+        x: [0, 40, -30, 0],
+        y: [0, -50, 30, 0],
+        scale: [1, 1.15, 0.9, 1],
+      }}
+      transition={{
+        duration: 15 + delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay,
+      }}
+    />
+  );
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -56,8 +75,9 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-mesh">
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <Orb className="top-1/4 right-1/4 w-[600px] h-[600px] bg-primary/12" delay={0} />
+        <Orb className="bottom-1/4 left-1/4 w-[500px] h-[500px] bg-accent/8" delay={3} />
+        <Orb className="top-1/3 left-1/2 w-[400px] h-[400px] bg-primary/6" delay={6} />
       </div>
       
       <motion.div
@@ -67,7 +87,7 @@ export default function RegisterPage() {
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <Link href="/home" className="inline-flex items-center gap-3 mb-6 group">
+          <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -98,7 +118,7 @@ export default function RegisterPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
-          className="rounded-3xl border border-border/50 bg-card/80 backdrop-blur-xl p-8 shadow-xl shadow-foreground/5"
+          className="rounded-3xl border border-border/40 bg-card/70 backdrop-blur-2xl p-8 shadow-2xl shadow-foreground/5"
         >
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {error && (
@@ -114,11 +134,11 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">Nombre completo</Label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 z-10" />
                   <Input
                     id="name"
                     placeholder="Juan Pérez"
-                    className="pl-11 h-12 rounded-xl"
+                    className="pl-11 h-12 rounded-xl input-premium"
                     {...register("name")}
                   />
                 </div>
@@ -130,12 +150,12 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 z-10" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="correo@ejemplo.com"
-                    className="pl-11 h-12 rounded-xl"
+                    className="pl-11 h-12 rounded-xl input-premium"
                     {...register("email")}
                   />
                 </div>
@@ -147,18 +167,18 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">Contraseña</Label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 z-10" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="pl-11 pr-11 h-12 rounded-xl"
+                    className="pl-11 pr-11 h-12 rounded-xl input-premium"
                     {...register("password")}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors z-10"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -186,18 +206,18 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirmar contraseña</Label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 z-10" />
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="pl-11 pr-11 h-12 rounded-xl"
+                    className="pl-11 pr-11 h-12 rounded-xl input-premium"
                     {...register("confirmPassword")}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors z-10"
                   >
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -212,7 +232,7 @@ export default function RegisterPage() {
                 disabled={isLoading}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                className="w-full h-12 text-base font-medium rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 text-base font-medium rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed btn-premium"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">

@@ -15,7 +15,7 @@ export default function BookingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/home">
+              <Link href="/">
                 <Button variant="ghost" size="sm" className="gap-2 rounded-xl">
                   <ArrowLeft className="w-4 h-4" />
                   Volver

@@ -40,7 +40,7 @@ export function Navbar({ user }: NavbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border/60 bg-background/80 px-6 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border/40 bg-background/70 px-6 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70">
       <div className="flex flex-1 items-center justify-between">
         <div className="flex items-center gap-4">
           <motion.h2 

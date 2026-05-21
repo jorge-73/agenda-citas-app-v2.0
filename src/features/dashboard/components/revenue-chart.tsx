@@ -51,7 +51,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <div className="rounded-2xl border border-border/60 bg-card">
+        <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm">
           <div className="p-6 pb-2 flex flex-row items-center justify-between">
             <h3 className="text-base font-semibold">Ingresos por Especialista</h3>
           </div>
@@ -71,7 +71,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <div className="rounded-2xl border border-border/60 bg-card">
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
         <div className="p-6 pb-2 flex flex-row items-center justify-between">
           <h3 className="text-base font-semibold">Ingresos por Especialista</h3>
           <span className="text-sm font-medium text-muted-foreground">
@@ -113,9 +113,12 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   />
                   <Tooltip 
                     contentStyle={{ 
-                      borderRadius: 8, 
-                      border: "1px solid #e5e7eb",
-                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)"
+                      borderRadius: 16, 
+                      border: "1px solid oklch(var(--border))",
+                      background: "oklch(var(--card) / 0.85)",
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                      boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
                     }}
                     formatter={(value) => [formatCurrency(Number(value) || 0), "Ingresos"]}
                   />

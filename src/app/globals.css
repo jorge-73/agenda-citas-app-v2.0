@@ -516,6 +516,22 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Background patterns */
+  .bg-grid-pattern {
+    background-image:
+      linear-gradient(oklch(var(--foreground) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(var(--foreground) / 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .bg-gradient-mesh {
+    background: 
+      radial-gradient(at 40% 20%, oklch(var(--primary) / 0.08) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, oklch(var(--accent) / 0.05) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, oklch(var(--primary) / 0.03) 0px, transparent 50%),
+      oklch(var(--background));
+  }
 }
 
 /* =============================================
@@ -591,3 +607,4 @@
     transparent
   );
 }
+

@@ -142,9 +142,9 @@ export function AppointmentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md gap-0 p-0 overflow-hidden">
+      <DialogContent className="max-w-md gap-0 p-0 overflow-hidden light:bg-stone-50/60 dark:bg-card">
         {/* Header with gradient */}
-        <DialogHeader className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 pb-8">
+        <DialogHeader className="bg-linear-to-br from-primary/20 via-primary/10 to-transparent p-6 pb-8">
           <DialogTitle className="text-xl font-bold">
             {isEdit ? "Editar Cita" : "Nueva Cita"}
           </DialogTitle>
@@ -158,7 +158,7 @@ export function AppointmentModal({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Patient Selection */}
             <div className="space-y-2">
-              <Label htmlFor="patientId" className="text-sm font-medium flex items-center gap-2">
+              <Label htmlFor="patientId" className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <User className="w-4 h-4 text-muted-foreground" />
                 Paciente
               </Label>
@@ -167,12 +167,12 @@ export function AppointmentModal({
                 onValueChange={(value) => setValue("patientId", value)}
               >
                 <SelectTrigger className={cn(
-                  "h-11",
+                  "h-11 bg-card border-border",
                   errors.patientId && "border-destructive focus:border-destructive"
                 )}>
                   <SelectValue placeholder="Seleccionar paciente" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card">
                   {patients.map((patient) => (
                     <SelectItem key={patient.id} value={patient.id}>
                       <div className="flex items-center gap-2">
@@ -190,7 +190,7 @@ export function AppointmentModal({
 
             {/* Specialist Selection */}
             <div className="space-y-2">
-              <Label htmlFor="specialistId" className="text-sm font-medium flex items-center gap-2">
+              <Label htmlFor="specialistId" className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <Stethoscope className="w-4 h-4 text-muted-foreground" />
                 Especialista
               </Label>
@@ -199,12 +199,12 @@ export function AppointmentModal({
                 onValueChange={(value) => setValue("specialistId", value)}
               >
                 <SelectTrigger className={cn(
-                  "h-11",
+                  "h-11 bg-card border-border",
                   errors.specialistId && "border-destructive focus:border-destructive"
                 )}>
                   <SelectValue placeholder="Seleccionar especialista" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card">
                   {specialists.map((specialist) => (
                     <SelectItem key={specialist.id} value={specialist.id}>
                       <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ export function AppointmentModal({
             {/* Date and Time */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="date" className="text-sm font-medium flex items-center gap-2">
+                <Label htmlFor="date" className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
                   Fecha
                 </Label>
@@ -231,7 +231,7 @@ export function AppointmentModal({
                   type="date" 
                   {...register("date")}
                   className={cn(
-                    "h-11",
+                    "h-11 bg-card border-border",
                     errors.date && "border-destructive focus:border-destructive"
                   )}
                 />
@@ -240,7 +240,7 @@ export function AppointmentModal({
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="startTime" className="text-sm font-medium flex items-center gap-2">
+                <Label htmlFor="startTime" className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
                   Hora
                 </Label>
@@ -248,7 +248,7 @@ export function AppointmentModal({
                   type="time" 
                   {...register("startTime")}
                   className={cn(
-                    "h-11",
+                    "h-11 bg-card border-border",
                     errors.startTime && "border-destructive focus:border-destructive"
                   )}
                 />
@@ -260,27 +260,27 @@ export function AppointmentModal({
 
             {/* Reason */}
             <div className="space-y-2">
-              <Label htmlFor="reason" className="text-sm font-medium flex items-center gap-2">
+              <Label htmlFor="reason" className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <FileText className="w-4 h-4 text-muted-foreground" />
                 Motivo de consulta
               </Label>
               <Input 
                 placeholder="Ej: Control mensual" 
                 {...register("reason")}
-                className="h-11"
+                className="h-11 bg-card border-border"
               />
             </div>
 
             {/* Notes */}
             <div className="space-y-2">
-              <Label htmlFor="notes" className="text-sm font-medium flex items-center gap-2">
+              <Label htmlFor="notes" className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <ScrollText className="w-4 h-4 text-muted-foreground" />
                 Notas adicionales
               </Label>
               <Textarea 
                 placeholder="Notas adicionales para la cita..." 
                 {...register("notes")}
-                className="min-h-[80px] resize-none"
+                className="min-h-[80px] resize-none bg-card border-border"
               />
             </div>
 

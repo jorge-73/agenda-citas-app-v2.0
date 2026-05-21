@@ -34,7 +34,7 @@ export function PatientsChart({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <div className="rounded-2xl border border-border/60 bg-card">
+        <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm">
           <div className="p-6 pb-2 flex flex-row items-center justify-between">
             <h3 className="text-base font-semibold">Pacientes y Reservas</h3>
           </div>
@@ -64,7 +64,7 @@ export function PatientsChart({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <div className="rounded-2xl border border-border/60 bg-card">
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
         <div className="p-6 pb-2 flex flex-row items-center justify-between">
           <h3 className="text-base font-semibold">Pacientes y Reservas</h3>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -102,9 +102,12 @@ export function PatientsChart({
                   />
                   <Tooltip 
                     contentStyle={{ 
-                      borderRadius: 8, 
-                      border: "1px solid #e5e7eb",
-                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)"
+                      borderRadius: 16, 
+                      border: "1px solid oklch(var(--border))",
+                      background: "oklch(var(--card) / 0.85)",
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                      boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
                     }}
                   />
                   <Legend 

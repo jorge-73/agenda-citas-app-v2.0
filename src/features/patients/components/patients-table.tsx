@@ -150,48 +150,46 @@ export function PatientsTable({ patients, isLoading, onCreateNew }: PatientsTabl
         )}
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <table className="w-full">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="border-b bg-muted/50">
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      className="px-4 py-3 text-left text-sm font-medium"
-                      style={{ width: header.getSize() }}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
+      <div className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-sm overflow-hidden hover:shadow-lg transition-all duration-300">
+        <table className="table-premium">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="border-b border-border/30 bg-muted/20">
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground/70"
+                    style={{ width: header.getSize() }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="py-16 text-center text-muted-foreground">
+                  No se encontraron pacientes
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map((row) => (
+                <tr key={row.id} className="border-b border-border/20 hover:bg-muted/20 transition-colors duration-150">
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="px-4 py-3.5">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
                   ))}
                 </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.length === 0 ? (
-                <tr>
-                  <td colSpan={columns.length} className="py-12 text-center text-muted-foreground">
-                    No se encontraron pacientes
-                  </td>
-                </tr>
-              ) : (
-                table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="border-b hover:bg-muted/50 transition-colors">
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-4 py-3">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
@@ -203,6 +201,7 @@ export function PatientsTable({ patients, isLoading, onCreateNew }: PatientsTabl
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            className="rounded-xl"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -211,6 +210,7 @@ export function PatientsTable({ patients, isLoading, onCreateNew }: PatientsTabl
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            className="rounded-xl"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

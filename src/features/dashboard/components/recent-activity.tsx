@@ -34,7 +34,7 @@ export function RecentActivity({ activities, isLoading }: RecentActivityProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.6 }}
     >
-      <div className="rounded-2xl border border-border/60 bg-card h-full">
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm h-full hover:shadow-xl hover:border-primary/10 transition-all duration-300">
         <div className="p-6 pb-3">
           <h3 className="text-base font-semibold">Actividad Reciente</h3>
         </div>

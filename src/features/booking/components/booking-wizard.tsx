@@ -172,7 +172,7 @@ export function BookingWizard() {
         >
           {/* Step 1: Specialties */}
           {currentStep === 1 && (
-            <div className="rounded-2xl border border-border/60 bg-card hover:shadow-xl transition-shadow duration-300">
+            <div className="rounded-3xl border border-border/50 bg-card/70 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
               <div className="p-6 pb-8 text-center">
                 <Badge variant="soft" className="w-fit mx-auto mb-3">
                   <Sparkles className="w-3 h-3 mr-1" />
@@ -195,10 +195,10 @@ export function BookingWizard() {
                         setSelectedSpecialty(specialty);
                         nextStep();
                       }}
-                      className={`p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
+                      className={`p-5 rounded-2xl border-2 transition-all duration-300 text-left group hover:scale-[1.01] ${
                         selectedSpecialty?.id === specialty.id
-                          ? "border-primary bg-primary/10 shadow-lg shadow-primary/10"
-                          : "border-border/60 hover:border-primary/50 hover:shadow-md bg-card/60"
+                          ? "border-primary bg-primary/5 shadow-lg shadow-primary/5"
+                          : "border-border/40 hover:border-primary/30 hover:shadow-md bg-card/50"
                       }`}
                     >
                       <div className="flex items-center gap-4">
@@ -216,7 +216,7 @@ export function BookingWizard() {
 
           {/* Step 2: Specialists */}
           {currentStep === 2 && (
-            <div className="rounded-2xl border border-border/60 bg-card hover:shadow-xl transition-shadow duration-300">
+            <div className="rounded-3xl border border-border/50 bg-card/70 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
               <div className="p-6 pb-8 text-center">
                 <Badge variant="soft" className="w-fit mx-auto mb-3">
                   <Sparkles className="w-3 h-3 mr-1" />
@@ -239,10 +239,10 @@ export function BookingWizard() {
                         setSelectedSpecialist(specialist);
                         nextStep();
                       }}
-                      className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group ${
+                      className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group hover:scale-[1.005] ${
                         selectedSpecialist?.id === specialist.id
-                          ? "border-primary bg-primary/10 shadow-lg shadow-primary/10"
-                          : "border-border/60 hover:border-primary/50 hover:shadow-md bg-card/60"
+                          ? "border-primary bg-primary/5 shadow-lg shadow-primary/5"
+                          : "border-border/40 hover:border-primary/30 hover:shadow-md bg-card/50"
                       }`}
                     >
                       <div className="flex items-center gap-5">
@@ -274,7 +274,7 @@ export function BookingWizard() {
 
           {/* Step 3: Date & Time */}
           {currentStep === 3 && (
-            <div className="rounded-2xl border border-border/60 bg-card hover:shadow-xl transition-shadow duration-300">
+            <div className="rounded-3xl border border-border/50 bg-card/70 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
               <div className="p-6 pb-8 text-center">
                 <Badge variant="soft" className="w-fit mx-auto mb-3">
                   <Sparkles className="w-3 h-3 mr-1" />
@@ -299,10 +299,10 @@ export function BookingWizard() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.03 }}
                         onClick={() => setSelectedDate(date)}
-                        className={`px-5 py-3 rounded-xl border-2 transition-all duration-300 ${
+                        className={`px-5 py-3 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${
                           selectedDate?.toDateString() === date.toDateString()
                             ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                            : "border-border/60 hover:border-primary/50 hover:shadow-md bg-card/60"
+                            : "border-border/40 hover:border-primary/30 hover:shadow-md bg-card/50"
                         }`}
                       >
                         <span className="font-medium">{format(date, "EEE d", { locale: es })}</span>
@@ -329,10 +329,10 @@ export function BookingWizard() {
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: index * 0.02 }}
                           onClick={() => setSelectedTime(time)}
-                          className={`px-5 py-3 rounded-xl border-2 transition-all duration-300 ${
+                          className={`px-5 py-3 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${
                             selectedTime === time
                               ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                              : "border-border/60 hover:border-primary/50 hover:shadow-md bg-card/60"
+                              : "border-border/40 hover:border-primary/30 hover:shadow-md bg-card/50"
                           }`}
                         >
                           <span className="font-medium">{time}</span>
@@ -347,7 +347,7 @@ export function BookingWizard() {
 
           {/* Step 4: Confirmation */}
           {currentStep === 4 && (
-            <div className="rounded-2xl border border-border/60 bg-card hover:shadow-xl transition-shadow duration-300">
+            <div className="rounded-3xl border border-border/50 bg-card/70 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
               <div className="p-6 pb-8 text-center">
                 <Badge variant="soft" className="w-fit mx-auto mb-3">
                   <Sparkles className="w-3 h-3 mr-1" />
@@ -359,7 +359,7 @@ export function BookingWizard() {
                 </p>
               </div>
               <div className="p-6 pt-0 space-y-8">
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/5 via-muted/30 to-transparent border border-border/60">
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/5 via-muted/30 to-transparent border border-border/40">
                   <div className="space-y-4">
                     <div className="flex justify-between items-center py-2 border-b border-border/40">
                       <span className="text-muted-foreground">Especialidad</span>

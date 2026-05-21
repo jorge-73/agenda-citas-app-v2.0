@@ -117,14 +117,22 @@ export function Sidebar() {
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
+                {isActive && (
+                  <motion.div
+                    layoutId="sidebar-active-border"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-gradient-to-b from-primary to-primary/60 rounded-full"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                )}
                 <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ rotate: [0, -5, 5, 0] }}
+                  transition={{ duration: 0.3 }}
                   className="relative z-10"
                 >
                   <Icon className={cn(
-                    "h-5 w-5 shrink-0",
-                    isActive ? "text-sidebar-primary" : "text-sidebar-foreground/60"
+                    "h-5 w-5 shrink-0 transition-colors duration-200",
+                    isActive ? "text-sidebar-primary" : "text-sidebar-foreground/60 group-hover:text-sidebar-foreground/80"
                   )} />
                 </motion.div>
                 <AnimatePresence mode="wait">

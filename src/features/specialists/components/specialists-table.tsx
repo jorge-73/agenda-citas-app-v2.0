@@ -135,7 +135,7 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-border/60 bg-card py-12 text-center text-muted-foreground">
+      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm py-12 text-center text-muted-foreground">
         Cargando especialistas...
       </div>
     );
@@ -161,15 +161,15 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
         )}
       </div>
 
-      <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-          <table className="w-full">
+      <div className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-sm overflow-hidden hover:shadow-lg transition-all duration-300">
+          <table className="table-premium">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="border-b bg-muted/50">
+                <tr key={headerGroup.id} className="border-b border-border/30 bg-muted/20">
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="px-4 py-3 text-left text-sm font-medium"
+                      className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground/70"
                       style={{ width: header.getSize() }}
                     >
                       {header.isPlaceholder
@@ -183,15 +183,15 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
             <tbody>
               {table.getRowModel().rows.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="py-12 text-center text-muted-foreground">
+                  <td colSpan={columns.length} className="py-16 text-center text-muted-foreground">
                     No se encontraron especialistas
                   </td>
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="border-b hover:bg-muted/50 transition-colors">
+                  <tr key={row.id} className="border-b border-border/20 hover:bg-muted/20 transition-colors duration-150">
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-4 py-3">
+                      <td key={cell.id} className="px-4 py-3.5">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
@@ -212,6 +212,7 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            className="rounded-xl"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -220,6 +221,7 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            className="rounded-xl"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
