@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { User, LogOut, Settings, ChevronDown, Loader2 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+import { MobileNav } from "./mobile-nav";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { logoutAction } from "@/features/auth/actions";
 import { motion } from "framer-motion";
+import type { UserRole } from "@/types";
 
 interface NavbarProps {
   user?: {
@@ -24,9 +26,10 @@ interface NavbarProps {
     email?: string;
     image?: string | null;
   } | null | undefined;
+  userRole?: UserRole;
 }
 
-export function Navbar({ user }: NavbarProps) {
+export function Navbar({ user, userRole }: NavbarProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
@@ -40,10 +43,13 @@ export function Navbar({ user }: NavbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border/40 bg-background/70 px-6 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70">
-      <div className="flex flex-1 items-center justify-between">
-        <div className="flex items-center gap-4">
-          <motion.h2 
+    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border/40 bg-background/70 px-4 md:px-6 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70">
+      <div className="flex flex-1 items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="lg:hidden">
+            <MobileNav userRole={userRole} />
+          </div>
+          <motion.h2
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-sm font-medium text-foreground/80"
@@ -52,10 +58,10 @@ export function Navbar({ user }: NavbarProps) {
           </motion.h2>
         </div>
       </div>
-      
+
       <div className="flex items-center gap-2">
         <ThemeToggle />
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <motion.button
@@ -75,7 +81,7 @@ export function Navbar({ user }: NavbarProps) {
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </motion.button>
           </DropdownMenuTrigger>
-          
+
           <DropdownMenuContent className="w-64 rounded-xl border border-border/60 p-2" align="end" forceMount>
             <DropdownMenuLabel className="px-3 py-2">
               <div className="flex flex-col space-y-1.5">
@@ -97,7 +103,7 @@ export function Navbar({ user }: NavbarProps) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="-mx-2 my-1" />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="cursor-pointer rounded-lg px-3 py-2 mx-1 text-destructive focus:text-destructive focus:bg-destructive/5"
               onClick={handleLogout}
               disabled={isLoggingOut}

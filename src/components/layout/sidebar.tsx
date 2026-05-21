@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type React from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,7 +24,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { hasPermission, type Permission } from "@/lib/permissions";
 import type { UserRole } from "@/types";
 
-const navItems: { title: string; href: string; icon: any; permission: Permission }[] = [
+const navItems: { title: string; href: string; icon: React.ComponentType<{ className?: string }>; permission: Permission }[] = [
   {
     title: "Dashboard",
     href: "/dashboard",

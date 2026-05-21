@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/layout/navbar";
-import { MobileNav } from "@/components/layout/mobile-nav";
+import type { UserRole } from "@/types";
 
 export default async function DashboardLayout({
   children,
@@ -19,7 +19,7 @@ export default async function DashboardLayout({
     name: session.user.name ?? null,
     email: session.user.email ?? "",
     image: session.user.image ?? null,
-    role: (session.user as { role?: string }).role as import("@/types").UserRole | undefined,
+    role: (session.user as { role?: string }).role as UserRole | undefined,
   } : null;
 
   return (
@@ -28,12 +28,9 @@ export default async function DashboardLayout({
       <div className="hidden lg:block">
         <Sidebar userRole={user?.role} />
       </div>
-      
-      {/* Mobile/Tablet Navigation */}
-        <MobileNav userRole={user?.role} />
-      
+
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Navbar user={user} />
+        <Navbar user={user} userRole={user?.role} />
         <main className="flex-1 overflow-y-auto bg-background p-4 md:p-6">
           {children}
         </main>

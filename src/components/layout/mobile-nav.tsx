@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,7 @@ import {
 import { hasPermission, type Permission } from "@/lib/permissions";
 import type { UserRole } from "@/types";
 
-const navItems: { title: string; href: string; icon: any; permission: Permission }[] = [
+const navItems: { title: string; href: string; icon: React.ComponentType<{ className?: string }>; permission: Permission }[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, permission: "view:dashboard" },
   { title: "Citas", href: "/dashboard/appointments", icon: Calendar, permission: "view:appointments" },
   { title: "Pacientes", href: "/dashboard/patients", icon: Users, permission: "view:patients" },
@@ -52,7 +53,7 @@ export function MobileNav({ userRole }: MobileNavProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden rounded-xl">
+        <Button variant="ghost" size="icon" className="rounded-xl">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Abrir menú</span>
         </Button>

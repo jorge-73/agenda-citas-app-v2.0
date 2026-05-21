@@ -1,18 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { createColumnHelper } from "@tanstack/react-table";
+import { toast } from "sonner";
+import { CalendarOff, Plus, Trash2, Loader2 } from "lucide-react";
+import { format } from "date-fns";
+
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { CalendarOff, Plus, Trash2, Loader2, Ban } from "lucide-react";
-import { toast } from "sonner";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { DataTable } from "@/components/ui/data-table";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { getBlockedDatesAction, createBlockedDateAction, unblockDateAction } from "@/features/blocked-dates/actions";
+import { DAY_OF_WEEK_LABELS } from "@/features/shared/constants";
+
+const blockedDateSchema = z.object({
+  date: z.string().min(1, "Selecciona una fecha"),
+  reason: z.string().optional(),
+  isRecurring: z.boolean(),
+});
+
+type BlockedDateFormData = z.infer<typeof blockedDateSchema>;
 
 interface BlockedDate {
   id: string;
@@ -22,43 +43,49 @@ interface BlockedDate {
   createdAt: Date;
 }
 
+const columnHelper = createColumnHelper<BlockedDate>();
+
 export default function BlockedDatesPage() {
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [newDate, setNewDate] = useState("");
-  const [newReason, setNewReason] = useState("");
-  const [newRecurring, setNewRecurring] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<BlockedDate | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const fetchBlockedDates = async () => {
-    setIsLoading(true);
-    const data = await getBlockedDatesAction();
-    setBlockedDates(data);
-    setIsLoading(false);
-  };
+  const {
+    register, handleSubmit, reset, setValue, watch, formState: { errors },
+  } = useForm<BlockedDateFormData>({
+    resolver: zodResolver(blockedDateSchema),
+    defaultValues: { date: "", reason: "", isRecurring: false },
+  });
 
-  useEffect(() => {
-    fetchBlockedDates();
+  const isRecurring = watch("isRecurring");
+
+  const fetchBlockedDates = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await getBlockedDatesAction();
+      setBlockedDates(data);
+    } catch {
+      toast.error("Error al cargar días bloqueados");
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const handleCreate = async () => {
-    if (!newDate) {
-      toast.error("Selecciona una fecha");
-      return;
-    }
+  useEffect(() => { fetchBlockedDates(); }, [fetchBlockedDates]);
+
+  const onCreateSubmit = async (data: BlockedDateFormData) => {
     setSaving(true);
     try {
       await createBlockedDateAction({
-        date: new Date(newDate),
-        reason: newReason || undefined,
-        isRecurring: newRecurring,
+        date: new Date(data.date),
+        reason: data.reason || undefined,
+        isRecurring: data.isRecurring,
       });
       toast.success("Fecha bloqueada correctamente");
       setModalOpen(false);
-      setNewDate("");
-      setNewReason("");
-      setNewRecurring(false);
+      reset();
       fetchBlockedDates();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error al bloquear fecha");
@@ -67,15 +94,68 @@ export default function BlockedDatesPage() {
     }
   };
 
-  const handleUnblock = async (id: string) => {
+  const handleUnblock = async () => {
+    if (!deleteTarget) return;
     try {
-      await unblockDateAction(id);
+      await unblockDateAction(deleteTarget.id);
       toast.success("Fecha desbloqueada");
+      setDeleteTarget(null);
       fetchBlockedDates();
     } catch {
       toast.error("Error al desbloquear fecha");
     }
   };
+
+  const columns = [
+    columnHelper.accessor("date", {
+      header: "Fecha",
+      cell: ({ row }) => (
+        <span className="text-sm font-medium">{format(new Date(row.original.date), "dd/MM/yyyy")}</span>
+      ),
+    }),
+    columnHelper.accessor("date", {
+      id: "day",
+      header: "Día",
+      cell: ({ row }) => (
+        <span className="text-sm text-muted-foreground capitalize">
+          {DAY_OF_WEEK_LABELS[new Date(row.original.date).getDay()]}
+        </span>
+      ),
+    }),
+    columnHelper.accessor("reason", {
+      header: "Motivo",
+      cell: ({ row }) => (
+        <span className="text-sm text-muted-foreground">{row.original.reason || "—"}</span>
+      ),
+    }),
+    columnHelper.accessor("isRecurring", {
+      header: "Recurrente",
+      cell: ({ row }) =>
+        row.original.isRecurring ? (
+          <span className="text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 px-2.5 py-1 rounded-full border border-amber-200 dark:border-amber-800">
+            Cada año
+          </span>
+        ) : (
+          <span className="text-xs text-muted-foreground">No</span>
+        ),
+    }),
+    columnHelper.display({
+      id: "actions",
+      header: "Acción",
+      cell: ({ row }) => (
+        <div className="flex justify-end">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setDeleteTarget(row.original)}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    }),
+  ];
 
   return (
     <div className="space-y-6">
@@ -84,107 +164,39 @@ export default function BlockedDatesPage() {
         description="Administra los días no laborables del sistema"
         icon={CalendarOff}
         actions={
-          <Button onClick={() => setModalOpen(true)} className="rounded-xl">
+          <Button onClick={() => { reset(); setModalOpen(true); }} className="rounded-xl">
             <Plus className="h-4 w-4 mr-2" />
             Bloquear fecha
           </Button>
         }
       />
 
-      <div className="rounded-2xl border border-border/50 bg-card">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : blockedDates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="h-16 w-16 rounded-full bg-muted/30 flex items-center justify-center mb-4">
-              <Ban className="h-8 w-8 text-muted-foreground/40" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-1">No hay días bloqueados</h3>
-            <p className="text-sm text-muted-foreground mb-6 max-w-sm">
-              Los días bloqueados son fechas no laborables como feriados o mantenimiento del sistema.
-            </p>
-            <Button onClick={() => setModalOpen(true)} variant="outline" className="rounded-xl">
-              <Plus className="h-4 w-4 mr-2" />
-              Bloquear primera fecha
-            </Button>
-          </div>
-        ) : (
-          <div className="overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border/50">
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Fecha</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Día</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Motivo</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Recurrente</th>
-                  <th className="text-right px-6 py-4 text-sm font-medium text-muted-foreground">Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {blockedDates.map((bd) => (
-                  <tr key={bd.id} className="border-b border-border/30 hover:bg-muted/20 transition-colors">
-                    <td className="px-6 py-4 text-sm font-medium">
-                      {format(new Date(bd.date), "dd/MM/yyyy")}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {format(new Date(bd.date), "EEEE", { locale: es })}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {bd.reason || "—"}
-                    </td>
-                    <td className="px-6 py-4">
-                      {bd.isRecurring ? (
-                        <span className="text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded-full">
-                          Cada año
-                        </span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">No</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleUnblock(bd.id)}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      <DataTable
+        columns={columns}
+        data={blockedDates}
+        isLoading={isLoading}
+        searchPlaceholder="Buscar fechas..."
+        emptyMessage="No hay días bloqueados"
+      />
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Bloquear fecha</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit(onCreateSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="date">Fecha</Label>
-              <Input
-                id="date"
-                type="date"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-                className="rounded-xl"
-              />
+              <Label htmlFor="bd-date">Fecha</Label>
+              <Input id="bd-date" type="date" {...register("date")} className="rounded-xl" />
+              {errors.date && <p className="text-xs text-destructive">{errors.date.message}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="reason">Motivo (opcional)</Label>
+              <Label htmlFor="bd-reason">Motivo <span className="text-muted-foreground font-normal">(opcional)</span></Label>
               <Textarea
-                id="reason"
-                placeholder="Ej: Feriado nacional"
-                value={newReason}
-                onChange={(e) => setNewReason(e.target.value)}
+                id="bd-reason"
+                {...register("reason")}
                 className="rounded-xl resize-none"
+                placeholder="Ej: Feriado nacional"
               />
             </div>
             <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30">
@@ -192,26 +204,39 @@ export default function BlockedDatesPage() {
                 <Label className="text-sm font-medium">Recurrente cada año</Label>
                 <p className="text-xs text-muted-foreground">Se bloquea automáticamente cada año en esta fecha</p>
               </div>
-              <Switch checked={newRecurring} onCheckedChange={setNewRecurring} />
+              <Switch
+                checked={isRecurring}
+                onCheckedChange={(v) => setValue("isRecurring", v)}
+              />
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)} className="rounded-xl">
-              Cancelar
-            </Button>
-            <Button onClick={handleCreate} disabled={saving} className="rounded-xl">
-              {saving ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Bloqueando...
-                </>
-              ) : (
-                "Bloquear fecha"
-              )}
-            </Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button variant="outline" type="button" onClick={() => setModalOpen(false)} className="rounded-xl">Cancelar</Button>
+              <Button type="submit" disabled={saving} className="rounded-xl">
+                {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Bloqueando...</> : "Bloquear fecha"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Desbloquear fecha?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se eliminará el bloqueo del día{" "}
+              <strong>{deleteTarget && format(new Date(deleteTarget.date), "dd/MM/yyyy")}</strong>.
+              {deleteTarget?.isRecurring && " Las recurrencias futuras no se verán afectadas."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUnblock} className="rounded-xl bg-destructive hover:bg-destructive/90">
+              Desbloquear
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

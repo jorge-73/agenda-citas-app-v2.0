@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, Suspense, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AppointmentCalendar } from "@/features/appointments/components/appointment-calendar";
 import { AppointmentFilters } from "@/features/appointments/components/appointment-filters";
 import { AppointmentModal } from "@/features/appointments/components/appointment-modal";
-import { LoadingState } from "@/components/shared/loading-state";
 import { Calendar, Plus, Download } from "lucide-react";
 import { Appointment } from "@/features/appointments/types";
 import { getAppointmentsByMonth, deleteAppointment } from "@/features/appointments/actions";
@@ -111,16 +112,38 @@ export default function AppointmentsPage() {
         />
       </div>
 
-      {isLoading ? (
-        <LoadingState type="card" />
-      ) : (
-        <Suspense fallback={<LoadingState type="card" />}>
-          <AppointmentCalendar
-            appointments={appointments}
-            onAppointmentClick={handleAppointmentClick}
-          />
-        </Suspense>
-      )}
+      <AnimatePresence mode="wait">
+        {isLoading ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="rounded-2xl border border-border/40 bg-card/70 p-6 space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-8 w-48" />
+              <div className="flex gap-2">
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-20" />
+              </div>
+            </div>
+            <Skeleton className="h-[400px] w-full rounded-xl" />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="calendar"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <AppointmentCalendar
+              appointments={appointments}
+              onAppointmentClick={handleAppointmentClick}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AppointmentModal
         open={modalOpen}
