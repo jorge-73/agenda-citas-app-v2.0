@@ -16,6 +16,8 @@ import {
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { exportToCSV, formatDateForExport } from "@/lib/export";
+import { Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -142,6 +144,26 @@ export function PatientsTable({ patients, isLoading, onCreateNew }: PatientsTabl
             className="pl-10"
           />
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            const data = patients.map((p: any) => ({
+              Nombre: p.user?.name || "—",
+              Email: p.user?.email || "—",
+              Teléfono: p.phone || "",
+              Documento: p.document || "",
+              "Tipo sangre": p.bloodType || "",
+              Seguro: p.insurance || "",
+              "Fecha registro": formatDateForExport(p.createdAt),
+            }));
+            exportToCSV(data, `pacientes-${new Date().toISOString().split("T")[0]}`);
+          }}
+          className="rounded-xl"
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Exportar
+        </Button>
         {onCreateNew && (
           <Button onClick={onCreateNew}>
             <Plus className="h-4 w-4 mr-2" />

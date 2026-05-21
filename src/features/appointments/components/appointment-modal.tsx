@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { AppointmentStatus } from "../types";
 import { toast } from "sonner";
 import { getPatientsList, getSpecialistsList, createAppointment, updateAppointment } from "../actions";
-import { Calendar, Clock, User, Stethoscope, FileText, ScrollText, Loader2 } from "lucide-react";
+import { Calendar, Clock, User, Stethoscope, FileText, ScrollText, Loader2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const appointmentSchema = z.object({
@@ -33,6 +33,7 @@ interface AppointmentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  onDelete?: (id: string) => void;
   initialData?: {
     id?: string;
     patientId?: string;
@@ -50,10 +51,12 @@ export function AppointmentModal({
   open,
   onOpenChange,
   onSuccess,
+  onDelete,
   initialData,
   isEdit = false,
 }: AppointmentModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [patients, setPatients] = useState<{ id: string; name: string; email: string }[]>([]);
   const [specialists, setSpecialists] = useState<{ id: string; name: string; specialty: string }[]>([]);
 
@@ -286,11 +289,30 @@ export function AppointmentModal({
 
             {/* Footer Actions */}
             <DialogFooter className="gap-2 mt-2">
+              {isEdit && onDelete && initialData?.id && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={deleteLoading}
+                  onClick={async () => {
+                    setDeleteLoading(true);
+                    await onDelete(initialData.id!);
+                    setDeleteLoading(false);
+                  }}
+                  className="text-destructive hover:text-destructive border-destructive/30 hover:border-destructive/50"
+                >
+                  {deleteLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                </Button>
+              )}
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
-                className="flex-1"
+                className={cn(isEdit && onDelete ? "flex-1" : "flex-1")}
               >
                 Cancelar
               </Button>

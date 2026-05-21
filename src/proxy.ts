@@ -10,6 +10,7 @@ const ROUTE_PERMISSIONS: Record<string, Permission> = {
   "/dashboard/specialists": "view:specialists",
   "/dashboard/schedules": "view:schedules",
   "/dashboard/blocked-dates": "view:blocked-dates",
+  "/dashboard/users": "view:users",
   "/dashboard/settings": "view:settings",
 };
 

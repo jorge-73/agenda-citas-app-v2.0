@@ -145,6 +145,10 @@ export async function createAppointment(data: {
   return appointment;
 }
 
+export async function deleteAppointment(id: string) {
+  return db.appointment.delete({ where: { id } });
+}
+
 export async function updateAppointment(id: string, data: {
   patientId?: string;
   specialistId?: string;

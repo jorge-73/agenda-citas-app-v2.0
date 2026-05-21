@@ -17,9 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { MoreHorizontal, Search, Plus, Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { MoreHorizontal, Search, Plus, Eye, Pencil, Trash2, ChevronLeft, ChevronRight, Clock, Download } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn, getInitials } from "@/lib/utils";
+import { exportToCSV } from "@/lib/export";
 
 const columnHelper = createColumnHelper<any>();
 
@@ -153,12 +154,35 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
             className="pl-10"
           />
         </div>
-        {onCreateNew && (
-          <Button onClick={onCreateNew}>
-            <Plus className="h-4 w-4 mr-2" />
-            Nuevo Especialista
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const data = specialists.map((s: any) => ({
+                Nombre: s.user?.name || "—",
+                Email: s.user?.email || "—",
+                Especialidad: s.specialty,
+                Licencia: s.license || "",
+                Teléfono: s.phone || "",
+                Precio: s.price ? `$${s.price}` : "",
+                Disponible: s.isAvailable ? "Sí" : "No",
+                "Duración consulta": `${s.consultationDuration} min`,
+              }));
+              exportToCSV(data, `especialistas-${new Date().toISOString().split("T")[0]}`);
+            }}
+            className="rounded-xl"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Exportar
           </Button>
-        )}
+          {onCreateNew && (
+            <Button onClick={onCreateNew}>
+              <Plus className="h-4 w-4 mr-2" />
+              Nuevo Especialista
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-sm overflow-hidden hover:shadow-lg transition-all duration-300">

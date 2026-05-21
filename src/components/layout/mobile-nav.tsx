@@ -12,6 +12,7 @@ import {
   Settings,
   Clock,
   CalendarOff,
+  Shield,
   HeartPulse,
   Menu,
 } from "lucide-react";
@@ -33,6 +34,7 @@ const navItems: { title: string; href: string; icon: any; permission: Permission
   { title: "Especialistas", href: "/dashboard/specialists", icon: Stethoscope, permission: "view:specialists" },
   { title: "Horarios", href: "/dashboard/schedules", icon: Clock, permission: "view:schedules" },
   { title: "Días bloqueados", href: "/dashboard/blocked-dates", icon: CalendarOff, permission: "view:blocked-dates" },
+  { title: "Usuarios", href: "/dashboard/users", icon: Shield, permission: "view:users" },
   { title: "Configuración", href: "/dashboard/settings", icon: Settings, permission: "view:settings" },
 ];
 

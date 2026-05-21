@@ -12,6 +12,7 @@ import {
   Settings,
   Clock,
   CalendarOff,
+  Shield,
   ChevronLeft,
   ChevronRight,
   HeartPulse,
@@ -58,6 +59,12 @@ const navItems: { title: string; href: string; icon: any; permission: Permission
     href: "/dashboard/blocked-dates",
     icon: CalendarOff,
     permission: "view:blocked-dates",
+  },
+  {
+    title: "Usuarios",
+    href: "/dashboard/users",
+    icon: Shield,
+    permission: "view:users",
   },
   {
     title: "Configuración",
