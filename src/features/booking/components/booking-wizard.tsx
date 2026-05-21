@@ -1,114 +1,229 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { 
-  Stethoscope, 
-  User, 
-  Calendar, 
-  Clock, 
-  CheckCircle2,
-  ArrowRight,
-  ArrowLeft,
-  Loader2,
-  Sparkles,
-  Star,
-  Mail
-} from "lucide-react";
-import { format, addDays } from "date-fns";
-import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { createBookingAction } from "@/features/booking/actions";
+import { getAvailableSpecialistsAction, getAvailableDatesAction, getAvailableTimeSlotsAction, createBookingAction } from "@/features/booking/actions";
+import { StepSpecialties } from "./step-specialties";
+import { StepProfessionals } from "./step-professionals";
+import { StepDateTime } from "./step-datetime";
+import { StepReview } from "./step-review";
+import { CheckCircle2, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import type { TimeSlot } from "../types";
 
-const STEPS = [
-  { id: 1, title: "Especialidad", icon: Stethoscope },
-  { id: 2, title: "Profesional", icon: User },
-  { id: 3, title: "Fecha y Hora", icon: Calendar },
-  { id: 4, title: "Confirmación", icon: CheckCircle2 },
+const VISUAL_STEPS = [
+  { id: 1, label: "Especialidad", short: "Esp." },
+  { id: 2, label: "Profesional", short: "Pro." },
+  { id: 3, label: "Fecha y Hora", short: "Fecha" },
+  { id: 4, label: "Confirmar", short: "Conf." },
 ];
 
-const SPECIALTIES = [
-  { id: "1", name: "Medicina General", icon: "🩺" },
-  { id: "2", name: "Cardiología", icon: "❤️" },
-  { id: "3", name: "Neurología", icon: "🧠" },
-  { id: "4", name: "Oftalmología", icon: "👁️" },
-  { id: "5", name: "Pediatría", icon: "👶" },
-  { id: "6", name: "Dermatología", icon: "✨" },
-];
+interface SpecialistFlat {
+  id: string;
+  name: string;
+  specialty: string;
+  price?: number | null;
+  bio?: string | null;
+}
 
-const MOCK_SPECIALISTS = [
-  { id: "1", name: "Dr. Juan Pérez", specialty: "Medicina General", rating: 4.9, experience: "15 años" },
-  { id: "2", name: "Dra. María García", specialty: "Medicina General", rating: 4.8, experience: "10 años" },
-  { id: "3", name: "Dr. Carlos López", specialty: "Cardiología", rating: 4.9, experience: "20 años" },
-  { id: "4", name: "Dra. Ana Martínez", specialty: "Neurología", rating: 4.7, experience: "12 años" },
-];
+function validateEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone: string) {
+  return /^[\d\s\-\+\(\)]{7,20}$/.test(phone);
+}
 
 export function BookingWizard() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedSpecialty, setSelectedSpecialty] = useState<typeof SPECIALTIES[0] | null>(null);
-  const [selectedSpecialist, setSelectedSpecialist] = useState<typeof MOCK_SPECIALISTS[0] | null>(null);
+  const [step, setStep] = useState(1);
+
+  // Data from server
+  const [allSpecialists, setAllSpecialists] = useState<SpecialistFlat[]>([]);
+  const [isLoadingSpecialists, setIsLoadingSpecialists] = useState(true);
+
+  // Selections
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [selectedSpecialistId, setSelectedSpecialistId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  
+
+  // Dynamic data
+  const [availableDates, setAvailableDates] = useState<Date[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+  const [isLoadingDates, setIsLoadingDates] = useState(false);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+
+  // Patient form
   const [patientData, setPatientData] = useState({
     name: "",
     lastname: "",
     email: "",
     phone: "",
-    reason: ""
+    reason: "",
   });
+  const [errors, setErrors] = useState<Partial<Record<"name" | "lastname" | "email" | "phone", string>>>({});
 
-  const availableDates = Array.from({ length: 14 }, (_, i) => addDays(new Date(), i + 1));
-  
-  const availableTimes = [
-    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-    "12:00", "12:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
-  ];
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const canProceed = () => {
-    switch (currentStep) {
+  // Fetch specialists on mount
+  useEffect(() => {
+    (async () => {
+      setIsLoadingSpecialists(true);
+      try {
+        const data = await getAvailableSpecialistsAction();
+        setAllSpecialists(
+          data.map((s) => ({
+            id: s.id,
+            name: s.user?.name || "Especialista",
+            specialty: s.specialty,
+            price: s.price,
+            bio: s.bio,
+          }))
+        );
+      } catch {
+        toast.error("Error al cargar especialistas");
+      } finally {
+        setIsLoadingSpecialists(false);
+      }
+    })();
+  }, []);
+
+  // Derived specialties from actual data
+  const specialties = useMemo(() => {
+    const map = new Map<string, number>();
+    allSpecialists.forEach((s) => {
+      map.set(s.specialty, (map.get(s.specialty) || 0) + 1);
+    });
+    return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
+  }, [allSpecialists]);
+
+  // Filtered specialists by specialty
+  const filteredSpecialists = useMemo(
+    () => allSpecialists.filter((s) => s.specialty === selectedSpecialty),
+    [allSpecialists, selectedSpecialty]
+  );
+
+  const selectedSpecialist = useMemo(
+    () => allSpecialists.find((s) => s.id === selectedSpecialistId),
+    [allSpecialists, selectedSpecialistId]
+  );
+
+  // Load dates when specialist is selected
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (!selectedSpecialistId) return;
+    let cancelled = false;
+
+    setAvailableDates([]);
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setAvailableSlots([]);
+    setIsLoadingDates(true);
+
+    getAvailableDatesAction(selectedSpecialistId)
+      .then((dates) => { if (!cancelled) setAvailableDates(dates.map((d) => new Date(d))); })
+      .catch(() => { if (!cancelled) toast.error("Error al cargar fechas disponibles"); })
+      .finally(() => { if (!cancelled) setIsLoadingDates(false); });
+
+    return () => { cancelled = true; };
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [selectedSpecialistId]);
+
+  // Load slots when date is selected
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (!selectedSpecialistId || !selectedDate) return;
+    let cancelled = false;
+
+    setSelectedTime(null);
+    setAvailableSlots([]);
+    setIsLoadingSlots(true);
+
+    getAvailableTimeSlotsAction(selectedSpecialistId, selectedDate)
+      .then((slots) => { if (!cancelled) setAvailableSlots(slots); })
+      .catch(() => { if (!cancelled) toast.error("Error al cargar horarios"); })
+      .finally(() => { if (!cancelled) setIsLoadingSlots(false); });
+
+    return () => { cancelled = true; };
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [selectedSpecialistId, selectedDate]);
+
+  const canProceed = useCallback(() => {
+    switch (step) {
       case 1: return !!selectedSpecialty;
-      case 2: return !!selectedSpecialist;
+      case 2: return !!selectedSpecialistId;
       case 3: return !!selectedDate && !!selectedTime;
-      case 4: return patientData.name && patientData.email && patientData.phone;
+      case 4: return !!(
+        patientData.name.trim() &&
+        patientData.lastname.trim() &&
+        patientData.email.trim() &&
+        patientData.phone.trim() &&
+        !Object.values(errors).some(Boolean)
+      );
       default: return false;
     }
-  };
+  }, [step, selectedSpecialty, selectedSpecialistId, selectedDate, selectedTime, patientData, errors]);
 
-  const nextStep = () => {
-    if (currentStep < 4) setCurrentStep(currentStep + 1);
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
-  };
-
-  const handleConfirm = async () => {
-    if (!selectedSpecialty || !selectedSpecialist || !selectedDate || !selectedTime || !patientData.name || !patientData.lastname || !patientData.email || !patientData.phone) {
-      toast.error("Por favor completa todos los campos requeridos");
-      return;
+  const goNext = useCallback(() => {
+    if (step < 4) {
+      // Auto-load on step 4
+      if (step === 3) {
+        setErrors({});
+      }
+      setStep((s) => s + 1);
     }
+  }, [step]);
 
-    setIsLoading(true);
+  const goBack = useCallback(() => {
+    if (step > 1) setStep((s) => s - 1);
+  }, [step]);
+
+  const handlePatientChange = useCallback((data: Partial<typeof patientData>) => {
+    setPatientData((prev) => {
+      const next = { ...prev, ...data };
+      return next;
+    });
+    setErrors((prev) => {
+      const next = { ...prev };
+      if ("name" in data) delete next.name;
+      if ("lastname" in data) delete next.lastname;
+      if ("email" in data) delete next.email;
+      if ("phone" in data) delete next.phone;
+      return next;
+    });
+  }, []);
+
+  const validateForm = useCallback(() => {
+    const errs: typeof errors = {};
+    if (!patientData.name.trim()) errs.name = "El nombre es requerido";
+    if (!patientData.lastname.trim()) errs.lastname = "El apellido es requerido";
+    if (!patientData.email.trim()) errs.email = "El email es requerido";
+    else if (!validateEmail(patientData.email)) errs.email = "Email inválido";
+    if (!patientData.phone.trim()) errs.phone = "El teléfono es requerido";
+    else if (!validatePhone(patientData.phone)) errs.phone = "Teléfono inválido";
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  }, [patientData]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!validateForm()) return;
+    if (!selectedSpecialty || !selectedSpecialistId || !selectedDate || !selectedTime) return;
+
+    setIsSubmitting(true);
     try {
       const booking = await createBookingAction({
-        patientName: patientData.name,
-        patientLastname: patientData.lastname,
-        patientEmail: patientData.email,
-        patientPhone: patientData.phone,
-        specialistId: selectedSpecialist.id,
-        specialty: selectedSpecialty.name,
-        reason: patientData.reason,
+        patientName: patientData.name.trim(),
+        patientLastname: patientData.lastname.trim(),
+        patientEmail: patientData.email.trim(),
+        patientPhone: patientData.phone.trim(),
+        specialistId: selectedSpecialistId,
+        specialty: selectedSpecialty,
+        reason: patientData.reason.trim() || undefined,
         date: selectedDate,
         time: selectedTime,
       });
@@ -117,381 +232,199 @@ export function BookingWizard() {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error al crear la reserva");
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
-  };
+  }, [validateForm, selectedSpecialty, selectedSpecialistId, selectedDate, selectedTime, patientData, router]);
 
   return (
-    <div className="space-y-10">
-      {/* Progress Steps */}
-      <div className="flex items-center justify-center">
-        {STEPS.map((s, index) => (
-          <div key={s.id} className="flex items-center">
-            <motion.div 
-              className="flex flex-col items-center"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <div 
-                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                  currentStep >= s.id 
-                    ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25" 
-                    : "bg-muted/60 text-muted-foreground"
-                }`}
-              >
-                {currentStep > s.id ? (
-                  <CheckCircle2 className="w-6 h-6" />
-                ) : (
-                  <s.icon className="w-5 h-5" />
+    <div className="space-y-6 sm:space-y-8 max-w-3xl mx-auto">
+      <div className="flex items-center justify-between gap-1 sm:gap-2 px-1">
+        {VISUAL_STEPS.map((s, i) => {
+          const isActive = step === s.id;
+          const isCompleted = step > s.id;
+          return (
+            <div key={s.id} className="flex items-center gap-0 flex-1">
+              <button
+                onClick={() => s.id < step && setStep(s.id)}
+                disabled={s.id >= step}
+                className={cn(
+                  "flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 rounded-xl transition-all duration-200 min-w-0",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                  isActive && "bg-primary/10 shadow-sm",
+                  isCompleted && "cursor-pointer hover:bg-primary/5"
                 )}
-              </div>
-              <span className={`text-xs mt-3 font-medium ${currentStep >= s.id ? "text-foreground" : "text-muted-foreground"}`}>
-                {s.title}
-              </span>
-            </motion.div>
-            {index < STEPS.length - 1 && (
-              <motion.div 
-                className={`w-20 h-0.5 mx-3 rounded-full ${currentStep > s.id ? "bg-primary" : "bg-muted"}`}
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: currentStep > s.id ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-              />
-            )}
-          </div>
-        ))}
+              >
+                <div
+                  className={cn(
+                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-all duration-300",
+                    isCompleted
+                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                      : isActive
+                        ? "border-2 border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                        : "border-2 border-border/50 bg-muted/40 text-muted-foreground"
+                  )}
+                >
+                  {isCompleted ? <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : s.id}
+                </div>
+                <span
+                  className={cn(
+                    "text-xs sm:text-sm font-medium truncate hidden sm:block",
+                    isActive || isCompleted ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
+                  {s.label}
+                </span>
+              </button>
+              {i < VISUAL_STEPS.length - 1 && (
+                <div
+                  className={cn(
+                    "flex-1 h-0.5 mx-1 sm:mx-2 rounded-full transition-colors duration-300",
+                    isCompleted ? "bg-primary" : "bg-border/30"
+                  )}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentStep}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-        >
-          {/* Step 1: Specialties */}
-          {currentStep === 1 && (
-            <div className="rounded-3xl border border-border/50 bg-card/70 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
-              <div className="p-6 pb-8 text-center">
-                <Badge variant="soft" className="w-fit mx-auto mb-3">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Paso 1
-                </Badge>
-                <h3 className="text-2xl font-semibold">Selecciona una especialidad</h3>
-                <p className="text-base mt-2 text-muted-foreground">
-                  Elige el tipo de atención médica que necesitas
-                </p>
-              </div>
-              <div className="p-6 pt-0">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {SPECIALTIES.map((specialty, index) => (
-                    <motion.button
-                      key={specialty.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      onClick={() => {
-                        setSelectedSpecialty(specialty);
-                        nextStep();
-                      }}
-                      className={`p-5 rounded-2xl border-2 transition-all duration-300 text-left group hover:scale-[1.01] ${
-                        selectedSpecialty?.id === specialty.id
-                          ? "border-primary bg-primary/5 shadow-lg shadow-primary/5"
-                          : "border-border/40 hover:border-primary/30 hover:shadow-md bg-card/50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="text-4xl">{specialty.icon}</div>
-                        <div>
-                          <p className="font-semibold">{specialty.name}</p>
-                        </div>
-                      </div>
-                    </motion.button>
-                  ))}
+      <div className="relative min-h-[360px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+          >
+            {step === 1 && (
+              <div>
+                <div className="mb-5 sm:mb-6 text-center sm:text-left">
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">Selecciona una especialidad</p>
+                  <p className="text-sm text-muted-foreground mt-1">Elige el tipo de atención médica que necesitas</p>
                 </div>
+                <StepSpecialties
+                  specialties={specialties}
+                  selected={selectedSpecialty}
+                  onSelect={(s) => { setSelectedSpecialty(s); goNext(); }}
+                  isLoading={isLoadingSpecialists}
+                />
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Step 2: Specialists */}
-          {currentStep === 2 && (
-            <div className="rounded-3xl border border-border/50 bg-card/70 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
-              <div className="p-6 pb-8 text-center">
-                <Badge variant="soft" className="w-fit mx-auto mb-3">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Paso 2
-                </Badge>
-                <h3 className="text-2xl font-semibold">Selecciona un profesional</h3>
-                <p className="text-base mt-2 text-muted-foreground">
-                  Elige el especialista que te atenderá
-                </p>
-              </div>
-              <div className="p-6 pt-0">
-                <div className="space-y-4">
-                  {MOCK_SPECIALISTS.map((specialist, index) => (
-                    <motion.button
-                      key={specialist.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      onClick={() => {
-                        setSelectedSpecialist(specialist);
-                        nextStep();
-                      }}
-                      className={`w-full p-5 rounded-2xl border-2 transition-all duration-300 text-left group hover:scale-[1.005] ${
-                        selectedSpecialist?.id === specialist.id
-                          ? "border-primary bg-primary/5 shadow-lg shadow-primary/5"
-                          : "border-border/40 hover:border-primary/30 hover:shadow-md bg-card/50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-5">
-                        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-xl font-bold text-primary">
-                          {specialist.name.charAt(0)}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-lg">{specialist.name}</p>
-                          <p className="text-sm text-muted-foreground">{specialist.specialty}</p>
-                          <div className="flex items-center gap-3 mt-2">
-                            <div className="flex items-center gap-1">
-                              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                              <span className="text-sm font-medium">{specialist.rating}</span>
-                            </div>
-                            <span className="text-xs text-muted-foreground">•</span>
-                            <span className="text-xs text-muted-foreground">{specialist.experience}</span>
-                          </div>
-                        </div>
-                        {selectedSpecialist?.id === specialist.id && (
-                          <CheckCircle2 className="w-6 h-6 text-primary" />
-                        )}
-                      </div>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Date & Time */}
-          {currentStep === 3 && (
-            <div className="rounded-3xl border border-border/50 bg-card/70 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
-              <div className="p-6 pb-8 text-center">
-                <Badge variant="soft" className="w-fit mx-auto mb-3">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Paso 3
-                </Badge>
-                <h3 className="text-2xl font-semibold">Selecciona fecha y hora</h3>
-                <p className="text-base mt-2 text-muted-foreground">
-                  Elige el horario disponible que más te convenga
-                </p>
-              </div>
-              <div className="p-6 pt-0 space-y-8">
-                <div>
-                  <p className="font-semibold mb-4 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-primary" />
-                    Fecha disponible
+            {step === 2 && (
+              <div>
+                <div className="mb-5 sm:mb-6 text-center sm:text-left">
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">Selecciona un profesional</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {filteredSpecialists.length} {filteredSpecialists.length === 1 ? "especialista disponible" : "especialistas disponibles"} en {selectedSpecialty}
                   </p>
-                  <div className="flex flex-wrap gap-3">
-                    {availableDates.slice(0, 7).map((date, index) => (
-                      <motion.button
-                        key={date.toISOString()}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.03 }}
-                        onClick={() => setSelectedDate(date)}
-                        className={`px-5 py-3 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${
-                          selectedDate?.toDateString() === date.toDateString()
-                            ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                            : "border-border/40 hover:border-primary/30 hover:shadow-md bg-card/50"
-                        }`}
-                      >
-                        <span className="font-medium">{format(date, "EEE d", { locale: es })}</span>
-                      </motion.button>
-                    ))}
-                  </div>
                 </div>
-                
-                {selectedDate && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <p className="font-semibold mb-4 flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-primary" />
-                      Horarios disponibles
-                    </p>
-                    <div className="flex flex-wrap gap-3">
-                      {availableTimes.map((time, index) => (
-                        <motion.button
-                          key={time}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.02 }}
-                          onClick={() => setSelectedTime(time)}
-                          className={`px-5 py-3 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${
-                            selectedTime === time
-                              ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                              : "border-border/40 hover:border-primary/30 hover:shadow-md bg-card/50"
-                          }`}
-                        >
-                          <span className="font-medium">{time}</span>
-                        </motion.button>
-                      ))}
-                    </div>
-                  </motion.div>
+                <StepProfessionals
+                  specialists={filteredSpecialists}
+                  selected={selectedSpecialistId}
+                  onSelect={(id) => { setSelectedSpecialistId(id); goNext(); }}
+                  isLoading={isLoadingSpecialists}
+                />
+              </div>
+            )}
+
+            {step === 3 && (
+              <div>
+                <div className="mb-5 sm:mb-6 text-center sm:text-left">
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">Selecciona fecha y hora</p>
+                  <p className="text-sm text-muted-foreground mt-1">Elige el horario disponible que más te convenga</p>
+                </div>
+                {isLoadingDates ? (
+                  <div className="flex items-center justify-center py-16">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : availableDates.length > 0 ? (
+                  <StepDateTime
+                    availableDates={availableDates}
+                    availableSlots={availableSlots}
+                    selectedDate={selectedDate}
+                    selectedTime={selectedTime}
+                    onSelectDate={setSelectedDate}
+                    onSelectTime={setSelectedTime}
+                    isLoadingSlots={isLoadingSlots}
+                  />
+                ) : (
+                  <div className="text-center py-16">
+                    <p className="text-muted-foreground">No hay fechas disponibles para este especialista.</p>
+                  </div>
                 )}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Step 4: Confirmation */}
-          {currentStep === 4 && (
-            <div className="rounded-3xl border border-border/50 bg-card/70 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
-              <div className="p-6 pb-8 text-center">
-                <Badge variant="soft" className="w-fit mx-auto mb-3">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Paso 4
-                </Badge>
-                <h3 className="text-2xl font-semibold">Confirmar cita</h3>
-                <p className="text-base mt-2 text-muted-foreground">
-                  Revisa los detalles y completa tus datos
-                </p>
-              </div>
-              <div className="p-6 pt-0 space-y-8">
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/5 via-muted/30 to-transparent border border-border/40">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center py-2 border-b border-border/40">
-                      <span className="text-muted-foreground">Especialidad</span>
-                      <span className="font-semibold">{selectedSpecialty?.name}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-border/40">
-                      <span className="text-muted-foreground">Profesional</span>
-                      <span className="font-semibold">{selectedSpecialist?.name}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-border/40">
-                      <span className="text-muted-foreground">Fecha</span>
-                      <span className="font-semibold">
-                        {selectedDate && format(selectedDate, "EEEE d 'de' MMMM", { locale: es })}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-muted-foreground">Hora</span>
-                      <span className="font-semibold">{selectedTime}</span>
-                    </div>
-                  </div>
+            {step === 4 && (
+              <div>
+                <div className="mb-5 sm:mb-6 text-center sm:text-left">
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">Confirma tu cita</p>
+                  <p className="text-sm text-muted-foreground mt-1">Revisa los detalles y completa tus datos</p>
                 </div>
-
-                <div className="space-y-5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Nombre *</Label>
-                      <Input
-                        id="name"
-                        value={patientData.name}
-                        onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
-                        className="h-12"
-                        placeholder="Tu nombre"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastname">Apellido *</Label>
-                      <Input
-                        id="lastname"
-                        value={patientData.lastname}
-                        onChange={(e) => setPatientData({ ...patientData, lastname: e.target.value })}
-                        className="h-12"
-                        placeholder="Tu apellido"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={patientData.email}
-                        onChange={(e) => setPatientData({ ...patientData, email: e.target.value })}
-                        className="h-12"
-                        placeholder="tu@email.com"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Teléfono *</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={patientData.phone}
-                        onChange={(e) => setPatientData({ ...patientData, phone: e.target.value })}
-                        className="h-12"
-                        placeholder="+52 123 456 7890"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reason">Motivo de consulta <span className="text-muted-foreground">(opcional)</span></Label>
-                    <Textarea
-                      id="reason"
-                      value={patientData.reason}
-                      onChange={(e) => setPatientData({ ...patientData, reason: e.target.value })}
-                      className="min-h-[100px]"
-                      placeholder="Describe brevemente tus síntomas"
-                    />
-                  </div>
-                </div>
+                <StepReview
+                  specialty={selectedSpecialty || ""}
+                  specialistName={selectedSpecialist?.name || ""}
+                  specialistSpecialty={selectedSpecialist?.specialty || ""}
+                  date={selectedDate}
+                  time={selectedTime || ""}
+                  patientData={patientData}
+                  onPatientDataChange={handlePatientChange}
+                  errors={errors}
+                />
               </div>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Navigation */}
-      <motion.div 
-        className="flex justify-between pt-4"
+      <motion.div
+        className="flex items-center justify-between pt-2 pb-4 sm:pb-0 gap-3 sticky bottom-0 bg-background/90 backdrop-blur-lg border-t border-border/20 -mx-4 px-4 sm:relative sm:bg-transparent sm:border-0 sm:mx-0 sm:px-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.15 }}
       >
         <Button
           variant="outline"
           size="lg"
-          onClick={prevStep}
-          disabled={currentStep === 1}
-          className="px-6"
+          onClick={goBack}
+          disabled={step === 1}
+          className="rounded-xl px-5 h-12"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft className="h-4 w-4 mr-2" />
           Atrás
         </Button>
-        
-        {currentStep === 4 ? (
-          <Button 
+
+        {step === 4 ? (
+          <Button
             size="lg"
-            onClick={handleConfirm} 
-            disabled={isLoading || !canProceed()}
-            className="px-8 shadow-lg shadow-primary/20"
+            onClick={handleSubmit}
+            disabled={isSubmitting || !canProceed()}
+            className="rounded-xl px-6 h-12 shadow-lg shadow-primary/20"
           >
-            {isLoading ? (
+            {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Confirmando...
               </>
             ) : (
               <>
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                Confirmar Cita
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Confirmar cita
               </>
             )}
           </Button>
         ) : (
-          <Button 
+          <Button
             size="lg"
-            onClick={nextStep} 
+            onClick={goNext}
             disabled={!canProceed()}
-            className="px-8"
+            className="rounded-xl px-6 h-12"
           >
             Siguiente
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         )}
       </motion.div>
