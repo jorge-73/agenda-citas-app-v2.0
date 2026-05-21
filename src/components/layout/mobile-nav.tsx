@@ -11,6 +11,7 @@ import {
   Stethoscope,
   Settings,
   Clock,
+  CalendarOff,
   HeartPulse,
   Menu,
 } from "lucide-react";
@@ -22,18 +23,29 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { hasPermission, type Permission } from "@/lib/permissions";
+import type { UserRole } from "@/types";
 
-const navItems = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Citas", href: "/dashboard/appointments", icon: Calendar },
-  { title: "Pacientes", href: "/dashboard/patients", icon: Users },
-  { title: "Especialistas", href: "/dashboard/specialists", icon: Stethoscope },
-  { title: "Horarios", href: "/dashboard/schedules", icon: Clock },
-  { title: "Configuración", href: "/dashboard/settings", icon: Settings },
+const navItems: { title: string; href: string; icon: any; permission: Permission }[] = [
+  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, permission: "view:dashboard" },
+  { title: "Citas", href: "/dashboard/appointments", icon: Calendar, permission: "view:appointments" },
+  { title: "Pacientes", href: "/dashboard/patients", icon: Users, permission: "view:patients" },
+  { title: "Especialistas", href: "/dashboard/specialists", icon: Stethoscope, permission: "view:specialists" },
+  { title: "Horarios", href: "/dashboard/schedules", icon: Clock, permission: "view:schedules" },
+  { title: "Días bloqueados", href: "/dashboard/blocked-dates", icon: CalendarOff, permission: "view:blocked-dates" },
+  { title: "Configuración", href: "/dashboard/settings", icon: Settings, permission: "view:settings" },
 ];
 
-export function MobileNav() {
+interface MobileNavProps {
+  userRole?: UserRole;
+}
+
+export function MobileNav({ userRole }: MobileNavProps) {
   const pathname = usePathname();
+
+  const visibleItems = navItems.filter(
+    (item) => hasPermission(userRole, item.permission)
+  );
 
   return (
     <Sheet>
@@ -54,7 +66,7 @@ export function MobileNav() {
         </SheetHeader>
         
         <nav className="flex flex-col gap-1 p-3">
-          {navItems.map((item) => {
+          {visibleItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               pathname === item.href || pathname.startsWith(`${item.href}/`);

@@ -21,6 +21,7 @@ model User {
   sessions      Session[]
   patient       Patient?
   specialist    Specialist?
+  preferences   UserPreference?
 }
 
 model Account {
@@ -122,6 +123,25 @@ model Schedule {
   specialist   Specialist @relation(fields: [specialistId], references: [id])
 
   @@unique([specialistId, dayOfWeek])
+}
+
+model UserPreference {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  emailNotifications Boolean @default(true)
+  appointmentReminders Boolean @default(true)
+  newBookingAlerts    Boolean @default(true)
+  weeklyReport        Boolean @default(false)
+  timezone       String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
 }
 
 model BlockedDate {

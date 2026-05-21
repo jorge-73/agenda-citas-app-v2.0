@@ -11,6 +11,7 @@ import {
   Stethoscope,
   Settings,
   Clock,
+  CalendarOff,
   ChevronLeft,
   ChevronRight,
   HeartPulse,
@@ -18,43 +19,65 @@ import {
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { hasPermission, type Permission } from "@/lib/permissions";
+import type { UserRole } from "@/types";
 
-const navItems = [
+const navItems: { title: string; href: string; icon: any; permission: Permission }[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    permission: "view:dashboard",
   },
   {
     title: "Citas",
     href: "/dashboard/appointments",
     icon: Calendar,
+    permission: "view:appointments",
   },
   {
     title: "Pacientes",
     href: "/dashboard/patients",
     icon: Users,
+    permission: "view:patients",
   },
   {
     title: "Especialistas",
     href: "/dashboard/specialists",
     icon: Stethoscope,
+    permission: "view:specialists",
   },
   {
     title: "Horarios",
     href: "/dashboard/schedules",
     icon: Clock,
+    permission: "view:schedules",
+  },
+  {
+    title: "Días bloqueados",
+    href: "/dashboard/blocked-dates",
+    icon: CalendarOff,
+    permission: "view:blocked-dates",
   },
   {
     title: "Configuración",
     href: "/dashboard/settings",
     icon: Settings,
+    permission: "view:settings",
   },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  userRole?: UserRole;
+}
+
+export function Sidebar({ userRole }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+
+  const visibleItems = navItems.filter(
+    (item) => !item.permission || hasPermission(userRole, item.permission)
+  );
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -92,7 +115,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 gap-1.5 p-3 overflow-y-auto">
-          {navItems.map((item) => {
+          {visibleItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               pathname === item.href || pathname.startsWith(`${item.href}/`);

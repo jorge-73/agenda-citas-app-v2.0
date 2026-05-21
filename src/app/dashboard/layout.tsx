@@ -19,17 +19,18 @@ export default async function DashboardLayout({
     name: session.user.name ?? null,
     email: session.user.email ?? "",
     image: session.user.image ?? null,
+    role: (session.user as { role?: string }).role as import("@/types").UserRole | undefined,
   } : null;
 
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Desktop Sidebar - hidden on mobile/tablet */}
       <div className="hidden lg:block">
-        <Sidebar />
+        <Sidebar userRole={user?.role} />
       </div>
       
       {/* Mobile/Tablet Navigation */}
-      <MobileNav />
+        <MobileNav userRole={user?.role} />
       
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar user={user} />

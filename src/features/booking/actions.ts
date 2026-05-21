@@ -180,7 +180,7 @@ export async function createBookingAction(data: {
     throw new Error("Ya existe una reserva en este horario");
   }
 
-  return db.booking.create({
+  const booking = await db.booking.create({
     data: {
       patientName: data.patientName,
       patientLastname: data.patientLastname,
@@ -194,4 +194,27 @@ export async function createBookingAction(data: {
       status: "PENDING",
     },
   });
+
+  try {
+    const { sendBookingConfirmationEmail } = await import("@/lib/email");
+    const specialist = await db.specialist.findUnique({
+      where: { id: data.specialistId },
+      include: { user: true },
+    });
+
+    await sendBookingConfirmationEmail({
+      to: data.patientEmail,
+      patientName: data.patientName,
+      patientLastname: data.patientLastname,
+      specialistName: specialist?.user.name || "Especialista",
+      specialty: data.specialty,
+      date: format(new Date(data.date), "dd/MM/yyyy"),
+      time: data.time,
+      reason: data.reason,
+    });
+  } catch (emailError) {
+    console.error("Error sending booking confirmation email:", emailError);
+  }
+
+  return booking;
 }

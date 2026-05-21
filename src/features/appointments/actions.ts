@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { AppointmentStatus } from "./types";
+import { format } from "date-fns";
 
 export async function getAppointmentsByMonth(year: number, month: number) {
   const startOfMonth = new Date(year, month, 1);
@@ -109,7 +110,7 @@ export async function createAppointment(data: {
   reason?: string;
   notes?: string;
 }) {
-  return db.appointment.create({
+  const appointment = await db.appointment.create({
     data: {
       patientId: data.patientId,
       specialistId: data.specialistId,
@@ -119,7 +120,29 @@ export async function createAppointment(data: {
       notes: data.notes,
       status: "PENDING",
     },
+    include: {
+      patient: { include: { user: true } },
+      specialist: { include: { user: true } },
+    },
   });
+
+  try {
+    const { sendBookingConfirmationEmail } = await import("@/lib/email");
+    await sendBookingConfirmationEmail({
+      to: appointment.patient.user.email,
+      patientName: appointment.patient.user.name || "Paciente",
+      patientLastname: "",
+      specialistName: appointment.specialist.user.name || "Especialista",
+      specialty: appointment.specialist.specialty,
+      date: format(new Date(appointment.startTime), "dd/MM/yyyy"),
+      time: format(new Date(appointment.startTime), "HH:mm"),
+      reason: appointment.reason || undefined,
+    });
+  } catch (emailError) {
+    console.error("Error sending appointment confirmation email:", emailError);
+  }
+
+  return appointment;
 }
 
 export async function updateAppointment(id: string, data: {
@@ -131,7 +154,15 @@ export async function updateAppointment(id: string, data: {
   notes?: string;
   status?: AppointmentStatus;
 }) {
-  return db.appointment.update({
+  const previous = await db.appointment.findUnique({
+    where: { id },
+    include: {
+      patient: { include: { user: true } },
+      specialist: { include: { user: true } },
+    },
+  });
+
+  const appointment = await db.appointment.update({
     where: { id },
     data: {
       ...(data.patientId && { patientId: data.patientId }),
@@ -142,5 +173,28 @@ export async function updateAppointment(id: string, data: {
       ...(data.notes !== undefined && { notes: data.notes }),
       ...(data.status && { status: data.status }),
     },
+    include: {
+      patient: { include: { user: true } },
+      specialist: { include: { user: true } },
+    },
   });
+
+  if (data.status && data.status !== previous?.status) {
+    try {
+      const { sendAppointmentStatusEmail } = await import("@/lib/email");
+      await sendAppointmentStatusEmail({
+        to: appointment.patient.user.email,
+        patientName: appointment.patient.user.name || "Paciente",
+        specialistName: appointment.specialist.user.name || "Especialista",
+        specialty: appointment.specialist.specialty,
+        date: format(new Date(appointment.startTime), "dd/MM/yyyy"),
+        time: format(new Date(appointment.startTime), "HH:mm"),
+        status: data.status,
+      });
+    } catch (emailError) {
+      console.error("Error sending status change email:", emailError);
+    }
+  }
+
+  return appointment;
 }

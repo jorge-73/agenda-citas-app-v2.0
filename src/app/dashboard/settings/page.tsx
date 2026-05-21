@@ -1,26 +1,132 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { PageHeader } from "@/components/layout/page-header";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, User, Bell, Palette, Shield, Save } from "lucide-react";
+import { Settings, User, Bell, Palette, Shield, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getProfileAction, updatePreferencesAction } from "@/features/settings/actions";
+import { updateProfileAction, changePasswordAction } from "@/features/auth/actions";
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
+  const [profile, setProfile] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    timezone: string;
+    emailNotifications: boolean;
+    appointmentReminders: boolean;
+    newBookingAlerts: boolean;
+    weeklyReport: boolean;
+  }>({
+    name: "",
+    email: "",
+    phone: "",
+    timezone: "america-mexico_city",
+    emailNotifications: true,
+    appointmentReminders: true,
+    newBookingAlerts: true,
+    weeklyReport: false,
+  });
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
-  const handleSave = () => {
+  useEffect(() => {
+    getProfileAction().then((user) => {
+      if (user) {
+        setProfile({
+          name: user.name || "",
+          email: user.email,
+          phone: user.patient?.phone || "",
+          timezone: user.preferences?.timezone || "america-mexico_city",
+          emailNotifications: user.preferences?.emailNotifications ?? true,
+          appointmentReminders: user.preferences?.appointmentReminders ?? true,
+          newBookingAlerts: user.preferences?.newBookingAlerts ?? true,
+          weeklyReport: user.preferences?.weeklyReport ?? false,
+        });
+      }
+    });
+  }, []);
+
+  const handleProfileSave = async () => {
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const result = await updateProfileAction({
+        name: profile.name,
+        email: profile.email,
+      });
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Perfil actualizado correctamente");
+    } catch {
+      toast.error("Error al guardar el perfil");
+    } finally {
       setIsLoading(false);
-      toast.success("Configuración guardada correctamente");
-    }, 1000);
+    }
+  };
+
+  const handlePreferencesSave = async () => {
+    setIsLoading(true);
+    try {
+      const result = await updatePreferencesAction({
+        emailNotifications: profile.emailNotifications,
+        appointmentReminders: profile.appointmentReminders,
+        newBookingAlerts: profile.newBookingAlerts,
+        weeklyReport: profile.weeklyReport,
+        timezone: profile.timezone,
+      });
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Preferencias guardadas correctamente");
+    } catch {
+      toast.error("Error al guardar preferencias");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error("Las contraseñas no coinciden");
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      toast.error("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      const result = await changePasswordAction({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Contraseña actualizada correctamente");
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch {
+      toast.error("Error al cambiar la contraseña");
+    } finally {
+      setPasswordLoading(false);
+    }
   };
 
   return (
@@ -61,20 +167,42 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nombre</Label>
-                  <Input id="name" placeholder="Tu nombre" defaultValue="Admin User" className="rounded-xl" />
+                  <Input
+                    id="name"
+                    placeholder="Tu nombre"
+                    value={profile.name}
+                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                    className="rounded-xl"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="tu@email.com" defaultValue="admin@citamed.com" className="rounded-xl" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="tu@email.com"
+                    value={profile.email}
+                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                    className="rounded-xl"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Teléfono</Label>
-                <Input id="phone" placeholder="+1234567890" className="rounded-xl" />
+                <Input
+                  id="phone"
+                  placeholder="+1234567890"
+                  value={profile.phone}
+                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                  className="rounded-xl"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="timezone">Zona Horaria</Label>
-                <Select defaultValue="america-mexico_city">
+                <Select
+                  value={profile.timezone}
+                  onValueChange={(value) => setProfile({ ...profile, timezone: value })}
+                >
                   <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="Selecciona zona horaria" />
                   </SelectTrigger>
@@ -85,7 +213,7 @@ export default function SettingsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleSave} disabled={isLoading} className="rounded-xl">
+              <Button onClick={handleProfileSave} disabled={isLoading} className="rounded-xl">
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
@@ -101,20 +229,41 @@ export default function SettingsPage() {
             </div>
             <div className="p-6 space-y-4">
               {[
-                { label: "Notificaciones de correo", desc: "Recibe notificaciones por correo electrónico", checked: true },
-                { label: "Recordatorios de citas", desc: "Recibe recordatorios antes de las citas", checked: true },
-                { label: "Notificaciones de nuevas reservas", desc: "Recibe alertas cuando hay nuevas reservas online", checked: true },
-                { label: "Reporte semanal", desc: "Recibe un resumen semanal de actividad", checked: false },
+                {
+                  key: "emailNotifications",
+                  label: "Notificaciones de correo",
+                  desc: "Recibe notificaciones por correo electrónico",
+                },
+                {
+                  key: "appointmentReminders",
+                  label: "Recordatorios de citas",
+                  desc: "Recibe recordatorios antes de las citas",
+                },
+                {
+                  key: "newBookingAlerts",
+                  label: "Notificaciones de nuevas reservas",
+                  desc: "Recibe alertas cuando hay nuevas reservas online",
+                },
+                {
+                  key: "weeklyReport",
+                  label: "Reporte semanal",
+                  desc: "Recibe un resumen semanal de actividad",
+                },
               ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/30 transition-colors">
+                <div key={item.key} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/30 transition-colors">
                   <div className="space-y-0.5">
                     <Label className="text-sm font-medium">{item.label}</Label>
                     <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
-                  <Switch defaultChecked={item.checked} />
+                  <Switch
+                    checked={profile[item.key as keyof typeof profile] as boolean}
+                    onCheckedChange={(checked) =>
+                      setProfile({ ...profile, [item.key]: checked })
+                    }
+                  />
                 </div>
               ))}
-              <Button onClick={handleSave} disabled={isLoading} className="rounded-xl">
+              <Button onClick={handlePreferencesSave} disabled={isLoading} className="rounded-xl">
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
@@ -131,7 +280,7 @@ export default function SettingsPage() {
             <div className="p-6 space-y-5">
               <div className="space-y-2">
                 <Label>Tema</Label>
-                <Select defaultValue="light">
+                <Select value={theme} onValueChange={setTheme}>
                   <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="Selecciona tema" />
                   </SelectTrigger>
@@ -155,10 +304,6 @@ export default function SettingsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleSave} disabled={isLoading} className="rounded-xl">
-                <Save className="h-4 w-4 mr-2" />
-                {isLoading ? "Guardando..." : "Guardar cambios"}
-              </Button>
             </div>
           </div>
         </TabsContent>
@@ -172,34 +317,52 @@ export default function SettingsPage() {
             <div className="p-6 space-y-6">
               <div className="space-y-4 p-4 bg-muted/30 rounded-xl">
                 <div className="space-y-2">
-                  <Label>Contraseña actual</Label>
-                  <Input type="password" placeholder="••••••••" className="rounded-xl" />
+                  <Label htmlFor="currentPassword">Contraseña actual</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                    className="rounded-xl"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>Nueva contraseña</Label>
-                  <Input type="password" placeholder="••••••••" className="rounded-xl" />
+                  <Label htmlFor="newPassword">Nueva contraseña</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                    className="rounded-xl"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>Confirmar contraseña</Label>
-                  <Input type="password" placeholder="••••••••" className="rounded-xl" />
+                  <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                    className="rounded-xl"
+                  />
                 </div>
-                <Button className="rounded-xl">Cambiar contraseña</Button>
-              </div>
-              <div className="border-t pt-4 space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/30 transition-colors">
-                  <div className="space-y-0.5">
-                    <Label className="text-sm font-medium">Autenticación de dos factores</Label>
-                    <p className="text-xs text-muted-foreground">Añade una capa extra de seguridad</p>
-                  </div>
-                  <Switch />
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/30 transition-colors">
-                  <div className="space-y-0.5">
-                    <Label className="text-sm font-medium">Sesiones activas</Label>
-                    <p className="text-xs text-muted-foreground">Gestiona tus sesiones activas</p>
-                  </div>
-                  <Button variant="outline" size="sm" className="rounded-xl">Ver sesiones</Button>
-                </div>
+                <Button
+                  onClick={handlePasswordChange}
+                  disabled={passwordLoading}
+                  className="rounded-xl"
+                >
+                  {passwordLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Cambiando...
+                    </>
+                  ) : (
+                    "Cambiar contraseña"
+                  )}
+                </Button>
               </div>
             </div>
           </div>
