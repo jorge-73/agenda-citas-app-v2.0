@@ -1,6 +1,15 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { z } from "zod";
+
+const createScheduleSchema = z.object({
+  specialistId: z.string().min(1, "Especialista requerido"),
+  dayOfWeek: z.number().min(0).max(6, "Día de semana inválido"),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
+  endTime: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
+});
 
 export async function getSpecialistsWithSchedules() {
   const specialists = await db.specialist.findMany({
@@ -32,6 +41,9 @@ export async function createSchedule(data: {
   startTime: string;
   endTime: string;
 }) {
+  await requireAuth();
+  validateInput(createScheduleSchema, data);
+
   const existing = await db.schedule.findFirst({
     where: {
       specialistId: data.specialistId,
@@ -62,6 +74,10 @@ export async function createSchedule(data: {
 }
 
 export async function deleteSchedule(id: string) {
+  await requireAuth();
+  const parsed = z.string().min(1, "ID requerido").safeParse(id);
+  if (!parsed.success) throw new Error("ID de horario inválido");
+
   await db.schedule.update({
     where: { id },
     data: { isActive: false },

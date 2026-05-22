@@ -31,16 +31,16 @@ export default function SchedulesPage() {
 
   const weekDays = [0, 1, 2, 3, 4, 5, 6];
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = () => {
+  function loadData() {
     getSpecialistsWithSchedules().then((data) => {
       setSpecialists(data);
       setIsLoading(false);
     });
-  };
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleDeleteSchedule = async (scheduleId: string) => {
     try {

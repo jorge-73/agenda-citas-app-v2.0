@@ -1,8 +1,29 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { AppointmentStatus } from "./types";
+import type { AppointmentStatus } from "./types";
 import { format } from "date-fns";
+import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { z } from "zod";
+
+const createAppointmentSchema = z.object({
+  patientId: z.string().min(1, "Paciente requerido"),
+  specialistId: z.string().min(1, "Especialista requerido"),
+  startTime: z.date(),
+  endTime: z.date(),
+  reason: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+const updateAppointmentSchema = z.object({
+  patientId: z.string().min(1, "Paciente requerido").optional(),
+  specialistId: z.string().min(1, "Especialista requerido").optional(),
+  startTime: z.date().optional(),
+  endTime: z.date().optional(),
+  reason: z.string().optional(),
+  notes: z.string().optional(),
+  status: z.enum(["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "ABSENT"]).optional(),
+});
 
 export async function getFilteredAppointmentsAction(filters: {
   specialistId?: string;
@@ -144,6 +165,9 @@ export async function createAppointment(data: {
   reason?: string;
   notes?: string;
 }) {
+  await requireAuth();
+  validateInput(createAppointmentSchema, data);
+
   const appointment = await db.appointment.create({
     data: {
       patientId: data.patientId,
@@ -180,6 +204,10 @@ export async function createAppointment(data: {
 }
 
 export async function deleteAppointment(id: string) {
+  await requireAuth();
+  const parsed = z.string().min(1, "ID requerido").safeParse(id);
+  if (!parsed.success) throw new Error("ID de cita inválido");
+
   return db.appointment.delete({ where: { id } });
 }
 
@@ -192,6 +220,9 @@ export async function updateAppointment(id: string, data: {
   notes?: string;
   status?: AppointmentStatus;
 }) {
+  await requireAuth();
+  validateInput(updateAppointmentSchema, data);
+
   const previous = await db.appointment.findUnique({
     where: { id },
     include: {
@@ -199,6 +230,10 @@ export async function updateAppointment(id: string, data: {
       specialist: { include: { user: true } },
     },
   });
+
+  if (!previous) {
+    throw new Error("Cita no encontrada");
+  }
 
   const appointment = await db.appointment.update({
     where: { id },

@@ -2,6 +2,20 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { z } from "zod";
+
+const specialistSchema = z.object({
+  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  email: z.string().email("Email inválido"),
+  specialty: z.string().min(3, "La especialidad es requerida"),
+  license: z.string().optional(),
+  phone: z.string().optional(),
+  bio: z.string().optional(),
+  consultationDuration: z.number().positive().optional(),
+  price: z.string().optional(),
+  isAvailable: z.boolean().optional(),
+});
 
 export async function createSpecialistAction(data: {
   name: string;
@@ -14,6 +28,9 @@ export async function createSpecialistAction(data: {
   price?: string;
   isAvailable?: boolean;
 }) {
+  await requireAuth();
+  validateInput(specialistSchema, data);
+
   const existingUser = await db.user.findUnique({ where: { email: data.email } });
 
   if (existingUser) {
@@ -73,13 +90,19 @@ export async function updateSpecialistAction(
     isAvailable?: boolean;
   }
 ) {
-  const user = await db.user.findUnique({ where: { email: data.email } });
-  if (user) {
-    await db.user.update({
-      where: { id: user.id },
-      data: { name: data.name },
-    });
-  }
+  await requireAuth();
+  validateInput(specialistSchema, data);
+
+  const specialist = await db.specialist.findUnique({
+    where: { id },
+    select: { userId: true },
+  });
+  if (!specialist) throw new Error("Especialista no encontrado");
+
+  await db.user.update({
+    where: { id: specialist.userId },
+    data: { name: data.name },
+  });
 
   await db.specialist.update({
     where: { id },

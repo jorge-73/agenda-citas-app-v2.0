@@ -2,8 +2,19 @@
 
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { z } from "zod";
+
+const createUserSchema = z.object({
+  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  role: z.string().min(1, "Rol requerido"),
+});
 
 export async function getUsersAction() {
+  await requireAuth();
+
   return db.user.findMany({
     include: {
       patient: { select: { id: true } },
@@ -20,6 +31,9 @@ export async function createUserAction(data: {
   password: string;
   role: string;
 }) {
+  await requireAuth();
+  validateInput(createUserSchema, data);
+
   const existing = await db.user.findUnique({ where: { email: data.email } });
   if (existing) throw new Error("El email ya está registrado");
 
@@ -36,6 +50,11 @@ export async function createUserAction(data: {
 }
 
 export async function updateUserRoleAction(userId: string, role: string) {
+  await requireAuth();
+
+  const parsedId = z.string().min(1, "ID requerido").safeParse(userId);
+  if (!parsedId.success) throw new Error("ID de usuario inválido");
+
   return db.user.update({
     where: { id: userId },
     data: { role },
@@ -43,5 +62,41 @@ export async function updateUserRoleAction(userId: string, role: string) {
 }
 
 export async function deleteUserAction(userId: string) {
+  await requireAuth();
+
+  const existingUser = await db.user.findUnique({
+    where: { id: userId },
+    include: {
+      patient: { select: { id: true } },
+      specialist: { select: { id: true } },
+      _count: { select: { accounts: true } },
+    },
+  });
+
+  if (!existingUser) throw new Error("Usuario no encontrado");
+
+  const relatedAppointments = await db.appointment.count({
+    where: {
+      OR: [
+        ...(existingUser.patient ? [{ patientId: existingUser.patient.id }] : []),
+        ...(existingUser.specialist ? [{ specialistId: existingUser.specialist.id }] : []),
+      ],
+    },
+  });
+
+  if (relatedAppointments > 0) {
+    throw new Error(
+      `No se puede eliminar el usuario porque tiene ${relatedAppointments} cita(s) asociada(s). Desasocie las citas primero.`
+    );
+  }
+
+  if (existingUser.patient) {
+    await db.patient.delete({ where: { id: existingUser.patient.id } });
+  }
+  if (existingUser.specialist) {
+    await db.schedule.deleteMany({ where: { specialistId: existingUser.specialist.id } });
+    await db.specialist.delete({ where: { id: existingUser.specialist.id } });
+  }
+
   return db.user.delete({ where: { id: userId } });
 }

@@ -2,6 +2,23 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { z } from "zod";
+
+const patientSchema = z.object({
+  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  email: z.string().email("Email inválido"),
+  phone: z.string().optional(),
+  document: z.string().optional(),
+  birthDate: z.string().optional(),
+  address: z.string().optional(),
+  emergencyContact: z.string().optional(),
+  bloodType: z.string().optional(),
+  allergies: z.string().optional(),
+  medicalConditions: z.string().optional(),
+  insurance: z.string().optional(),
+  insuranceNumber: z.string().optional(),
+});
 
 export async function createPatientAction(data: {
   name: string;
@@ -17,6 +34,9 @@ export async function createPatientAction(data: {
   insurance?: string;
   insuranceNumber?: string;
 }) {
+  await requireAuth();
+  validateInput(patientSchema, data);
+
   const existingUser = await db.user.findUnique({ where: { email: data.email } });
 
   if (existingUser) {
@@ -85,13 +105,19 @@ export async function updatePatientAction(
     insuranceNumber?: string;
   }
 ) {
-  const user = await db.user.findUnique({ where: { email: data.email } });
-  if (user) {
-    await db.user.update({
-      where: { id: user.id },
-      data: { name: data.name },
-    });
-  }
+  await requireAuth();
+  validateInput(patientSchema, data);
+
+  const patient = await db.patient.findUnique({
+    where: { id },
+    select: { userId: true },
+  });
+  if (!patient) throw new Error("Paciente no encontrado");
+
+  await db.user.update({
+    where: { id: patient.userId },
+    data: { name: data.name },
+  });
 
   await db.patient.update({
     where: { id },
