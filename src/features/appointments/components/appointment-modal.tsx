@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format, addMinutes } from "date-fns";
-import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -308,18 +307,20 @@ export function AppointmentModal({
                   )}
                 </Button>
               )}
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => onOpenChange(false)}
                 className={cn(isEdit && onDelete ? "flex-1" : "flex-1")}
+                aria-label="Cancelar cita"
               >
                 Cancelar
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isLoading}
                 className="flex-1"
+                aria-label={isEdit ? "Actualizar cita" : "Crear nueva cita"}
               >
                 {isLoading ? (
                   <>
