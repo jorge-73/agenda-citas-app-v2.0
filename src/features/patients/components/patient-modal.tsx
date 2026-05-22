@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { createPatientAction, updatePatientAction } from "../actions";
 import { BLOOD_TYPES } from "../types";
 
 const patientSchema = z.object({
@@ -113,79 +113,17 @@ export function PatientModal({
     setIsLoading(true);
     try {
       if (isEdit && initialData?.id) {
-        const user = await db.user.findUnique({ where: { email: data.email } });
-        if (user) {
-          await db.user.update({
-            where: { id: user.id },
-            data: { name: data.name },
-          });
-        }
-        await db.patient.update({
-          where: { id: initialData.id },
-          data: {
-            phone: data.phone,
-            document: data.document,
-            birthDate: data.birthDate ? new Date(data.birthDate) : null,
-            address: data.address,
-            emergencyContact: data.emergencyContact,
-            bloodType: data.bloodType || null,
-            allergies: data.allergies || null,
-            medicalConditions: data.medicalConditions || null,
-            insurance: data.insurance || null,
-            insuranceNumber: data.insuranceNumber || null,
-          },
-        });
+        await updatePatientAction(initialData.id, data);
         toast.success("Paciente actualizado correctamente");
       } else {
-        const existingUser = await db.user.findUnique({ where: { email: data.email } });
-        
-        let userId = initialData?.userId;
-        
-        if (!existingUser && !userId) {
-          const newUser = await db.user.create({
-            data: {
-              email: data.email,
-              name: data.name,
-              password: "changeme123",
-              role: "PATIENT",
-            },
-          });
-          userId = newUser.id;
-        } else if (existingUser) {
-          userId = existingUser.id;
-        }
-
-        if (!userId) {
-          throw new Error("No se pudo crear el usuario");
-        }
-
-        const existingPatient = await db.patient.findUnique({ where: { userId } });
-        if (existingPatient) {
-          throw new Error("El paciente ya existe");
-        }
-
-        await db.patient.create({
-          data: {
-            userId,
-            phone: data.phone,
-            document: data.document,
-            birthDate: data.birthDate ? new Date(data.birthDate) : null,
-            address: data.address,
-            emergencyContact: data.emergencyContact,
-            bloodType: data.bloodType || null,
-            allergies: data.allergies || null,
-            medicalConditions: data.medicalConditions || null,
-            insurance: data.insurance || null,
-            insuranceNumber: data.insuranceNumber || null,
-          },
-        });
+        await createPatientAction(data);
         toast.success("Paciente creado correctamente");
       }
 
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      toast.error("Error al guardar el paciente");
+      toast.error(error instanceof Error ? error.message : "Error al guardar el paciente");
     } finally {
       setIsLoading(false);
     }

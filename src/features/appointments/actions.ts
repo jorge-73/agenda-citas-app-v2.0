@@ -4,6 +4,40 @@ import { db } from "@/lib/db";
 import { AppointmentStatus } from "./types";
 import { format } from "date-fns";
 
+export async function getFilteredAppointmentsAction(filters: {
+  specialistId?: string;
+  patientId?: string;
+  status?: AppointmentStatus;
+  startDate?: Date;
+  endDate?: Date;
+}) {
+  const appointments = await db.appointment.findMany({
+    where: {
+      ...(filters.specialistId && { specialistId: filters.specialistId }),
+      ...(filters.patientId && { patientId: filters.patientId }),
+      ...(filters.status && { status: filters.status }),
+      ...(filters.startDate || filters.endDate
+        ? {
+            startTime: {
+              ...(filters.startDate && { gte: filters.startDate }),
+              ...(filters.endDate && { lte: filters.endDate }),
+            },
+          }
+        : {}),
+    },
+    include: {
+      patient: { include: { user: true } },
+      specialist: { include: { user: true } },
+    },
+    orderBy: { startTime: "desc" },
+  });
+
+  return appointments.map((apt) => ({
+    ...apt,
+    status: apt.status as AppointmentStatus,
+  }));
+}
+
 export async function getAppointmentsByMonth(year: number, month: number) {
   const startOfMonth = new Date(year, month, 1);
   const endOfMonth = new Date(year, month + 1, 0);

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { createSpecialistAction, updateSpecialistAction } from "../actions";
 import { SPECIALTIES } from "../types";
 
 const specialistSchema = z.object({
@@ -102,73 +102,17 @@ export function SpecialistModal({
     setIsLoading(true);
     try {
       if (isEdit && initialData?.id) {
-        const user = await db.user.findUnique({ where: { email: data.email } });
-        if (user) {
-          await db.user.update({
-            where: { id: user.id },
-            data: { name: data.name },
-          });
-        }
-        await db.specialist.update({
-          where: { id: initialData.id },
-          data: {
-            specialty: data.specialty,
-            license: data.license || null,
-            phone: data.phone || null,
-            bio: data.bio || null,
-            consultationDuration: data.consultationDuration || 30,
-            price: data.price ? parseFloat(data.price) : null,
-            isAvailable: data.isAvailable,
-          },
-        });
+        await updateSpecialistAction(initialData.id, data);
         toast.success("Especialista actualizado correctamente");
       } else {
-        const existingUser = await db.user.findUnique({ where: { email: data.email } });
-        
-        let userId = initialData?.userId;
-        
-        if (!existingUser && !userId) {
-          const newUser = await db.user.create({
-            data: {
-              email: data.email,
-              name: data.name,
-              password: "changeme123",
-              role: "SPECIALIST",
-            },
-          });
-          userId = newUser.id;
-        } else if (existingUser) {
-          userId = existingUser.id;
-        }
-
-        if (!userId) {
-          throw new Error("No se pudo crear el usuario");
-        }
-
-        const existingSpecialist = await db.specialist.findUnique({ where: { userId } });
-        if (existingSpecialist) {
-          throw new Error("El especialista ya existe");
-        }
-
-        await db.specialist.create({
-          data: {
-            userId,
-            specialty: data.specialty,
-            license: data.license || null,
-            phone: data.phone || null,
-            bio: data.bio || null,
-            consultationDuration: data.consultationDuration || 30,
-            price: data.price ? parseFloat(data.price) : null,
-            isAvailable: data.isAvailable ?? true,
-          },
-        });
+        await createSpecialistAction(data);
         toast.success("Especialista creado correctamente");
       }
 
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      toast.error("Error al guardar el especialista");
+      toast.error(error instanceof Error ? error.message : "Error al guardar el especialista");
     } finally {
       setIsLoading(false);
     }
