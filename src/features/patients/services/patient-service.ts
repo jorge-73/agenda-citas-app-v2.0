@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import type { Prisma } from "@prisma/client";
 import { PatientFilters, CreatePatientInput, UpdatePatientInput } from "../types";
 
 export const patientService = {
@@ -54,7 +55,7 @@ export const patientService = {
   },
 
   async getAll(filters?: PatientFilters, page: number = 1, limit: number = 10) {
-    const where: any = {};
+    const where: Prisma.PatientWhereInput = {};
 
     if (filters?.search) {
       where.user = {

@@ -20,7 +20,7 @@ import {
   eachDayOfInterval
 } from "date-fns";
 import { es } from "date-fns/locale";
-import type { CalendarEvent } from "../types";
+import type { CalendarEvent, AppointmentStatus, Appointment } from "../types";
 
 export type CalendarView = "day" | "week" | "month";
 
@@ -163,7 +163,7 @@ export function useCalendar(options?: UseCalendarOptions) {
 }
 
 export function useCalendarEvents(
-  appointments: any[],
+  appointments: Appointment[],
   view: CalendarView
 ): CalendarEvent[] {
   return useMemo(() => {
@@ -172,10 +172,10 @@ export function useCalendarEvents(
       title: apt.patient?.user?.name || "Paciente",
       start: new Date(apt.startTime),
       end: new Date(apt.endTime),
-      status: apt.status as any,
+      status: apt.status as AppointmentStatus,
       patientName: apt.patient?.user?.name || "Paciente",
       specialistName: apt.specialist?.user?.name || "Especialista",
-      reason: apt.reason,
+      reason: apt.reason ?? undefined,
     }));
   }, [appointments, view]);
 }

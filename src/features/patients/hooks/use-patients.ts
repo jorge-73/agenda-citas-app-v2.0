@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { patientService } from "../services/patient-service";
-import { PatientFilters, CreatePatientInput, UpdatePatientInput } from "../types";
+import { PatientFilters, CreatePatientInput, UpdatePatientInput, type Patient } from "../types";
 
 interface UsePatientsOptions {
   initialFilters?: PatientFilters;
@@ -10,7 +10,7 @@ interface UsePatientsOptions {
 }
 
 export function usePatients(options?: UsePatientsOptions) {
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<PatientFilters>(options?.initialFilters || {});

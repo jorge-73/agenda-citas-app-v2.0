@@ -8,21 +8,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DataTable } from "@/components/ui/data-table";
-import { MoreHorizontal, Eye, Pencil, Trash2, Download } from "lucide-react";
+import { MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { getInitials } from "@/lib/utils";
 import { exportToCSV, formatDateForExport } from "@/lib/export";
+import type { Patient } from "../types";
 
-const columnHelper = createColumnHelper<any>();
+const columnHelper = createColumnHelper<Patient>();
 
 interface PatientsTableProps {
-  patients: any[];
+  patients: Patient[];
   isLoading?: boolean;
   onCreateNew?: () => void;
 }
 
 export function PatientsTable({ patients, isLoading, onCreateNew }: PatientsTableProps) {
-  const columns: ColumnDef<any, any>[] = [
+  const columns: ColumnDef<Patient, any>[] = [
     columnHelper.accessor("user", {
       header: "Paciente",
       cell: ({ row }) => (
@@ -96,7 +97,7 @@ export function PatientsTable({ patients, isLoading, onCreateNew }: PatientsTabl
       searchPlaceholder="Buscar pacientes..."
       emptyMessage="No se encontraron pacientes"
       onExport={() => {
-        const data = patients.map((p: any) => ({
+        const data = patients.map((p: Patient) => ({
           Nombre: p.user?.name || "—",
           Email: p.user?.email || "—",
           Teléfono: p.phone || "",

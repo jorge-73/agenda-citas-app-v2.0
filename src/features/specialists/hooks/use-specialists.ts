@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { specialistService } from "../services/specialist-service";
-import { SpecialistFilters, CreateSpecialistInput, UpdateSpecialistInput } from "../types";
+import { SpecialistFilters, CreateSpecialistInput, UpdateSpecialistInput, type Specialist } from "../types";
 
 interface UseSpecialistsOptions {
   initialFilters?: SpecialistFilters;
@@ -10,7 +10,7 @@ interface UseSpecialistsOptions {
 }
 
 export function useSpecialists(options?: UseSpecialistsOptions) {
-  const [specialists, setSpecialists] = useState<any[]>([]);
+  const [specialists, setSpecialists] = useState<Specialist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<SpecialistFilters>(options?.initialFilters || {});

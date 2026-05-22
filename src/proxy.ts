@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { hasPermission, Permission } from "@/lib/permissions";
+import type { UserRole } from "@/types";
 
 const ROUTE_PERMISSIONS: Record<string, Permission> = {
   "/dashboard": "view:dashboard",
@@ -31,7 +32,7 @@ export default async function proxy(request: NextRequest) {
 
   if (route) {
     const permission = ROUTE_PERMISSIONS[route];
-    if (!hasPermission(role as any, permission)) {
+    if (!hasPermission(role as UserRole, permission)) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }

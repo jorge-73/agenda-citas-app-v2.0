@@ -19,7 +19,7 @@ export interface Patient {
     email: string;
     image?: string | null;
   };
-  appointments?: { id: string; startTime: Date; status: string }[];
+  appointments?: { id: string }[];
 }
 
 export interface CreatePatientInput {

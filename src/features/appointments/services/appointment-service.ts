@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import type { Prisma } from "@prisma/client";
 import { 
   CreateAppointmentInput, 
   UpdateAppointmentInput, 
@@ -180,7 +181,7 @@ export const appointmentService = {
   },
 
   async getByDateRange(startDate: Date, endDate: Date, filters?: AppointmentFilters) {
-    const where: any = {
+    const where: Prisma.AppointmentWhereInput = {
       startTime: {
         gte: startDate,
         lte: endDate,
@@ -220,7 +221,7 @@ export const appointmentService = {
   },
 
   async getAll(filters?: AppointmentFilters) {
-    const where: any = {};
+    const where: Prisma.AppointmentWhereInput = {};
 
     if (filters?.specialistId) {
       where.specialistId = filters.specialistId;
@@ -234,12 +235,11 @@ export const appointmentService = {
       where.status = filters.status;
     }
 
-    if (filters?.startDate) {
-      where.startTime = { ...where.startTime, gte: filters.startDate };
-    }
-
-    if (filters?.endDate) {
-      where.startTime = { ...where.startTime, lte: filters.endDate };
+    if (filters?.startDate || filters?.endDate) {
+      where.startTime = {
+        ...(filters.startDate ? { gte: filters.startDate } : {}),
+        ...(filters.endDate ? { lte: filters.endDate } : {}),
+      };
     }
 
     return db.appointment.findMany({

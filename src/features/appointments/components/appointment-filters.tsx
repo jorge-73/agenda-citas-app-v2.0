@@ -14,7 +14,7 @@ interface AppointmentFiltersProps {
     specialistId?: string;
     status?: string;
   };
-  onFilterChange: (filters: any) => void;
+  onFilterChange: (filters: { specialistId?: string; status?: string }) => void;
 }
 
 interface SpecialistData {

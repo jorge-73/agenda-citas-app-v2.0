@@ -6,21 +6,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DataTable } from "@/components/ui/data-table";
-import { MoreHorizontal, Eye, Pencil, Trash2, Clock, Download } from "lucide-react";
+import { MoreHorizontal, Eye, Pencil, Trash2, Clock } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { getInitials } from "@/lib/utils";
 import { exportToCSV } from "@/lib/export";
+import type { Specialist } from "../types";
 
-const columnHelper = createColumnHelper<any>();
+const columnHelper = createColumnHelper<Specialist>();
 
 interface SpecialistsTableProps {
-  specialists: any[];
+  specialists: Specialist[];
   isLoading?: boolean;
   onCreateNew?: () => void;
 }
 
 export function SpecialistsTable({ specialists, isLoading, onCreateNew }: SpecialistsTableProps) {
-  const columns: ColumnDef<any, any>[] = [
+  const columns: ColumnDef<Specialist, any>[] = [
     columnHelper.accessor("user", {
       header: "Especialista",
       cell: ({ row }) => (
@@ -108,7 +109,7 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
       searchPlaceholder="Buscar especialistas..."
       emptyMessage="No se encontraron especialistas"
       onExport={() => {
-        const data = specialists.map((s: any) => ({
+        const data = specialists.map((s: Specialist) => ({
           Nombre: s.user?.name || "—",
           Email: s.user?.email || "—",
           Especialidad: s.specialty,

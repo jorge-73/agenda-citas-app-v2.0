@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import type { Prisma } from "@prisma/client";
 import { SpecialistFilters, CreateSpecialistInput, UpdateSpecialistInput } from "../types";
 
 export const specialistService = {
@@ -64,7 +65,7 @@ export const specialistService = {
   },
 
   async getAll(filters?: SpecialistFilters, page: number = 1, limit: number = 10) {
-    const where: any = {};
+    const where: Prisma.SpecialistWhereInput = {};
 
     if (filters?.search) {
       where.OR = [

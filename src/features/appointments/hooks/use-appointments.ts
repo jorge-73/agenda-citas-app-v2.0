@@ -6,6 +6,7 @@ import {
   UpdateAppointmentInput,
   AppointmentFilters,
   AppointmentStatus,
+  type Appointment,
 } from "../types";
 import {
   getFilteredAppointmentsAction,
@@ -18,7 +19,7 @@ interface UseAppointmentsOptions {
 }
 
 export function useAppointments(options?: UseAppointmentsOptions) {
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<AppointmentFilters>(
@@ -49,7 +50,7 @@ export function useAppointments(options?: UseAppointmentsOptions) {
       setIsLoading(true);
       setError(null);
       try {
-        const appointment = await createAppointmentAction(input);
+        const appointment = (await createAppointmentAction(input)) as Appointment;
         setAppointments((prev) => [...prev, appointment]);
         return appointment;
       } catch (err) {
@@ -70,7 +71,7 @@ export function useAppointments(options?: UseAppointmentsOptions) {
       setIsLoading(true);
       setError(null);
       try {
-        const appointment = await updateAppointmentAction(id, data);
+        const appointment = (await updateAppointmentAction(id, data)) as Appointment;
         setAppointments((prev) =>
           prev.map((a) => (a.id === appointment.id ? appointment : a))
         );
@@ -110,10 +111,10 @@ export function useAppointments(options?: UseAppointmentsOptions) {
       setIsLoading(true);
       setError(null);
       try {
-        const appointment = await updateAppointmentAction(id, {
+        const appointment = (await updateAppointmentAction(id, {
           startTime,
           endTime,
-        });
+        })) as Appointment;
         setAppointments((prev) =>
           prev.map((a) => (a.id === appointment.id ? appointment : a))
         );
