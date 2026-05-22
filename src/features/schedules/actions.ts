@@ -9,6 +9,9 @@ const createScheduleSchema = z.object({
   dayOfWeek: z.number().min(0).max(6, "Día de semana inválido"),
   startTime: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
   endTime: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
+}).refine((d) => d.endTime > d.startTime, {
+  message: "La hora de fin debe ser posterior a la de inicio",
+  path: ["endTime"],
 });
 
 export async function getSpecialistsWithSchedules() {

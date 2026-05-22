@@ -6,7 +6,7 @@ import { requireAuth, validateInput } from "@/lib/action-helpers";
 import { z } from "zod";
 
 const blockedDateSchema = z.object({
-  date: z.date(),
+  date: z.date().refine((d) => d > new Date(), "La fecha debe ser futura"),
   reason: z.string().optional(),
   isRecurring: z.boolean().optional(),
 });

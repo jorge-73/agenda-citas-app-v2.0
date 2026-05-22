@@ -10,10 +10,13 @@ const specialistSchema = z.object({
   email: z.string().email("Email inválido"),
   specialty: z.string().min(3, "La especialidad es requerida"),
   license: z.string().optional(),
-  phone: z.string().optional(),
+  phone: z.string().regex(/^[\d\s\-+()]{6,20}$/, "Teléfono inválido").optional().or(z.literal("")),
   bio: z.string().optional(),
-  consultationDuration: z.number().positive().optional(),
-  price: z.string().optional(),
+  consultationDuration: z.number().positive("La duración debe ser positiva").optional(),
+  price: z.string().refine(
+    (v) => v === "" || (!isNaN(parseFloat(v)) && parseFloat(v) > 0),
+    "El precio debe ser un número positivo"
+  ).optional(),
   isAvailable: z.boolean().optional(),
 });
 

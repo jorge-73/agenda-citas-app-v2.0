@@ -8,7 +8,7 @@ import { z } from "zod";
 const patientSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   email: z.string().email("Email inválido"),
-  phone: z.string().optional(),
+  phone: z.string().regex(/^[\d\s\-+()]{6,20}$/, "Teléfono inválido").optional().or(z.literal("")),
   document: z.string().optional(),
   birthDate: z.string().optional(),
   address: z.string().optional(),

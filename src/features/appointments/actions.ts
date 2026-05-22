@@ -9,10 +9,13 @@ import { z } from "zod";
 const createAppointmentSchema = z.object({
   patientId: z.string().min(1, "Paciente requerido"),
   specialistId: z.string().min(1, "Especialista requerido"),
-  startTime: z.date(),
-  endTime: z.date(),
+  startTime: z.date().refine((d) => d > new Date(), "La fecha de inicio debe ser futura"),
+  endTime: z.date().refine((d) => d > new Date(), "La fecha de fin debe ser futura"),
   reason: z.string().optional(),
   notes: z.string().optional(),
+}).refine((d) => d.endTime > d.startTime, {
+  message: "La fecha de fin debe ser posterior a la de inicio",
+  path: ["endTime"],
 });
 
 const updateAppointmentSchema = z.object({
@@ -23,6 +26,12 @@ const updateAppointmentSchema = z.object({
   reason: z.string().optional(),
   notes: z.string().optional(),
   status: z.enum(["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "ABSENT"]).optional(),
+}).refine((d) => {
+  if (d.startTime && d.endTime) return d.endTime > d.startTime;
+  return true;
+}, {
+  message: "La fecha de fin debe ser posterior a la de inicio",
+  path: ["endTime"],
 });
 
 export async function getFilteredAppointmentsAction(filters: {

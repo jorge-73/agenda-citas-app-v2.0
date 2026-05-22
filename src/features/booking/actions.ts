@@ -9,11 +9,11 @@ const createBookingSchema = z.object({
   patientName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   patientLastname: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
   patientEmail: z.string().email("Email inválido"),
-  patientPhone: z.string().min(6, "Teléfono requerido"),
+  patientPhone: z.string().regex(/^[\d\s\-+()]{6,20}$/, "Teléfono inválido"),
   specialistId: z.string().min(1, "Especialista requerido"),
   specialty: z.string().min(1, "Especialidad requerida"),
   reason: z.string().optional(),
-  date: z.date(),
+  date: z.date().refine((d) => d > new Date(), "La fecha debe ser futura"),
   time: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
 });
 
