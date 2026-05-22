@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { User, LogOut, Settings, ChevronDown, Loader2 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { MobileNav } from "./mobile-nav";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { logoutAction } from "@/features/auth/actions";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types";
 
 interface NavbarProps {
@@ -31,6 +31,13 @@ interface NavbarProps {
 
 export function Navbar({ user, userRole }: NavbarProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -43,7 +50,10 @@ export function Navbar({ user, userRole }: NavbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border/40 bg-background/70 px-4 md:px-6 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70">
+    <header className={cn(
+      "sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border/40 bg-background/70 px-4 md:px-6 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70 transition-shadow duration-200",
+      scrolled && "shadow-sm"
+    )}>
       <div className="flex flex-1 items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="lg:hidden">

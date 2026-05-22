@@ -110,11 +110,19 @@ export interface CalendarEvent {
 }
 
 export const APPOINTMENT_STATUS_COLORS: Record<AppointmentStatus, string> = {
-  PENDING: "#fbbf24",    // Yellow
-  CONFIRMED: "#22c55e",   // Green
-  CANCELLED: "#ef4444",   // Red
-  COMPLETED: "#3b82f6",   // Blue
-  ABSENT: "#6b7280",      // Gray
+  PENDING: "var(--status-pending)",
+  CONFIRMED: "var(--status-confirmed)",
+  CANCELLED: "var(--status-cancelled)",
+  COMPLETED: "var(--status-completed)",
+  ABSENT: "var(--status-absent)",
+};
+
+export const APPOINTMENT_STATUS_COLORS_HEX: Record<AppointmentStatus, string> = {
+  PENDING: "#fbbf24",
+  CONFIRMED: "#22c55e",
+  CANCELLED: "#ef4444",
+  COMPLETED: "#3b82f6",
+  ABSENT: "#6b7280",
 };
 
 export const APPOINTMENT_STATUS_LABELS: Record<AppointmentStatus, string> = {

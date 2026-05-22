@@ -66,7 +66,8 @@ src/
 │   └── globals.css
 ├── components/
 │   ├── ui/               # Componentes base shadcn
-│   ├── layout/           # Sidebar, Navbar, etc.
+│   ├── layout/           # Sidebar, Navbar, PageTransition, etc.
+│   ├── shared/           # EmptyState, LoadingState (reutilizables)
 │   └── providers.tsx     # ThemeProvider
 ├── features/             # Arquitectura feature-based (11 módulos)
 │   ├── auth/              # Autenticación y Server Actions

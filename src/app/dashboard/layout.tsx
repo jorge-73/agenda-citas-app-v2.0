@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/layout/navbar";
+import { PageTransition } from "@/components/layout/page-transition";
 import type { UserRole } from "@/types";
 
 export default async function DashboardLayout({
@@ -32,7 +33,7 @@ export default async function DashboardLayout({
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar user={user} userRole={user?.role} />
         <main className="flex-1 overflow-y-auto bg-background p-4 md:p-6">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
     </div>

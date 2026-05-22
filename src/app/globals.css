@@ -62,10 +62,17 @@
     --sidebar-accent: oklch(94% 0.015 40);
     --sidebar-accent-foreground: oklch(28% 0.015 40);
     --sidebar-border: oklch(88% 0.015 40);
-    --sidebar-ring: oklch(50% 0.09 155);
-  }
+  --sidebar-ring: oklch(50% 0.09 155);
 
-  /* ---------- DARK MODE - Premium Slate ---------- */
+  /* Status colors for appointments */
+  --status-pending: oklch(72% 0.13 80);
+  --status-confirmed: oklch(62% 0.15 145);
+  --status-cancelled: oklch(58% 0.18 25);
+  --status-completed: oklch(55% 0.14 240);
+  --status-absent: oklch(55% 0.02 260);
+}
+
+/* ---------- DARK MODE - Premium Slate ---------- */
   .dark {
     /* Backgrounds - Deep slate (NO pure black) */
     --background: oklch(12% 0.015 260);
@@ -118,8 +125,15 @@
     --sidebar-accent: oklch(28% 0.02 260);
     --sidebar-accent-foreground: oklch(90% 0.008 260);
     --sidebar-border: oklch(32% 0.02 260);
-    --sidebar-ring: oklch(72% 0.12 160);
-  }
+  --sidebar-ring: oklch(72% 0.12 160);
+
+  /* Status colors for dark mode */
+  --status-pending: oklch(75% 0.12 80);
+  --status-confirmed: oklch(68% 0.14 145);
+  --status-cancelled: oklch(65% 0.16 25);
+  --status-completed: oklch(62% 0.12 240);
+  --status-absent: oklch(60% 0.02 260);
+}
 }
 
 /* =============================================
@@ -207,6 +221,13 @@
   --font-sans: var(--font-dm-sans);
   --font-display: var(--font-dm-sans);
   --font-mono: var(--font-dm-mono);
+
+  /* Status colors */
+  --color-status-pending: var(--status-pending);
+  --color-status-confirmed: var(--status-confirmed);
+  --color-status-cancelled: var(--status-cancelled);
+  --color-status-completed: var(--status-completed);
+  --color-status-absent: var(--status-absent);
 }
 
 /* =============================================

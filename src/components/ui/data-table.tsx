@@ -122,10 +122,17 @@ export function DataTable<TData>({
               ) : rows.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <FileSpreadsheet className="h-8 w-8 text-muted-foreground/40" />
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-muted-foreground/10 to-muted-foreground/5 flex items-center justify-center mb-2">
+                        <FileSpreadsheet className="h-5 w-5 text-muted-foreground/40" />
+                      </div>
                       <p className="text-sm text-muted-foreground">{emptyMessage}</p>
-                    </div>
+                    </motion.div>
                   </td>
                 </tr>
               ) : (

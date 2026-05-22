@@ -116,7 +116,7 @@ export function AppointmentCalendar({
                       key={event.id}
                       className="text-xs p-1 rounded truncate"
                       style={{
-                        backgroundColor: `${APPOINTMENT_STATUS_COLORS[event.status]}20`,
+                        backgroundColor: `color-mix(in srgb, ${APPOINTMENT_STATUS_COLORS[event.status]} 20%, transparent)`,
                         color: APPOINTMENT_STATUS_COLORS[event.status],
                       }}
                       onClick={(e) => {
@@ -211,7 +211,7 @@ export function AppointmentCalendar({
                   style={{
                     top: pos.top,
                     height: pos.height,
-                    backgroundColor: `${APPOINTMENT_STATUS_COLORS[event.status]}15`,
+                    backgroundColor: `color-mix(in srgb, ${APPOINTMENT_STATUS_COLORS[event.status]} 15%, transparent)`,
                     borderLeft: `3px solid ${APPOINTMENT_STATUS_COLORS[event.status]}`,
                   }}
                   onClick={() => onAppointmentClick?.(appointments.find((a) => a.id === event.id)!)}
@@ -223,18 +223,10 @@ export function AppointmentCalendar({
                         <Clock className="h-3 w-3" />
                         {format(new Date(event.start), "HH:mm")} - {format(new Date(event.end), "HH:mm")}
                       </div>
-                      {event.reason && (
-                        <div className="text-xs text-muted-foreground mt-1">{event.reason}</div>
-                      )}
+                      {event.reason && <div className="text-xs text-muted-foreground mt-1">{event.reason}</div>}
                     </div>
-                    <Badge
-                      variant="outline"
-                      className="text-xs"
-                      style={{
-                        color: APPOINTMENT_STATUS_COLORS[event.status],
-                        borderColor: APPOINTMENT_STATUS_COLORS[event.status],
-                      }}
-                    >
+                    <Badge variant="outline" className="text-xs"
+                      style={{ color: APPOINTMENT_STATUS_COLORS[event.status], borderColor: APPOINTMENT_STATUS_COLORS[event.status] }}>
                       {APPOINTMENT_STATUS_LABELS[event.status]}
                     </Badge>
                   </div>
@@ -324,7 +316,8 @@ export function AppointmentCalendar({
                           style={{
                             top: `calc(${(hour - 8) * 60}px + ${offsetTop}px)`,
                             height: pos.height,
-                            backgroundColor: `${APPOINTMENT_STATUS_COLORS[event.status]}15`,
+                            backgroundColor: `color-mix(in srgb, ${APPOINTMENT_STATUS_COLORS[event.status]} 15%, transparent)`,
+
                             borderLeft: `2px solid ${APPOINTMENT_STATUS_COLORS[event.status]}`,
                           }}
                           onClick={(e) => {
