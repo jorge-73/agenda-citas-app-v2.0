@@ -1,5 +1,5 @@
 export function exportToCSV(
-  data: Record<string, any>[],
+  data: Record<string, unknown>[],
   filename: string
 ) {
   if (data.length === 0) return;

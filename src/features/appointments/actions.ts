@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import type { AppointmentStatus } from "./types";
 import { format } from "date-fns";
 import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { APPOINTMENT_STATUSES } from "@/lib/constants";
 import { z } from "zod";
 
 const createAppointmentSchema = z.object({
@@ -25,7 +26,7 @@ const updateAppointmentSchema = z.object({
   endTime: z.date().optional(),
   reason: z.string().optional(),
   notes: z.string().optional(),
-  status: z.enum(["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "ABSENT"]).optional(),
+  status: z.enum(APPOINTMENT_STATUSES).optional(),
 }).refine((d) => {
   if (d.startTime && d.endTime) return d.endTime > d.startTime;
   return true;

@@ -3,18 +3,19 @@
 import { db } from "@/lib/db";
 import { addDays, startOfDay, endOfDay, format, eachDayOfInterval } from "date-fns";
 import { validateInput } from "@/lib/action-helpers";
+import { PHONE_REGEX, TIME_REGEX } from "@/lib/constants";
 import { z } from "zod";
 
 const createBookingSchema = z.object({
   patientName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   patientLastname: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
   patientEmail: z.string().email("Email inválido"),
-  patientPhone: z.string().regex(/^[\d\s\-+()]{6,20}$/, "Teléfono inválido"),
+  patientPhone: z.string().regex(PHONE_REGEX, "Teléfono inválido"),
   specialistId: z.string().min(1, "Especialista requerido"),
   specialty: z.string().min(1, "Especialidad requerida"),
   reason: z.string().optional(),
   date: z.date().refine((d) => d > new Date(), "La fecha debe ser futura"),
-  time: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
+  time: z.string().regex(TIME_REGEX, "Formato de hora inválido"),
 });
 
 export async function getAvailableSpecialistsAction(specialty?: string) {

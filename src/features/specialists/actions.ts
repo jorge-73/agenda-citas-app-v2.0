@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { PHONE_REGEX } from "@/lib/constants";
 import { z } from "zod";
 
 const specialistSchema = z.object({
@@ -10,7 +11,7 @@ const specialistSchema = z.object({
   email: z.string().email("Email inválido"),
   specialty: z.string().min(3, "La especialidad es requerida"),
   license: z.string().optional(),
-  phone: z.string().regex(/^[\d\s\-+()]{6,20}$/, "Teléfono inválido").optional().or(z.literal("")),
+  phone: z.string().regex(PHONE_REGEX, "Teléfono inválido").optional().or(z.literal("")),
   bio: z.string().optional(),
   consultationDuration: z.number().positive("La duración debe ser positiva").optional(),
   price: z.string().refine(

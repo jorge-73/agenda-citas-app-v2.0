@@ -17,7 +17,7 @@ export interface Specialist {
     image?: string | null;
   };
   schedules?: Schedule[];
-  appointments?: any[];
+  appointments?: { id: string; startTime: Date; status: string }[];
 }
 
 export interface Schedule {

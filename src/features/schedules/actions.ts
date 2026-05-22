@@ -2,13 +2,14 @@
 
 import { db } from "@/lib/db";
 import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { TIME_REGEX } from "@/lib/constants";
 import { z } from "zod";
 
 const createScheduleSchema = z.object({
   specialistId: z.string().min(1, "Especialista requerido"),
   dayOfWeek: z.number().min(0).max(6, "Día de semana inválido"),
-  startTime: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
-  endTime: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
+  startTime: z.string().regex(TIME_REGEX, "Formato de hora inválido"),
+  endTime: z.string().regex(TIME_REGEX, "Formato de hora inválido"),
 }).refine((d) => d.endTime > d.startTime, {
   message: "La hora de fin debe ser posterior a la de inicio",
   path: ["endTime"],

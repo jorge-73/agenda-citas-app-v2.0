@@ -47,7 +47,7 @@ export default function SchedulesPage() {
       await deleteSchedule(scheduleId);
       toast.success("Horario eliminado");
       loadData();
-    } catch (error) {
+    } catch {
       toast.error("Error al eliminar el horario");
     }
   };
