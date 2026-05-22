@@ -26,7 +26,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { hasPermission, type Permission } from "@/lib/permissions";
-import type { UserRole } from "@/types";
+import { useAuthStore } from "@/store/auth-store";
 
 const navItems: { title: string; href: string; icon: React.ComponentType<{ className?: string }>; permission: Permission }[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, permission: "view:dashboard" },
@@ -39,12 +39,9 @@ const navItems: { title: string; href: string; icon: React.ComponentType<{ class
   { title: "Configuración", href: "/dashboard/settings", icon: Settings, permission: "view:settings" },
 ];
 
-interface MobileNavProps {
-  userRole?: UserRole;
-}
-
-export function MobileNav({ userRole }: MobileNavProps) {
+export function MobileNav() {
   const pathname = usePathname();
+  const userRole = useAuthStore((state) => state.user?.role);
 
   const visibleItems = navItems.filter(
     (item) => hasPermission(userRole, item.permission)

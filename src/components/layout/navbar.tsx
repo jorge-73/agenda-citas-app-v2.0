@@ -18,18 +18,10 @@ import { getInitials } from "@/lib/utils";
 import { logoutAction } from "@/features/auth/actions";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import type { UserRole } from "@/types";
+import { useAuthStore } from "@/store/auth-store";
 
-interface NavbarProps {
-  user?: {
-    name?: string | null;
-    email?: string;
-    image?: string | null;
-  } | null | undefined;
-  userRole?: UserRole;
-}
-
-export function Navbar({ user, userRole }: NavbarProps) {
+export function Navbar() {
+  const user = useAuthStore((state) => state.user);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -57,7 +49,7 @@ export function Navbar({ user, userRole }: NavbarProps) {
       <div className="flex flex-1 items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="lg:hidden">
-            <MobileNav userRole={userRole} />
+            <MobileNav />
           </div>
           <motion.h2
             initial={{ opacity: 0, y: -10 }}

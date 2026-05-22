@@ -88,6 +88,7 @@ src/
 │   ├── export.ts        # Exportación CSV
 │   ├── permissions.ts   # RBAC con 4 roles y 15 permisos
 │   └── utils.ts         # Helpers (cn, formatDate, etc.)
+├── store/               # Zustand stores (auth, ui)
 ├── schemas/              # Zod schemas de autenticación
 ├── types/               # TypeScript types y augmentación NextAuth
 └── prisma/              # Schema, seed y migraciones

@@ -18,11 +18,11 @@ import {
   ChevronRight,
   HeartPulse,
 } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { hasPermission, type Permission } from "@/lib/permissions";
-import type { UserRole } from "@/types";
+import { useAuthStore } from "@/store/auth-store";
+import { useUIStore } from "@/store/ui-store";
 
 const navItems: { title: string; href: string; icon: React.ComponentType<{ className?: string }>; permission: Permission }[] = [
   {
@@ -75,13 +75,11 @@ const navItems: { title: string; href: string; icon: React.ComponentType<{ class
   },
 ];
 
-interface SidebarProps {
-  userRole?: UserRole;
-}
-
-export function Sidebar({ userRole }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const userRole = useAuthStore((state) => state.user?.role);
+  const collapsed = useUIStore((state) => state.sidebarCollapsed);
+  const toggleSidebar = useUIStore((state) => state.toggleSidebar);
 
   const visibleItems = navItems.filter(
     (item) => !item.permission || hasPermission(userRole, item.permission)
@@ -206,7 +204,7 @@ export function Sidebar({ userRole }: SidebarProps) {
               "transition-all duration-200",
               collapsed && "px-2"
             )}
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={toggleSidebar}
           >
             {collapsed ? (
               <ChevronRight className="h-4 w-4" />
