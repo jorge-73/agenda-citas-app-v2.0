@@ -1,7 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { motion } from "framer-motion";
@@ -27,7 +26,7 @@ interface ConfirmationClientProps {
 export function ConfirmationClient({ booking }: ConfirmationClientProps) {
   const details = [
     { icon: User, label: "Profesional", value: booking.specialist?.user?.name || "Especialista", sub: booking.specialist?.specialty },
-    { icon: Calendar, label: "Fecha", value: format(new Date(booking.date), "EEEE d 'de' MMMM 'de' yyyy", { locale: es }) },
+    { icon: Calendar, label: "Fecha", value: formatInTz(new Date(booking.date), "EEEE d 'de' MMMM 'de' yyyy", AR_TZ) },
     { icon: Clock, label: "Hora", value: booking.time },
     { icon: Mail, label: "Email de contacto", value: booking.patientEmail, sub: booking.patientPhone },
   ];

@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { Clock } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -76,7 +75,7 @@ export function TodayAppointments({ appointments, isLoading }: TodayAppointments
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
                       <Clock className="h-3.5 w-3.5" />
-                      {apt.startTime ? format(new Date(apt.startTime), "HH:mm") : "--:--"}
+                      {apt.startTime ? formatInTz(new Date(apt.startTime), "HH:mm", AR_TZ) : "--:--"}
                     </div>
                     <div className="space-y-0.5">
                       <p className="text-sm font-medium">

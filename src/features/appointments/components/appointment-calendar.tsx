@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { format, isSameDay, isToday, startOfDay, addHours, setHours, setMinutes } from "date-fns";
-import { es } from "date-fns/locale";
+import { isSameDay, isToday, startOfDay, addHours, setHours, setMinutes } from "date-fns";
+import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -108,7 +108,7 @@ export function AppointmentCalendar({
                     isToday(day) && "bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center"
                   )}
                 >
-                  {format(day, "d")}
+                  {formatInTz(day, "d", AR_TZ)}
                 </div>
                 <div className="space-y-1">
                   {dayEvents.slice(0, 3).map((event) => (
@@ -124,7 +124,7 @@ export function AppointmentCalendar({
                         onAppointmentClick?.(appointments.find((a) => a.id === event.id)!);
                       }}
                     >
-                      {format(new Date(event.start), "HH:mm")} {event.patientName}
+                      {formatInTz(new Date(event.start), "HH:mm", AR_TZ)} {event.patientName}
                     </div>
                   ))}
                   {dayEvents.length > 3 && (
@@ -159,7 +159,7 @@ export function AppointmentCalendar({
           <div className="grid grid-cols-[80px_1fr]">
             <div className="border-r bg-muted/50 p-2">
               <div className="text-sm font-medium">
-                {format(currentDate, "EEEE d 'de' MMMM", { locale: es })}
+                {formatInTz(currentDate, "EEEE d 'de' MMMM", AR_TZ)}
               </div>
             </div>
             <div className="p-2 flex items-center gap-2">
@@ -188,7 +188,7 @@ export function AppointmentCalendar({
                 style={{ top: `${(hour - 8) * 60}px`, height: "60px" }}
               >
                 <div className="border-r pr-2 text-right text-xs text-muted-foreground pt-1">
-                  {format(setHours(new Date(), hour), "HH:mm")}
+                  {formatInTz(setHours(new Date(), hour), "HH:mm", AR_TZ)}
                 </div>
                 <div
                   className="border-l cursor-pointer hover:bg-muted/30"
@@ -221,7 +221,7 @@ export function AppointmentCalendar({
                       <div className="font-medium text-sm">{event.patientName}</div>
                       <div className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {format(new Date(event.start), "HH:mm")} - {format(new Date(event.end), "HH:mm")}
+                        {formatInTz(new Date(event.start), "HH:mm", AR_TZ)} - {formatInTz(new Date(event.end), "HH:mm", AR_TZ)}
                       </div>
                       {event.reason && <div className="text-xs text-muted-foreground mt-1">{event.reason}</div>}
                     </div>
@@ -264,7 +264,7 @@ export function AppointmentCalendar({
               onClick={() => selectDate(day)}
             >
               <div className="text-xs text-muted-foreground">
-                {format(day, "EEE", { locale: es })}
+                {formatInTz(day, "EEE", AR_TZ)}
               </div>
               <div
                 className={cn(
@@ -272,7 +272,7 @@ export function AppointmentCalendar({
                   isToday(day) && "bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center mx-auto"
                 )}
               >
-                {format(day, "d")}
+                {formatInTz(day, "d", AR_TZ)}
               </div>
             </div>
           ))}
@@ -285,7 +285,7 @@ export function AppointmentCalendar({
               className="grid grid-cols-[60px_repeat(7,1fr)] min-h-[60px]"
             >
               <div className="border-r border-t p-1 text-xs text-muted-foreground text-right pr-2">
-                {format(setHours(new Date(), hour), "HH:mm")}
+                {formatInTz(setHours(new Date(), hour), "HH:mm", AR_TZ)}
               </div>
               {days.map((day, dayIndex) => {
                 const dayEvents = getEventsForDay(day).filter((event) => {
@@ -327,7 +327,7 @@ export function AppointmentCalendar({
                         >
                           <div className="font-medium truncate">{event.patientName}</div>
                           <div className="text-muted-foreground truncate">
-                            {format(new Date(event.start), "HH:mm")}
+                            {formatInTz(new Date(event.start), "HH:mm", AR_TZ)}
                           </div>
                         </div>
                       );

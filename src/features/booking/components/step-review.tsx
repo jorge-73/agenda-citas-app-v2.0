@@ -1,7 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { Calendar, Clock, User, Stethoscope } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -67,7 +66,7 @@ export function StepReview({
             <div>
               <p className="text-xs text-muted-foreground">Fecha</p>
               <p className="font-semibold text-sm text-foreground">
-                {date && format(date, "EEEE d 'de' MMMM 'de' yyyy", { locale: es })}
+                {date && formatInTz(date, "EEEE d 'de' MMMM 'de' yyyy", AR_TZ)}
               </p>
             </div>
           </div>

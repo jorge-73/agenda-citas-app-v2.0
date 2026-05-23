@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,7 +55,7 @@ export function PatientsTable({ patients, isLoading, onCreateNew }: PatientsTabl
     }),
     columnHelper.accessor("createdAt", {
       header: "Registrado",
-      cell: ({ row }) => format(new Date(row.original.createdAt), "dd MMM yyyy", { locale: es }),
+      cell: ({ row }) => formatInTz(new Date(row.original.createdAt), "dd MMM yyyy", AR_TZ),
     }),
     columnHelper.display({
       id: "actions",

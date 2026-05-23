@@ -7,7 +7,7 @@ import { z } from "zod";
 import { createColumnHelper } from "@tanstack/react-table";
 import { toast } from "sonner";
 import { CalendarOff, Plus, Trash2, Loader2 } from "lucide-react";
-import { format } from "date-fns";
+import { formatInTz, AR_TZ } from "@/lib/date-utils";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
@@ -110,7 +110,7 @@ export default function BlockedDatesPage() {
     columnHelper.accessor("date", {
       header: "Fecha",
       cell: ({ row }) => (
-        <span className="text-sm font-medium">{format(new Date(row.original.date), "dd/MM/yyyy")}</span>
+        <span className="text-sm font-medium">{formatInTz(new Date(row.original.date), "dd/MM/yyyy", AR_TZ)}</span>
       ),
     }),
     columnHelper.accessor("date", {
@@ -225,7 +225,7 @@ export default function BlockedDatesPage() {
             <AlertDialogTitle>¿Desbloquear fecha?</AlertDialogTitle>
             <AlertDialogDescription>
               Se eliminará el bloqueo del día{" "}
-              <strong>{deleteTarget && format(new Date(deleteTarget.date), "dd/MM/yyyy")}</strong>.
+              <strong>{deleteTarget && formatInTz(new Date(deleteTarget.date), "dd/MM/yyyy", AR_TZ)}</strong>.
               {deleteTarget?.isRecurring && " Las recurrencias futuras no se verán afectadas."}
             </AlertDialogDescription>
           </AlertDialogHeader>

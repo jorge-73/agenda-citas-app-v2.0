@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format, addMinutes } from "date-fns";
+import { addMinutes } from "date-fns";
+import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,8 +72,8 @@ export function AppointmentModal({
     defaultValues: {
       patientId: initialData?.patientId || "",
       specialistId: initialData?.specialistId || "",
-      date: initialData?.startTime ? format(initialData.startTime, "yyyy-MM-dd") : "",
-      startTime: initialData?.startTime ? format(initialData.startTime, "HH:mm") : "",
+      date: initialData?.startTime ? formatInTz(initialData.startTime, "yyyy-MM-dd", AR_TZ) : "",
+      startTime: initialData?.startTime ? formatInTz(initialData.startTime, "HH:mm", AR_TZ) : "",
       reason: initialData?.reason || "",
       notes: initialData?.notes || "",
     },
@@ -95,8 +96,8 @@ export function AppointmentModal({
       if (initialData) {
         setValue("patientId", initialData.patientId || "");
         setValue("specialistId", initialData.specialistId || "");
-        setValue("date", initialData.startTime ? format(initialData.startTime, "yyyy-MM-dd") : "");
-        setValue("startTime", initialData.startTime ? format(initialData.startTime, "HH:mm") : "");
+        setValue("date", initialData.startTime ? formatInTz(initialData.startTime, "yyyy-MM-dd", AR_TZ) : "");
+        setValue("startTime", initialData.startTime ? formatInTz(initialData.startTime, "HH:mm", AR_TZ) : "");
         setValue("reason", initialData.reason || "");
         setValue("notes", initialData.notes || "");
       } else {

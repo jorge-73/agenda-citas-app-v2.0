@@ -1,8 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { format, isSameDay } from "date-fns";
-import { es } from "date-fns/locale";
+import { isSameDay } from "date-fns";
+import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import { CalendarDays, Clock, Loader2, CheckCircle2 } from "lucide-react";
 import type { TimeSlot } from "../types";
@@ -47,8 +47,8 @@ export function StepDateTime({
           {availableDates.slice(0, 21).map((date, index) => {
             const isSelected = selectedDate && isSameDay(date, selectedDate);
             const isToday = isSameDay(date, new Date());
-            const dayName = format(date, "EEE", { locale: es });
-            const dayNum = format(date, "d");
+            const dayName = formatInTz(date, "EEE", AR_TZ);
+            const dayNum = formatInTz(date, "d", AR_TZ);
 
             return (
               <motion.button
@@ -170,7 +170,7 @@ export function StepDateTime({
                 <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                 <span className="text-foreground">
                   Cita programada para el{" "}
-                  <strong>{selectedDate && format(selectedDate, "d 'de' MMMM", { locale: es })}</strong> a las{" "}
+                  <strong>{selectedDate && formatInTz(selectedDate, "d 'de' MMMM", AR_TZ)}</strong> a las{" "}
                   <strong>{selectedTime}</strong>
                 </span>
               </motion.div>
