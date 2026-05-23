@@ -31,7 +31,6 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
     appointments: "#10b981",
     bookings: "#06b6d4",
     grid: "oklch(var(--border) / 0.5)",
-    text: "oklch(var(--muted-foreground))",
   };
 
   if (isLoading) {
@@ -79,33 +78,33 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
         </div>
       </div>
       <div className="p-6 pt-2">
-        <div className="h-[300px]">
+        <div className="h-[300px] [&_.recharts-text]:text-muted-foreground">
           <ResponsiveContainer width="100%" height="100%">
             {activeView === "bar" ? (
-              <BarChart data={combinedData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  tick={{ fontSize: 11, fill: colors.text }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis 
-                  tick={{ fontSize: 11, fill: colors.text }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    borderRadius: "16px", 
-                    border: "1px solid oklch(var(--border))",
-                    background: "oklch(var(--card) / 0.85)",
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                    boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
-                  }}
-                  cursor={{ fill: "oklch(var(--muted) / 0.5)" }}
-                />
+                <BarChart data={combinedData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fontSize: 11, fill: "currentColor" }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11, fill: "currentColor" }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      borderRadius: "16px", 
+                      border: "1px solid oklch(var(--border))",
+                      background: "oklch(var(--card) / 0.85)",
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                      boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
+                    }}
+                    cursor={{ fill: "oklch(var(--muted) / 0.5)" }}
+                  />
                 <Legend 
                   wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
                   iconType="circle"
@@ -137,29 +136,29 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
                 />
               </BarChart>
             ) : (
-              <LineChart data={combinedData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  tick={{ fontSize: 11, fill: colors.text }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis 
-                  tick={{ fontSize: 11, fill: colors.text }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    borderRadius: "16px", 
-                    border: "1px solid oklch(var(--border))",
-                    background: "oklch(var(--card) / 0.85)",
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                    boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
-                  }}
-                />
+                <LineChart data={combinedData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fontSize: 11, fill: "currentColor" }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11, fill: "currentColor" }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      borderRadius: "16px", 
+                      border: "1px solid oklch(var(--border))",
+                      background: "oklch(var(--card) / 0.85)",
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                      boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
+                    }}
+                  />
                 <Legend 
                   wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
                   iconType="circle"
