@@ -156,6 +156,14 @@ export async function updateProfileAction(data: {
       },
     });
 
+    if (data.timezone) {
+      await db.userPreference.upsert({
+        where: { userId: session.user.id },
+        update: { timezone: data.timezone },
+        create: { userId: session.user.id, timezone: data.timezone },
+      });
+    }
+
     return { success: true };
   } catch (error) {
     console.error("Update profile error:", error);
