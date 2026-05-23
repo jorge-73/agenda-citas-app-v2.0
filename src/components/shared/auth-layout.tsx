@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HeartPulse } from "lucide-react";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { AuthOrb } from "./auth-orb";
 
 interface OrbConfig {
@@ -38,8 +39,11 @@ export function AuthLayout({ children, title, subtitle, orbs = defaultOrbs, show
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative"
       >
+        <div className="absolute -top-2 right-0 z-20">
+          <ThemeToggle />
+        </div>
         {showHeader && title && (
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
@@ -76,7 +80,7 @@ export function AuthLayout({ children, title, subtitle, orbs = defaultOrbs, show
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
-          className="rounded-3xl border border-border/40 bg-card/70 backdrop-blur-2xl p-8 shadow-2xl shadow-foreground/5"
+          className="rounded-3xl border border-border/40 bg-card p-8 shadow-2xl shadow-foreground/5"
         >
           {children}
         </motion.div>
