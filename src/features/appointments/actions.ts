@@ -5,6 +5,8 @@ import type { AppointmentStatus } from "./types";
 import { format } from "date-fns";
 import { requireAuth, validateInput } from "@/lib/action-helpers";
 import { APPOINTMENT_STATUSES } from "@/lib/constants";
+import { toUTC, AR_TZ } from "@/lib/date-utils";
+import { appointmentService } from "./services/appointment-service";
 import { z } from "zod";
 
 const createAppointmentSchema = z.object({
@@ -178,20 +180,13 @@ export async function createAppointment(data: {
   await requireAuth();
   validateInput(createAppointmentSchema, data);
 
-  const appointment = await db.appointment.create({
-    data: {
-      patientId: data.patientId,
-      specialistId: data.specialistId,
-      startTime: data.startTime,
-      endTime: data.endTime,
-      reason: data.reason,
-      notes: data.notes,
-      status: "PENDING",
-    },
-    include: {
-      patient: { include: { user: true } },
-      specialist: { include: { user: true } },
-    },
+  const appointment = await appointmentService.create({
+    patientId: data.patientId,
+    specialistId: data.specialistId,
+    startTime: toUTC(data.startTime, AR_TZ),
+    endTime: toUTC(data.endTime, AR_TZ),
+    reason: data.reason,
+    notes: data.notes,
   });
 
   try {
@@ -245,21 +240,15 @@ export async function updateAppointment(id: string, data: {
     throw new Error("Cita no encontrada");
   }
 
-  const appointment = await db.appointment.update({
-    where: { id },
-    data: {
-      ...(data.patientId && { patientId: data.patientId }),
-      ...(data.specialistId && { specialistId: data.specialistId }),
-      ...(data.startTime && { startTime: data.startTime }),
-      ...(data.endTime && { endTime: data.endTime }),
-      ...(data.reason !== undefined && { reason: data.reason }),
-      ...(data.notes !== undefined && { notes: data.notes }),
-      ...(data.status && { status: data.status }),
-    },
-    include: {
-      patient: { include: { user: true } },
-      specialist: { include: { user: true } },
-    },
+  const appointment = await appointmentService.update({
+    id,
+    ...(data.patientId && { patientId: data.patientId }),
+    ...(data.specialistId && { specialistId: data.specialistId }),
+    ...(data.startTime && { startTime: toUTC(data.startTime, AR_TZ) }),
+    ...(data.endTime && { endTime: toUTC(data.endTime, AR_TZ) }),
+    ...(data.reason !== undefined && { reason: data.reason }),
+    ...(data.notes !== undefined && { notes: data.notes }),
+    ...(data.status && { status: data.status }),
   });
 
   if (data.status && data.status !== previous?.status) {

@@ -3,10 +3,11 @@
 import { db } from "@/lib/db";
 import { startOfDay, endOfDay } from "date-fns";
 import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { toUTC, AR_TZ } from "@/lib/date-utils";
 import { z } from "zod";
 
 const blockedDateSchema = z.object({
-  date: z.date().refine((d) => d > new Date(), "La fecha debe ser futura"),
+  date: z.date().refine((d) => endOfDay(d) > new Date(), "La fecha debe ser futura"),
   reason: z.string().optional(),
   isRecurring: z.boolean().optional(),
 });
@@ -25,8 +26,9 @@ export async function createBlockedDateAction(data: {
   await requireAuth();
   validateInput(blockedDateSchema, data);
 
-  const dayStart = startOfDay(new Date(data.date));
-  const dayEnd = endOfDay(new Date(data.date));
+  const utcDate = startOfDay(toUTC(data.date, AR_TZ));
+  const dayStart = utcDate;
+  const dayEnd = endOfDay(utcDate);
 
   const existing = await db.blockedDate.findFirst({
     where: {
@@ -41,7 +43,7 @@ export async function createBlockedDateAction(data: {
 
   return db.blockedDate.create({
     data: {
-      date: dayStart,
+      date: utcDate,
       reason: data.reason,
       isRecurring: data.isRecurring ?? false,
     },

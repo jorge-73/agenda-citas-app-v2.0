@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
+import { MAX_LIMIT } from "@/lib/constants";
 import { SpecialistFilters, CreateSpecialistInput, UpdateSpecialistInput } from "../types";
 
 export const specialistService = {
@@ -98,8 +99,8 @@ export const specialistService = {
         orderBy: {
           createdAt: "desc",
         },
-        skip: (page - 1) * limit,
-        take: limit,
+        skip: (page - 1) * Math.min(limit, MAX_LIMIT),
+        take: Math.min(limit, MAX_LIMIT),
       }),
       db.specialist.count({ where }),
     ]);
@@ -125,7 +126,7 @@ export const specialistService = {
       include: {
         user: true,
       },
-      take: limit,
+      take: Math.min(limit, MAX_LIMIT),
     });
   },
 

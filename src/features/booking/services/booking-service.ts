@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { addDays, startOfDay, endOfDay, format, isBefore, isSameDay, parseISO, eachDayOfInterval } from "date-fns";
+import { MAX_LIMIT } from "@/lib/constants";
 import { CreateBookingInput, TimeSlot } from "../types";
 
 export const bookingService = {
@@ -236,7 +237,7 @@ export const bookingService = {
         status: { in: ["PENDING", "CONFIRMED"] },
       },
       orderBy: { date: "asc" },
-      take: limit,
+      take: Math.min(limit, MAX_LIMIT),
     });
     
     const bookingsWithSpecialist = await Promise.all(

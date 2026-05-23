@@ -1,9 +1,10 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { addDays, startOfDay, endOfDay, format, eachDayOfInterval } from "date-fns";
+import { addDays, startOfDay, endOfDay, format, eachDayOfInterval, isSameDay } from "date-fns";
 import { validateInput } from "@/lib/action-helpers";
 import { PHONE_REGEX, TIME_REGEX } from "@/lib/constants";
+import { toUTC, AR_TZ } from "@/lib/date-utils";
 import { z } from "zod";
 
 const createBookingSchema = z.object({
@@ -14,7 +15,7 @@ const createBookingSchema = z.object({
   specialistId: z.string().min(1, "Especialista requerido"),
   specialty: z.string().min(1, "Especialidad requerida"),
   reason: z.string().optional(),
-  date: z.date().refine((d) => d > new Date(), "La fecha debe ser futura"),
+  date: z.date(),
   time: z.string().regex(TIME_REGEX, "Formato de hora inválido"),
 });
 
@@ -64,7 +65,7 @@ export async function getAvailableDatesAction(specialistId: string) {
   for (const day of days) {
     const dayOfWeek = day.getDay();
     const schedule = schedules.find((s) => s.dayOfWeek === dayOfWeek);
-    
+
     if (schedule && !blockedDatesSet.has(format(day, "yyyy-MM-dd"))) {
       availableDates.push(day);
     }
@@ -126,21 +127,33 @@ export async function getAvailableTimeSlotsAction(specialistId: string, date: Da
   const slots: { time: string; available: boolean }[] = [];
   const [startHour, startMin] = schedule.startTime.split(":").map(Number);
   const [endHour, endMin] = schedule.endTime.split(":").map(Number);
-  
+
   let currentMinutes = startHour * 60 + startMin;
   const endMinutes = endHour * 60 + endMin;
   const slotDuration = 30;
+
+  const now = new Date();
 
   while (currentMinutes < endMinutes) {
     const hours = Math.floor(currentMinutes / 60);
     const mins = currentMinutes % 60;
     const timeString = `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
-    
+
+    if (isSameDay(date, now)) {
+      const [slotHour, slotMin] = timeString.split(":").map(Number);
+      const slotDate = new Date(date);
+      slotDate.setHours(slotHour, slotMin, 0, 0);
+      if (slotDate <= now) {
+        currentMinutes += slotDuration;
+        continue;
+      }
+    }
+
     slots.push({
       time: timeString,
       available: !bookedTimes.has(timeString),
     });
-    
+
     currentMinutes += slotDuration;
   }
 
@@ -160,57 +173,63 @@ export async function createBookingAction(data: {
 }) {
   validateInput(createBookingSchema, data);
 
-  const dayStart = startOfDay(new Date(data.date));
-  const dayEnd = endOfDay(new Date(data.date));
+  const [hour, min] = data.time.split(":").map(Number);
+  const slotDate = new Date(data.date);
+  slotDate.setHours(hour, min, 0, 0);
+  const utcSlot = toUTC(slotDate, AR_TZ);
+  if (utcSlot <= new Date()) {
+    throw new Error("La fecha y hora de la cita deben ser futuras");
+  }
 
-  const existingAppointment = await db.appointment.findFirst({
-    where: {
-      specialistId: data.specialistId,
-      status: { not: "CANCELLED" },
-      startTime: {
-        gte: dayStart,
-        lte: dayEnd,
+  const utcDate = toUTC(data.date, AR_TZ);
+
+  const dayStart = startOfDay(utcDate);
+  const dayEnd = endOfDay(utcDate);
+
+  const booking = await db.$transaction(async (tx) => {
+    const existingAppointment = await tx.appointment.findFirst({
+      where: {
+        specialistId: data.specialistId,
+        status: { not: "CANCELLED" },
+        startTime: { gte: dayStart, lte: dayEnd },
       },
-    },
-  });
+    });
 
-  if (existingAppointment) {
-    const aptTime = format(new Date(existingAppointment.startTime), "HH:mm");
-    if (aptTime === data.time) {
-      throw new Error("Ya existe una cita en este horario");
+    if (existingAppointment) {
+      const aptTime = format(new Date(existingAppointment.startTime), "HH:mm");
+      if (aptTime === data.time) {
+        throw new Error("Ya existe una cita en este horario");
+      }
     }
-  }
 
-  const existingBooking = await db.booking.findFirst({
-    where: {
-      specialistId: data.specialistId,
-      date: {
-        gte: dayStart,
-        lte: dayEnd,
+    const existingBooking = await tx.booking.findFirst({
+      where: {
+        specialistId: data.specialistId,
+        date: { gte: dayStart, lte: dayEnd },
+        time: data.time,
+        status: { in: ["PENDING", "CONFIRMED"] },
       },
-      time: data.time,
-      status: { in: ["PENDING", "CONFIRMED"] },
-    },
-  });
+    });
 
-  if (existingBooking) {
-    throw new Error("Ya existe una reserva en este horario");
-  }
+    if (existingBooking) {
+      throw new Error("Ya existe una reserva en este horario");
+    }
 
-  const booking = await db.booking.create({
-    data: {
-      patientName: data.patientName,
-      patientLastname: data.patientLastname,
-      patientEmail: data.patientEmail,
-      patientPhone: data.patientPhone,
-      specialistId: data.specialistId,
-      specialty: data.specialty,
-      reason: data.reason,
-      date: data.date,
-      time: data.time,
-      status: "PENDING",
-    },
-  });
+    return tx.booking.create({
+      data: {
+        patientName: data.patientName,
+        patientLastname: data.patientLastname,
+        patientEmail: data.patientEmail,
+        patientPhone: data.patientPhone,
+        specialistId: data.specialistId,
+        specialty: data.specialty,
+        reason: data.reason,
+        date: utcDate,
+        time: data.time,
+        status: "PENDING",
+      },
+    });
+  }, { isolationLevel: "Serializable" });
 
   try {
     const { sendBookingConfirmationEmail } = await import("@/lib/email");
@@ -225,7 +244,7 @@ export async function createBookingAction(data: {
       patientLastname: data.patientLastname,
       specialistName: specialist?.user.name || "Especialista",
       specialty: data.specialty,
-      date: format(new Date(data.date), "dd/MM/yyyy"),
+      date: format(utcDate, "dd/MM/yyyy"),
       time: data.time,
       reason: data.reason,
     });

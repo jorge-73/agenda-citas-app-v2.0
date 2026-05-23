@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { MAX_LIMIT } from "@/lib/constants";
 import { 
   startOfMonth, 
   endOfMonth, 
@@ -321,7 +322,7 @@ export async function getRecentPatients(limit: number = 10): Promise<RecentPatie
     orderBy: {
       createdAt: "desc"
     },
-    take: limit
+    take: Math.min(limit, MAX_LIMIT)
   });
 
   return patients.map(p => ({
@@ -392,5 +393,5 @@ export async function getRecentActivity(limit: number = 20): Promise<ActivityIte
 
   return activities
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-    .slice(0, limit);
+    .slice(0, Math.min(limit, MAX_LIMIT));
 }

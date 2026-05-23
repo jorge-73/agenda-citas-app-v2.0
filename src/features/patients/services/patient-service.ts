@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
+import { MAX_LIMIT } from "@/lib/constants";
 import { PatientFilters, CreatePatientInput, UpdatePatientInput } from "../types";
 
 export const patientService = {
@@ -86,8 +87,8 @@ export const patientService = {
         orderBy: {
           createdAt: "desc",
         },
-        skip: (page - 1) * limit,
-        take: limit,
+        skip: (page - 1) * Math.min(limit, MAX_LIMIT),
+        take: Math.min(limit, MAX_LIMIT),
       }),
       db.patient.count({ where }),
     ]);
@@ -114,7 +115,7 @@ export const patientService = {
       include: {
         user: true,
       },
-      take: limit,
+      take: Math.min(limit, MAX_LIMIT),
     });
   },
 
