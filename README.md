@@ -8,15 +8,19 @@ Sistema profesional de gestión de citas médicas construido con Next.js 16.2.6,
 - **Gestión de usuarios** con roles (Admin, Especialista, Recepcionista, Paciente)
 - **Dashboard profesional** con estadísticas en tiempo real y 4 tipos de gráficos (Recharts)
 - **Booking público** wizard de 4 pasos para pacientes sin cuenta
+- **Gestión de reservas** en dashboard (confirmar/cancelar)
 - **Calendario de citas** con vistas día/semana/mes
 - **Gestión de horarios** por especialista y día de semana
-- **RBAC** con 4 roles (Admin, Especialista, Recepcionista, Paciente) y 15 permisos
+- **RBAC** con 4 roles (Admin, Especialista, Recepcionista, Paciente) y 17 permisos
 - **Notificaciones por email** (confirmación booking, cambio estado, reset password)
+- **Rate limiting** en login, registro y reset de contraseña
+- **Zona horaria dinámica** por usuario (guardada en preferencias + JWT)
+- **Recordarme** en login (sesión extendida 30 días)
 - **Exportación CSV** de citas, pacientes y especialistas
 - **Dark/Light mode** con next-themes
 - **Diseño premium** con animaciones Framer Motion, glass effect y gradientes
 - **Responsive** para todos los dispositivos
-- **TypeScript** estricto con validaciones Zod
+- **TypeScript** estricto con validaciones Zod (+70 tests unitarios)
 
 ## 🛠️ Tech Stack
 
@@ -40,6 +44,7 @@ Sistema profesional de gestión de citas médicas construido con Next.js 16.2.6,
 
 ```
 src/
+├── proxy.ts               # Middleware alternativo (auth + RBAC)
 ├── app/                    # Next.js App Router
 │   ├── (auth)/            # Rutas de autenticación
 │   │   ├── login/
@@ -49,8 +54,9 @@ src/
 │   │   ├── booking/       # Reserva de citas
 │   │   │   └── confirmation/
 │   │   └── page.tsx       # Landing page
-│   ├── dashboard/          # Dashboard protegido (9 secciones)
+│   ├── dashboard/          # Dashboard protegido (10 secciones)
 │   │   ├── appointments/
+│   │   ├── bookings/      # Gestión de reservas online
 │   │   ├── patients/
 │   │   ├── specialists/
 │   │   ├── schedules/
@@ -70,8 +76,8 @@ src/
 │   ├── shared/           # EmptyState, LoadingState (reutilizables)
 │   └── providers.tsx     # ThemeProvider
 ├── features/             # Arquitectura feature-based (11 módulos)
-│   ├── auth/              # Autenticación y Server Actions
-│   ├── booking/           # Reservas públicas sin cuenta
+│   ├── auth/              # Autenticación y Server Actions (rate limit + rememberMe)
+│   ├── booking/           # Reservas públicas + gestión dashboard
 │   ├── dashboard/         # Dashboard con estadísticas y gráficos
 │   ├── appointments/      # Gestión de citas (calendario multi-vista)
 │   ├── patients/          # Gestión de pacientes
@@ -82,12 +88,16 @@ src/
 │   ├── settings/          # Configuración del sistema
 │   └── shared/            # Constantes y utilidades compartidas
 ├── lib/                  # Utilidades y configuración
-│   ├── auth.ts          # NextAuth config
+│   ├── auth.ts          # NextAuth config (JWT + timezone + rememberMe)
 │   ├── db.ts            # Prisma client (singleton)
 │   ├── email.ts         # Nodemailer (reset password, confirmaciones)
 │   ├── export.ts        # Exportación CSV
-│   ├── permissions.ts   # RBAC con 4 roles y 15 permisos
-│   └── utils.ts         # Helpers (cn, formatDate, etc.)
+│   ├── permissions.ts   # RBAC con 4 roles y 17 permisos
+│   ├── rate-limit.ts    # Rate limiter in-memory (login, register, reset)
+│   ├── date-utils.ts    # Utilidades timezone (toUTC, fromUTC, formatInTz)
+│   ├── constants.ts     # Constantes (MAX_LIMIT, PHONE_REGEX, TIME_REGEX)
+│   ├── action-helpers.ts# Helpers para server actions (validateInput)
+│   └── utils.ts         # Helpers (cn, getInitials, etc.)
 ├── store/               # Zustand stores (auth, ui)
 ├── schemas/              # Zod schemas de autenticación
 ├── types/               # TypeScript types y augmentación NextAuth
@@ -102,9 +112,11 @@ src/
 ### Prerrequisitos
 - Node.js 18+
 - npm o yarn
-- Docker (para PostgreSQL)
+- PostgreSQL 16 (nativo o Docker)
 
 ### Instalación
+
+**Opción A — PostgreSQL nativo (recomendado en Windows):**
 
 ```bash
 # Clonar el repositorio
@@ -114,8 +126,8 @@ cd agenda-citas-app-v2.0
 # Instalar dependencias
 npm install
 
-# Iniciar PostgreSQL con Docker
-docker run --name citamed-pg -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=citamed_db -p 5432:5432 -d postgres:16
+# Asegurar que PostgreSQL 17 está iniciado
+# (Servicio: postgresql-x64-17)
 
 # Generar Prisma Client
 npx prisma generate
@@ -127,14 +139,30 @@ npx prisma db push
 npm run db:seed
 ```
 
+**Opción B — PostgreSQL con Docker:**
+
+```bash
+docker run --name citamed-pg -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=citamed_db -p 5432:5432 -d postgres:16
+npx prisma generate
+npx prisma db push
+npm run db:seed
+```
+
 ### Variables de Entorno
 
-Crear `.env`:
+Crear `.env.local`:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/citamed_db?schema=public
 NEXTAUTH_SECRET="your-secret-key-here"
 NEXTAUTH_URL="http://localhost:3000"
+
+# SMTP (opcional — necesario para emails de confirmación y reset password)
+SMTP_HOST=sandbox.smtp.mailtrap.io
+SMTP_PORT=2525
+SMTP_USER=your_mailtrap_user
+SMTP_PASSWORD=your_mailtrap_password
+SMTP_FROM="CitasMed <noreply@citamed.com>"
 ```
 
 ### Ejecutar Desarrollo
@@ -150,8 +178,16 @@ Abrir [http://localhost:3000](http://localhost:3000)
 | Rol | Email | Contraseña |
 |-----|-------|------------|
 | Admin | admin@citamed.com | admin123 |
-| Especialista | doctor@citamed.com | doctor123 |
+| Med. General | dr.juan.perez@citamed.com | doctor123 |
+| Cardióloga | dra.laura.martinez@citamed.com | doctor123 |
+| Pediatra | dr.carlos.gomez@citamed.com | doctor123 |
+| Dermatóloga | dra.ana.rodriguez@citamed.com | doctor123 |
+| Traumatólogo | dr.pablo.fernandez@citamed.com | doctor123 |
+| Psicóloga | dra.sofia.lopez@citamed.com | doctor123 |
 | Recepcionista | recepcion@citamed.com | recep123 |
+| Paciente | paciente@test.com | paciente123 |
+
+> Todos los especialistas usan la misma contraseña `doctor123`.
 
 ## 🗄️ Modelos de Base de Datos
 
@@ -170,26 +206,27 @@ Abrir [http://localhost:3000](http://localhost:3000)
 ## 📝 Scripts Disponibles
 
 ```bash
-npm run dev          # Iniciar desarrollo
-npm run build        # Construir producción
-npm run start        # Iniciar producción
-npm run lint         # Lint code
-npm run db:seed      # Ejecutar seed
-npm run db:studio    # Abrir Prisma Studio
+npm run dev            # Iniciar desarrollo
+npm run build          # Construir producción
+npm run start          # Iniciar producción
+npm run lint           # Lint code
+npm run test           # Tests en watch mode
+npm run test:run       # Tests una sola vez (CI)
+npm run test:coverage  # Tests con reporte de cobertura
+npm run db:seed        # Ejecutar seed
+npm run db:studio      # Abrir Prisma Studio
 ```
 
 ## 🔄 Base de Datos
 
-### PostgreSQL (Docker - Desarrollo y Producción)
+### PostgreSQL Nativo (recomendado en Windows)
 
-El proyecto usa PostgreSQL 16 vía Docker. Para gestionar la base de datos:
+```powershell
+# Verificar estado del servicio
+Get-Service postgresql-x64-17
 
-```bash
-# Iniciar contenedor
-docker start citamed-pg
-
-# Detener contenedor
-docker stop citamed-pg
+# Iniciar servicio si está detenido
+Start-Service postgresql-x64-17
 
 # Aplicar migraciones
 npx prisma db push
@@ -201,10 +238,15 @@ npx prisma migrate dev --name descripcion_cambio
 npm run db:studio
 ```
 
-> **Nota**: Si tienes PostgreSQL instalado nativamente en Windows, detén el servicio para evitar conflictos de puerto:
-> ```powershell
-> Stop-Service postgresql-x64-17
-> ```
+### PostgreSQL con Docker (alternativa)
+
+```bash
+docker start citamed-pg
+docker stop citamed-pg
+npx prisma db push
+npx prisma migrate dev --name descripcion_cambio
+npm run db:studio
+```
 
 ## 📄 Licencia
 

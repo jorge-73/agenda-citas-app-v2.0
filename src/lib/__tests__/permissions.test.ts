@@ -9,6 +9,7 @@ const ALL_PERMISSIONS: Permission[] = [
   "view:specialists",
   "view:schedules",
   "view:blocked-dates",
+  "view:bookings",
   "view:settings",
   "view:users",
   "manage:appointments",
@@ -16,6 +17,7 @@ const ALL_PERMISSIONS: Permission[] = [
   "manage:specialists",
   "manage:schedules",
   "manage:blocked-dates",
+  "manage:bookings",
   "manage:settings",
   "manage:users",
 ];
@@ -34,28 +36,32 @@ describe("hasPermission", () => {
   });
 
   describe("SPECIALIST", () => {
-    it("has dashboard, appointments, patients, schedules, settings", () => {
+    it("has dashboard, appointments, patients, schedules, settings, bookings", () => {
       expect(hasPermission("SPECIALIST", "view:dashboard")).toBe(true);
       expect(hasPermission("SPECIALIST", "view:appointments")).toBe(true);
       expect(hasPermission("SPECIALIST", "view:patients")).toBe(true);
       expect(hasPermission("SPECIALIST", "view:schedules")).toBe(true);
+      expect(hasPermission("SPECIALIST", "view:bookings")).toBe(true);
       expect(hasPermission("SPECIALIST", "view:settings")).toBe(true);
       expect(hasPermission("SPECIALIST", "manage:appointments")).toBe(true);
       expect(hasPermission("SPECIALIST", "manage:schedules")).toBe(true);
     });
 
-    it("does NOT have users, blocked-dates, specialists management", () => {
+    it("does NOT have users, blocked-dates, bookings management, specialists management", () => {
       expect(hasPermission("SPECIALIST", "view:users")).toBe(false);
       expect(hasPermission("SPECIALIST", "view:blocked-dates")).toBe(false);
+      expect(hasPermission("SPECIALIST", "manage:bookings")).toBe(false);
       expect(hasPermission("SPECIALIST", "manage:users")).toBe(false);
     });
   });
 
   describe("RECEPTIONIST", () => {
-    it("has operational permissions", () => {
+    it("has operational permissions including bookings", () => {
       expect(hasPermission("RECEPTIONIST", "view:appointments")).toBe(true);
       expect(hasPermission("RECEPTIONIST", "view:patients")).toBe(true);
       expect(hasPermission("RECEPTIONIST", "view:specialists")).toBe(true);
+      expect(hasPermission("RECEPTIONIST", "view:bookings")).toBe(true);
+      expect(hasPermission("RECEPTIONIST", "manage:bookings")).toBe(true);
       expect(hasPermission("RECEPTIONIST", "manage:appointments")).toBe(true);
       expect(hasPermission("RECEPTIONIST", "manage:patients")).toBe(true);
     });

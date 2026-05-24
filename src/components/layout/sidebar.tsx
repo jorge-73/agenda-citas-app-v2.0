@@ -14,6 +14,7 @@ import {
   Clock,
   CalendarOff,
   Shield,
+  ClipboardList,
   ChevronLeft,
   ChevronRight,
   HeartPulse,
@@ -60,6 +61,12 @@ const navItems: { title: string; href: string; icon: React.ComponentType<{ class
     href: "/dashboard/blocked-dates",
     icon: CalendarOff,
     permission: "view:blocked-dates",
+  },
+  {
+    title: "Reservas",
+    href: "/dashboard/bookings",
+    icon: ClipboardList,
+    permission: "view:bookings",
   },
   {
     title: "Usuarios",

@@ -7,6 +7,7 @@ export type Permission =
   | "view:specialists"
   | "view:schedules"
   | "view:blocked-dates"
+  | "view:bookings"
   | "view:settings"
   | "view:users"
   | "manage:appointments"
@@ -14,6 +15,7 @@ export type Permission =
   | "manage:specialists"
   | "manage:schedules"
   | "manage:blocked-dates"
+  | "manage:bookings"
   | "manage:settings"
   | "manage:users";
 
@@ -25,6 +27,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "view:specialists",
     "view:schedules",
     "view:blocked-dates",
+    "view:bookings",
     "view:settings",
     "view:users",
     "manage:appointments",
@@ -32,6 +35,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "manage:specialists",
     "manage:schedules",
     "manage:blocked-dates",
+    "manage:bookings",
     "manage:settings",
     "manage:users",
   ],
@@ -40,6 +44,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "view:appointments",
     "view:patients",
     "view:schedules",
+    "view:bookings",
     "view:settings",
     "manage:appointments",
     "manage:schedules",
@@ -51,12 +56,14 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "view:specialists",
     "view:schedules",
     "view:blocked-dates",
+    "view:bookings",
     "view:settings",
     "manage:appointments",
     "manage:patients",
     "manage:specialists",
     "manage:schedules",
     "manage:blocked-dates",
+    "manage:bookings",
   ],
   PATIENT: [
     "view:dashboard",

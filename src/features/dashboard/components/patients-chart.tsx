@@ -78,7 +78,7 @@ export function PatientsChart({
             </span>
           </div>
         </div>
-        <div className="p-6 pt-2">
+        <div className="p-6 pt-2 [&_.recharts-text]:text-muted-foreground">
           <div className="h-[250px]">
             {isLoading ? (
               <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -90,12 +90,12 @@ export function PatientsChart({
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                   <XAxis 
                     dataKey="label" 
-                    tick={{ fontSize: 11 }}
+                    tick={{ fontSize: 11, fill: "currentColor" }}
                     tickLine={false}
                     axisLine={false}
                   />
                   <YAxis 
-                    tick={{ fontSize: 11 }}
+                    tick={{ fontSize: 11, fill: "currentColor" }}
                     tickLine={false}
                     axisLine={false}
                     width={30}

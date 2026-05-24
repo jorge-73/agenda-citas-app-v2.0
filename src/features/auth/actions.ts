@@ -182,6 +182,22 @@ export async function updateProfileAction(data: {
       },
     });
 
+    if (data.phone !== undefined) {
+      const existingPatient = await db.patient.findUnique({
+        where: { userId: session.user.id },
+      });
+      if (existingPatient) {
+        await db.patient.update({
+          where: { userId: session.user.id },
+          data: { phone: data.phone },
+        });
+      } else {
+        await db.patient.create({
+          data: { userId: session.user.id, phone: data.phone },
+        });
+      }
+    }
+
     if (data.timezone) {
       await db.userPreference.upsert({
         where: { userId: session.user.id },

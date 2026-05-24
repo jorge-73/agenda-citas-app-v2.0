@@ -1,0 +1,185 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { PageHeader } from "@/components/layout/page-header";
+import { DataTable } from "@/components/ui/data-table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, CheckCircle, XCircle } from "lucide-react";
+import { toast } from "sonner";
+import { getAllBookingsAction, cancelBookingAction, confirmBookingAction } from "@/features/booking/actions";
+import type { ColumnDef } from "@tanstack/react-table";
+
+interface BookingWithSpecialist {
+  id: string;
+  patientName: string;
+  patientLastname: string;
+  patientEmail: string;
+  patientPhone: string;
+  specialistId: string;
+  specialty: string;
+  reason: string | null;
+  status: "PENDING" | "CONFIRMED" | "CANCELLED";
+  date: Date;
+  time: string;
+  createdAt: Date;
+  specialist: { user: { name: string } } | null;
+}
+
+const statusBadge: Record<string, { label: string; variant: "warning" | "success" | "destructive" }> = {
+  PENDING: { label: "Pendiente", variant: "warning" },
+  CONFIRMED: { label: "Confirmada", variant: "success" },
+  CANCELLED: { label: "Cancelada", variant: "destructive" },
+};
+
+export default function BookingsPage() {
+  const [bookings, setBookings] = useState<BookingWithSpecialist[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchBookings = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await getAllBookingsAction();
+      setBookings(data as unknown as BookingWithSpecialist[]);
+    } catch {
+      toast.error("Error al cargar reservas");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  const handleCancel = async (id: string) => {
+    try {
+      await cancelBookingAction(id);
+      toast.success("Reserva cancelada correctamente");
+      fetchBookings();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error al cancelar reserva");
+    }
+  };
+
+  const handleConfirm = async (id: string) => {
+    try {
+      await confirmBookingAction(id);
+      toast.success("Reserva confirmada correctamente");
+      fetchBookings();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error al confirmar reserva");
+    }
+  };
+
+  const columns: ColumnDef<BookingWithSpecialist>[] = [
+    {
+      header: "Paciente",
+      accessorKey: "patientName",
+      cell: ({ row }) => (
+        <div>
+          <p className="font-medium">{row.original.patientName} {row.original.patientLastname}</p>
+          <p className="text-xs text-muted-foreground">{row.original.patientEmail}</p>
+        </div>
+      ),
+    },
+    {
+      header: "Teléfono",
+      accessorKey: "patientPhone",
+    },
+    {
+      header: "Especialista",
+      accessorFn: (row) => row.specialist?.user?.name || "—",
+    },
+    {
+      header: "Especialidad",
+      accessorKey: "specialty",
+    },
+    {
+      header: "Fecha",
+      accessorFn: (row) => format(new Date(row.date), "dd/MM/yyyy", { locale: es }),
+    },
+    {
+      header: "Hora",
+      accessorKey: "time",
+    },
+    {
+      header: "Estado",
+      accessorKey: "status",
+      cell: ({ row }) => {
+        const badge = statusBadge[row.original.status];
+        return <Badge variant={badge.variant}>{badge.label}</Badge>;
+      },
+    },
+    {
+      header: "Acciones",
+      id: "actions",
+      cell: ({ row }) => {
+        const { id, status } = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            {status === "PENDING" && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleConfirm(id)}
+                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Confirmar
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCancel(id)}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <XCircle className="h-4 w-4 mr-1" />
+                  Cancelar
+                </Button>
+              </>
+            )}
+            {status === "CONFIRMED" && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleCancel(id)}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <XCircle className="h-4 w-4 mr-1" />
+                Cancelar
+              </Button>
+            )}
+          </div>
+        );
+      },
+    },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
+      <PageHeader
+        title="Reservas"
+        description="Gestiona las reservas online del sistema"
+        icon={Calendar}
+      />
+
+      <DataTable
+        columns={columns}
+        data={bookings}
+        isLoading={isLoading}
+        searchPlaceholder="Buscar reserva..."
+        emptyMessage="No hay reservas registradas"
+      />
+    </motion.div>
+  );
+}

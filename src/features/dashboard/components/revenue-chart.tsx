@@ -78,7 +78,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
             Total: {formatCurrency(totalRevenue)}
           </span>
         </div>
-        <div className="p-6 pt-2">
+        <div className="p-6 pt-2 [&_.recharts-text]:text-muted-foreground">
           <div className="h-[300px]">
             {isLoading ? (
               <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -98,7 +98,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
                   <XAxis 
                     type="number"
-                    tick={{ fontSize: 11 }}
+                    tick={{ fontSize: 11, fill: "currentColor" }}
                     tickLine={false}
                     axisLine={false}
                     tickFormatter={(value) => `$${value}`}
@@ -106,7 +106,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   <YAxis 
                     type="category"
                     dataKey="name"
-                    tick={{ fontSize: 11 }}
+                    tick={{ fontSize: 11, fill: "currentColor" }}
                     tickLine={false}
                     axisLine={false}
                     width={80}

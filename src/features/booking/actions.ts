@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { addDays, startOfDay, endOfDay, format, eachDayOfInterval, isSameDay } from "date-fns";
 import { validateInput } from "@/lib/action-helpers";
-import { PHONE_REGEX, TIME_REGEX } from "@/lib/constants";
+import { PHONE_REGEX, TIME_REGEX, MAX_LIMIT } from "@/lib/constants";
 import { toUTC, AR_TZ } from "@/lib/date-utils";
 import { z } from "zod";
 
@@ -253,4 +253,56 @@ export async function createBookingAction(data: {
   }
 
   return booking;
+}
+
+export async function getAllBookingsAction(params?: {
+  status?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+}) {
+  const where: Record<string, unknown> = {};
+  if (params?.status) where.status = params.status;
+  if (params?.dateFrom || params?.dateTo) {
+    where.date = {
+      ...(params?.dateFrom && { gte: params.dateFrom }),
+      ...(params?.dateTo && { lte: params.dateTo }),
+    };
+  }
+  const bookings = await db.booking.findMany({
+    where,
+    orderBy: { date: "desc" },
+    take: MAX_LIMIT,
+  });
+  const enriched = await Promise.all(
+    bookings.map(async (b) => {
+      const specialist = await db.specialist.findUnique({
+        where: { id: b.specialistId },
+        include: { user: true },
+      });
+      return { ...b, specialist };
+    })
+  );
+  return enriched;
+}
+
+export async function cancelBookingAction(id: string) {
+  const booking = await db.booking.findUnique({ where: { id } });
+  if (!booking) throw new Error("Reserva no encontrada");
+  if (booking.status === "CANCELLED") throw new Error("La reserva ya está cancelada");
+  await db.booking.update({
+    where: { id },
+    data: { status: "CANCELLED" },
+  });
+  return { success: true };
+}
+
+export async function confirmBookingAction(id: string) {
+  const booking = await db.booking.findUnique({ where: { id } });
+  if (!booking) throw new Error("Reserva no encontrada");
+  if (booking.status !== "PENDING") throw new Error("Solo se pueden confirmar reservas pendientes");
+  await db.booking.update({
+    where: { id },
+    data: { status: "CONFIRMED" },
+  });
+  return { success: true };
 }

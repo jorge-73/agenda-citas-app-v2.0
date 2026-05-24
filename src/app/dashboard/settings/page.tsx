@@ -66,6 +66,8 @@ export default function SettingsPage() {
       const result = await updateProfileAction({
         name: profile.name,
         email: profile.email,
+        phone: profile.phone,
+        timezone: profile.timezone,
       });
       if (result.error) {
         toast.error(result.error);
