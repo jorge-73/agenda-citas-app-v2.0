@@ -37,7 +37,7 @@ Sistema profesional de gestión de citas médicas construido con Next.js 16.2.6,
 ### Backend
 - Next.js Server Actions
 - Prisma ORM
-- PostgreSQL (desarrollo con Docker / producción)
+- PostgreSQL (Neon serverless — producción / Docker — desarrollo)
 - NextAuth.js v5
 
 ## 📁 Estructura del Proyecto
@@ -154,15 +154,16 @@ Crear `.env.local`:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/citamed_db?schema=public
+DIRECT_URL=postgresql://postgres:postgres@localhost:5432/citamed_db?schema=public
 NEXTAUTH_SECRET="your-secret-key-here"
 NEXTAUTH_URL="http://localhost:3000"
 
-# SMTP (opcional — necesario para emails de confirmación y reset password)
+# SMTP (opcional — Mailtrap para desarrollo, Resend para producción)
 SMTP_HOST=sandbox.smtp.mailtrap.io
 SMTP_PORT=2525
 SMTP_USER=your_mailtrap_user
 SMTP_PASSWORD=your_mailtrap_password
-SMTP_FROM="CitasMed <noreply@citamed.com>"
+EMAIL_FROM=noreply@citamed.com
 ```
 
 ### Ejecutar Desarrollo
@@ -207,7 +208,7 @@ Abrir [http://localhost:3000](http://localhost:3000)
 
 ```bash
 npm run dev            # Iniciar desarrollo
-npm run build          # Construir producción
+npm run build          # Construir producción (incluye prisma generate)
 npm run start          # Iniciar producción
 npm run lint           # Lint code
 npm run test           # Tests en watch mode
@@ -216,6 +217,41 @@ npm run test:coverage  # Tests con reporte de cobertura
 npm run db:seed        # Ejecutar seed
 npm run db:studio      # Abrir Prisma Studio
 ```
+
+## 🚀 Deploy en Producción
+
+### Stack
+- **Hosting**: [Vercel](https://vercel.com) (Next.js full-stack)
+- **Base de datos**: [Neon](https://neon.tech) (PostgreSQL serverless)
+- **Email**: [Resend](https://resend.com) SMTP
+
+### Pasos
+
+1. Conectar el repositorio de GitHub en Vercel e importar el proyecto
+2. En Vercel → Storage → Conectar Neon Postgres (crea la DB y agrega `DATABASE_URL` automáticamente)
+3. Agregar `DIRECT_URL` manualmente en Vercel (usar el valor `DATABASE_URL_UNPOOLED` de Neon)
+4. Configurar Resend y agregar credenciales SMTP en Vercel
+5. Agregar `NEXTAUTH_SECRET` y `NEXTAUTH_URL` en Vercel
+6. Ejecutar migraciones y seed contra Neon: `npx prisma db push && npm run db:seed`
+7. Hacer push a `main` — Vercel deploya automáticamente
+
+### Variables de Entorno en Vercel
+
+| Variable | Fuente |
+|----------|--------|
+| `DATABASE_URL` | Neon (integrado automáticamente) |
+| `DIRECT_URL` | Neon (`DATABASE_URL_UNPOOLED`) |
+| `NEXTAUTH_SECRET` | Generar con `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | `https://tu-proyecto.vercel.app` |
+| `SMTP_HOST` | `smtp.resend.com` |
+| `SMTP_PORT` | `587` |
+| `SMTP_USER` | `resend` |
+| `SMTP_PASSWORD` | API Key de Resend |
+| `EMAIL_FROM` | `onboarding@resend.dev` o dominio verificado |
+
+> **Nota**: El plan gratuito de Resend solo envía a direcciones verificadas. Para enviar a cualquier destinatario, verificar un dominio propio.
+>
+> **Nota**: El rate limiter es in-memory (local). En producción con múltiples instancias serverless, considerar migrar a Redis/Upstash para escalar.
 
 ## 🔄 Base de Datos
 
