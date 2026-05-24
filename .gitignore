@@ -39,6 +39,11 @@ prisma/dev.db
 # vercel
 .vercel
 
+# agent tooling
+.antigravitycli/
+.claude/
+.agents/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
