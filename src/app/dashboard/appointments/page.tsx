@@ -9,8 +9,8 @@ import { AppointmentCalendar } from "@/features/appointments/components/appointm
 import { AppointmentFilters } from "@/features/appointments/components/appointment-filters";
 import { AppointmentModal } from "@/features/appointments/components/appointment-modal";
 import { Calendar, Plus, Download } from "lucide-react";
-import { Appointment } from "@/features/appointments/types";
-import { getAppointmentsByMonth, deleteAppointment } from "@/features/appointments/actions";
+import { Appointment, type AppointmentStatus } from "@/features/appointments/types";
+import { getAppointmentsByMonth, getFilteredAppointmentsAction, deleteAppointment } from "@/features/appointments/actions";
 import { toast } from "sonner";
 import { exportToCSV, formatDateForExport, formatTimeForExport } from "@/lib/export";
 
@@ -30,12 +30,25 @@ export default function AppointmentsPage() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
   const fetchAppointments = useCallback(() => {
-    const now = new Date();
-    getAppointmentsByMonth(now.getFullYear(), now.getMonth()).then((data) => {
-      setAppointments(data);
-      setIsLoading(false);
-    });
-  }, []);
+    const hasFilters = filters.status || filters.specialistId || filters.dateFrom || filters.dateTo;
+    if (hasFilters) {
+      getFilteredAppointmentsAction({
+        status: filters.status as AppointmentStatus | undefined,
+        specialistId: filters.specialistId,
+        startDate: filters.dateFrom,
+        endDate: filters.dateTo,
+      }).then((data) => {
+        setAppointments(data);
+        setIsLoading(false);
+      });
+    } else {
+      const now = new Date();
+      getAppointmentsByMonth(now.getFullYear(), now.getMonth()).then((data) => {
+        setAppointments(data);
+        setIsLoading(false);
+      });
+    }
+  }, [filters]);
 
   useEffect(() => {
     fetchAppointments();

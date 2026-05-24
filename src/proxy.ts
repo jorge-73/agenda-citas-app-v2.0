@@ -18,12 +18,18 @@ const ROUTE_PERMISSIONS: Record<string, Permission> = {
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  const session = await auth();
+  const isAuth = !!session?.user;
+
+  if (isAuth && (pathname.startsWith("/login") || pathname.startsWith("/register"))) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   if (!pathname.startsWith("/dashboard")) {
     return NextResponse.next();
   }
 
-  const session = await auth();
-  if (!session?.user) {
+  if (!isAuth) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -41,5 +47,5 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/login", "/register"],
 };
