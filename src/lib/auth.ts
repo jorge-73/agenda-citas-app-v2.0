@@ -13,6 +13,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        rememberMe: { label: "Recordarme", type: "hidden" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -42,7 +43,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           image: user.image,
           role: user.role as UserRole,
-        };
+          rememberMe: credentials.rememberMe === "true",
+        } as any;
       },
     }),
   ],
@@ -53,10 +55,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        if ((user as any).rememberMe) {
+          token.rememberMe = true;
+        }
+      }
+      const userId = token.id as string | undefined;
+      if (userId && !(token.timezone as string | undefined)) {
+        const pref = await db.userPreference.findUnique({
+          where: { userId },
+          select: { timezone: true },
+        });
+        token.timezone = pref?.timezone || null;
+      }
+      if (!(token.rememberMe as boolean | undefined) && token.iat) {
+        const sevenDays = 7 * 24 * 60 * 60;
+        const age = Math.floor(Date.now() / 1000) - (token.iat as number);
+        if (age > sevenDays) {
+          return null;
+        }
       }
       return token;
     },
@@ -64,6 +84,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         (session.user as { role?: string }).role = token.role as string;
+        session.user.preferences = { timezone: token.timezone as string | null | undefined };
       }
       return session;
     },

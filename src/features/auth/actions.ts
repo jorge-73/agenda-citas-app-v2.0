@@ -6,8 +6,15 @@ import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import crypto from "crypto";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
-export async function loginAction(data: { email: string; password: string }) {
+export async function loginAction(data: { email: string; password: string; rememberMe?: boolean }) {
+  const rateKey = getRateLimitKey(data.email, "login");
+  const rateCheck = checkRateLimit(rateKey, 5, 60_000);
+  if (!rateCheck.allowed) {
+    return { error: "Demasiados intentos. Intenta de nuevo en 1 minuto." };
+  }
+
   try {
     const user = await db.user.findUnique({
       where: { email: data.email },
@@ -26,6 +33,7 @@ export async function loginAction(data: { email: string; password: string }) {
     await signIn("credentials", {
       email: data.email,
       password: data.password,
+      rememberMe: data.rememberMe ? "true" : "false",
       redirect: false,
     });
 
@@ -42,6 +50,12 @@ export async function registerAction(data: {
   password: string;
   role?: string;
 }) {
+  const rateKey = getRateLimitKey(data.email, "register");
+  const rateCheck = checkRateLimit(rateKey, 3, 60_000);
+  if (!rateCheck.allowed) {
+    return { error: "Demasiados intentos. Intenta de nuevo en 1 minuto." };
+  }
+
   try {
     const existingUser = await db.user.findUnique({
       where: { email: data.email },
@@ -81,6 +95,12 @@ export async function logoutAction() {
 }
 
 export async function requestPasswordResetAction(email: string) {
+  const rateKey = getRateLimitKey(email, "reset-request");
+  const rateCheck = checkRateLimit(rateKey, 3, 300_000);
+  if (!rateCheck.allowed) {
+    return { error: "Demasiados intentos. Intenta de nuevo en 5 minutos." };
+  }
+
   try {
     const user = await db.user.findUnique({ where: { email } });
 
@@ -108,6 +128,12 @@ export async function requestPasswordResetAction(email: string) {
 }
 
 export async function resetPasswordAction(token: string, password: string) {
+  const rateKey = getRateLimitKey(token, "reset-password");
+  const rateCheck = checkRateLimit(rateKey, 5, 60_000);
+  if (!rateCheck.allowed) {
+    return { error: "Demasiados intentos. Intenta de nuevo en 1 minuto." };
+  }
+
   try {
     const resetToken = await db.passwordResetToken.findUnique({
       where: { token },

@@ -28,6 +28,7 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
+    defaultValues: { rememberMe: false },
   });
 
   const onSubmit = async (data: LoginInput) => {
@@ -79,7 +80,7 @@ export default function LoginPage() {
 
         <div className="flex items-center justify-between text-sm">
           <label className="flex items-center gap-2 cursor-pointer">
-            <Checkbox id="remember" />
+            <Checkbox id="remember" {...register("rememberMe")} />
             <Label htmlFor="remember" className="text-muted-foreground cursor-pointer">Recordarme</Label>
           </label>
           <Link href="/forgot-password" className="text-primary hover:underline">
