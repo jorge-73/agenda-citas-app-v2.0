@@ -169,16 +169,12 @@ export default function PublicLandingPage() {
             <div className="flex items-center gap-3">
               <ThemeToggle />
               <div className="hidden sm:flex items-center gap-2.5">
-                <Link href="/login">
-                  <Button variant="ghost" size="sm" className="text-sm rounded-xl px-4">
-                    Iniciar sesión
-                  </Button>
-                </Link>
-                <Link href="/booking">
-                  <Button size="sm" className="text-sm rounded-xl px-4 shadow-lg shadow-primary/10">
-                    Reservar Cita
-                  </Button>
-                </Link>
+                <Button variant="ghost" size="sm" className="text-sm rounded-xl px-4" asChild>
+                  <Link href="/login">Iniciar sesión</Link>
+                </Button>
+                <Button size="sm" className="text-sm rounded-xl px-4 shadow-lg shadow-primary/10" asChild>
+                  <Link href="/booking">Reservar Cita</Link>
+                </Button>
               </div>
 
               <button
@@ -211,12 +207,12 @@ export default function PublicLandingPage() {
                 </Link>
               ))}
               <div className="pt-4 border-t border-border/20 flex flex-col gap-2.5">
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" className="w-full rounded-xl">Iniciar sesión</Button>
-                </Link>
-                <Link href="/booking" onClick={() => setMobileMenuOpen(false)}>
-                  <Button size="sm" className="w-full rounded-xl shadow-lg shadow-primary/10">Reservar Cita</Button>
-                </Link>
+                <Button variant="ghost" size="sm" className="w-full rounded-xl" asChild>
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Iniciar sesión</Link>
+                </Button>
+                <Button size="sm" className="w-full rounded-xl shadow-lg shadow-primary/10" asChild>
+                  <Link href="/booking" onClick={() => setMobileMenuOpen(false)}>Reservar Cita</Link>
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -259,22 +255,18 @@ export default function PublicLandingPage() {
                 </motion.p>
 
                 <motion.div variants={itemVariants} className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <Link href="/booking" className="w-full sm:w-auto">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full sm:w-auto px-8 py-4 text-base font-semibold rounded-2xl bg-gradient-to-br from-primary to-primary/95 text-primary-foreground shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2"
-                    >
-                      <Calendar className="w-5 h-5" />
-                      Reservar Cita
-                      <ArrowRight className="w-4 h-4" />
-                    </motion.button>
-                  </Link>
-                  <Link href="#specialties" className="w-full sm:w-auto">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 py-4 text-base rounded-2xl border-border/80 hover:bg-muted/50 transition-colors">
-                      Ver Especialistas
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button size="lg" className="w-full sm:w-auto px-8 text-base rounded-2xl bg-gradient-to-br from-primary to-primary/95 shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30" asChild>
+                      <Link href="/booking">
+                        <Calendar className="w-5 h-5" />
+                        Reservar Cita
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
                     </Button>
-                  </Link>
+                  </motion.div>
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 text-base rounded-2xl border-border/80 hover:bg-muted/50" asChild>
+                    <Link href="#specialties">Ver Especialistas</Link>
+                  </Button>
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="mt-14 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
@@ -501,16 +493,14 @@ export default function PublicLandingPage() {
                 Sin papeleos y con confirmación garantizada.
               </motion.p>
               <motion.div variants={itemVariants}>
-                <Link href="/booking" className="inline-block">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="px-10 py-4 text-base font-semibold rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2"
-                  >
-                    <Calendar className="w-5 h-5" />
-                    Reservar Ahora
-                  </motion.button>
-                </Link>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button size="lg" className="px-10 text-base rounded-2xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30" asChild>
+                    <Link href="/booking">
+                      <Calendar className="w-5 h-5" />
+                      Reservar Ahora
+                    </Link>
+                  </Button>
+                </motion.div>
               </motion.div>
             </motion.div>
           </div>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loginSchema, type LoginInput } from "@/schemas/auth-schema";
 import { loginAction } from "@/features/auth/actions";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,7 +16,6 @@ import { PasswordInput } from "@/components/shared/password-input";
 
 import { useState } from "react";
 import { Mail, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -88,13 +88,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <motion.button
-          type="submit"
-          disabled={isLoading}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          className="w-full h-12 text-base font-medium rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <Button size="lg" className="w-full text-base rounded-2xl" type="submit" disabled={isLoading}>
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -103,7 +97,7 @@ export default function LoginPage() {
           ) : (
             "Iniciar sesión"
           )}
-        </motion.button>
+        </Button>
       </form>
 
       <div className="mt-6 text-center text-sm">

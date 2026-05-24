@@ -244,14 +244,15 @@ export function BookingWizard() {
           const isCompleted = step > s.id;
           return (
             <div key={s.id} className="flex items-center gap-0 flex-1">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => s.id < step && setStep(s.id)}
                 disabled={s.id >= step}
                 className={cn(
-                  "flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 rounded-xl transition-all duration-200 min-w-0",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                  "flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 rounded-xl min-w-0",
                   isActive && "bg-primary/10 shadow-sm",
-                  isCompleted && "cursor-pointer hover:bg-primary/5"
+                  isCompleted && "hover:bg-primary/5",
+                  s.id >= step && "opacity-50"
                 )}
               >
                 <div
@@ -274,7 +275,7 @@ export function BookingWizard() {
                 >
                   {s.label}
                 </span>
-              </button>
+              </Button>
               {i < VISUAL_STEPS.length - 1 && (
                 <div
                   className={cn(

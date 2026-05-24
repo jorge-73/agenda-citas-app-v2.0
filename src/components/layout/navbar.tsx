@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { User, LogOut, Settings, ChevronDown, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./theme-toggle";
 import { MobileNav } from "./mobile-nav";
 import {
@@ -66,11 +67,7 @@ export function Navbar() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-2 h-10 px-3 rounded-xl transition-all duration-200 hover:bg-accent/50"
-            >
+            <Button variant="ghost" className="gap-2 h-10 px-3 rounded-xl">
               <Avatar className="h-8 w-8 border border-border/40">
                 <AvatarImage src={user?.image ?? ""} alt={user?.name ?? ""} />
                 <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
@@ -81,7 +78,7 @@ export function Navbar() {
                 {user?.name ?? "Usuario"}
               </span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </motion.button>
+            </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-64 rounded-xl border border-border/60 p-2" align="end" forceMount>
