@@ -1,16 +1,32 @@
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "sandbox.smtp.mailtrap.io",
-  port: Number(process.env.SMTP_PORT) || 2525,
-  auth: {
-    user: process.env.SMTP_USER || "",
-    pass: process.env.SMTP_PASSWORD || "",
-  },
-});
-
+const BREVO_API = "https://api.brevo.com/v3/smtp/email";
 const APP_NAME = "CitasMed";
-const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@citamed.com";
+const SENDER_EMAIL = process.env.EMAIL_FROM || "ac6994001@smtp-brevo.com";
+const SENDER = { email: SENDER_EMAIL, name: APP_NAME };
+
+async function sendBrevoEmail(to: string, subject: string, html: string) {
+  const apiKey = process.env.SMTP_PASSWORD;
+  if (!apiKey) {
+    console.error("SMTP_PASSWORD (Brevo API key) not configured");
+    return;
+  }
+  const res = await fetch(BREVO_API, {
+    method: "POST",
+    headers: {
+      "api-key": apiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      sender: SENDER,
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Brevo API error ${res.status}: ${body}`);
+  }
+}
 
 export async function sendPasswordResetEmail(email: string, resetLink: string) {
   const html = `
@@ -42,21 +58,14 @@ export async function sendPasswordResetEmail(email: string, resetLink: string) {
           </p>
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
           <p style="color: #9ca3af; font-size: 12px; line-height: 1.5;">
-            Este es un mensaje automático, por favor no respondas a este correo.
-            &copy; ${new Date().getFullYear()} ${APP_NAME}. Todos los derechos reservados.
+            Este es un mensaje automático, por favor no respondas a este correo. &copy; ${new Date().getFullYear()} ${APP_NAME}. Todos los derechos reservados.
           </p>
         </div>
       </div>
     </body>
     </html>
   `;
-
-  await transporter.sendMail({
-    from: `"${APP_NAME}" <${FROM_EMAIL}>`,
-    to: email,
-    subject: "Recuperación de contraseña - CitasMed",
-    html,
-  });
+  await sendBrevoEmail(email, "Recuperación de contraseña - CitasMed", html);
 }
 
 export async function sendBookingConfirmationEmail(data: {
@@ -107,13 +116,7 @@ export async function sendBookingConfirmationEmail(data: {
     </body>
     </html>
   `;
-
-  await transporter.sendMail({
-    from: `"${APP_NAME}" <${FROM_EMAIL}>`,
-    to: data.to,
-    subject: "Confirmación de cita - CitasMed",
-    html,
-  });
+  await sendBrevoEmail(data.to, "Confirmación de cita - CitasMed", html);
 }
 
 export async function sendAppointmentStatusEmail(data: {
@@ -172,11 +175,5 @@ export async function sendAppointmentStatusEmail(data: {
     </body>
     </html>
   `;
-
-  await transporter.sendMail({
-    from: `"${APP_NAME}" <${FROM_EMAIL}>`,
-    to: data.to,
-    subject: `Cita ${statusStyle.label.toLowerCase()} - CitasMed`,
-    html,
-  });
+  await sendBrevoEmail(data.to, `Cita ${statusStyle.label.toLowerCase()} - CitasMed`, html);
 }
