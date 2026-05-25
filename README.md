@@ -223,14 +223,14 @@ npm run db:studio      # Abrir Prisma Studio
 ### Stack
 - **Hosting**: [Vercel](https://vercel.com) (Next.js full-stack)
 - **Base de datos**: [Neon](https://neon.tech) (PostgreSQL serverless)
-- **Email**: [Resend](https://resend.com) SMTP
+- **Email**: [Resend](https://resend.com) API REST
 
 ### Pasos
 
 1. Conectar el repositorio de GitHub en Vercel e importar el proyecto
 2. En Vercel → Storage → Conectar Neon Postgres (crea la DB y agrega `DATABASE_URL` automáticamente)
 3. Agregar `DIRECT_URL` manualmente en Vercel (usar el valor `DATABASE_URL_UNPOOLED` de Neon)
-4. Configurar Resend y agregar credenciales SMTP en Vercel
+4. Configurar Resend y agregar API Key en Vercel (`SMTP_PASSWORD`)
 5. Agregar `NEXTAUTH_SECRET` y `NEXTAUTH_URL` en Vercel
 6. Ejecutar migraciones y seed contra Neon: `npx prisma db push && npm run db:seed`
 7. Hacer push a `main` — Vercel deploya automáticamente
@@ -243,11 +243,8 @@ npm run db:studio      # Abrir Prisma Studio
 | `DIRECT_URL` | Neon (`DATABASE_URL_UNPOOLED`) |
 | `NEXTAUTH_SECRET` | Generar con `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | `https://tu-proyecto.vercel.app` |
-| `SMTP_HOST` | `smtp.resend.com` |
-| `SMTP_PORT` | `587` |
-| `SMTP_USER` | `resend` |
-| `SMTP_PASSWORD` | API Key de Resend |
-| `EMAIL_FROM` | `onboarding@resend.dev` o dominio verificado |
+| `SMTP_PASSWORD` | Resend API Key (ej. `re_...`) |
+| `EMAIL_FROM` | `CitasMed <onboarding@resend.dev>` o dominio verificado |
 
 > **Nota**: El plan gratuito de Resend solo envía a direcciones verificadas. Para enviar a cualquier destinatario, verificar un dominio propio.
 >

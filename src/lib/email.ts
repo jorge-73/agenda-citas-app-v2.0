@@ -1,30 +1,29 @@
-const BREVO_API = "https://api.brevo.com/v3/smtp/email";
+const RESEND_API = "https://api.resend.com/emails";
 const APP_NAME = "CitasMed";
-const SENDER_EMAIL = process.env.EMAIL_FROM || "ac6994001@smtp-brevo.com";
-const SENDER = { email: SENDER_EMAIL, name: APP_NAME };
+const FROM_EMAIL = process.env.EMAIL_FROM || "CitasMed <onboarding@resend.dev>";
 
-async function sendBrevoEmail(to: string, subject: string, html: string) {
+async function sendResendEmail(to: string, subject: string, html: string) {
   const apiKey = process.env.SMTP_PASSWORD;
   if (!apiKey) {
-    console.error("SMTP_PASSWORD (Brevo API key) not configured");
+    console.error("SMTP_PASSWORD (Resend API key) not configured");
     return;
   }
-  const res = await fetch(BREVO_API, {
+  const res = await fetch(RESEND_API, {
     method: "POST",
     headers: {
-      "api-key": apiKey,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      sender: SENDER,
-      to: [{ email: to }],
+      from: FROM_EMAIL,
+      to: [to],
       subject,
-      htmlContent: html,
+      html,
     }),
   });
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Brevo API error ${res.status}: ${body}`);
+    throw new Error(`Resend API error ${res.status}: ${body}`);
   }
 }
 
@@ -65,7 +64,7 @@ export async function sendPasswordResetEmail(email: string, resetLink: string) {
     </body>
     </html>
   `;
-  await sendBrevoEmail(email, "Recuperación de contraseña - CitasMed", html);
+  await sendResendEmail(email, "Recuperación de contraseña - CitasMed", html);
 }
 
 export async function sendBookingConfirmationEmail(data: {
@@ -116,7 +115,7 @@ export async function sendBookingConfirmationEmail(data: {
     </body>
     </html>
   `;
-  await sendBrevoEmail(data.to, "Confirmación de cita - CitasMed", html);
+  await sendResendEmail(data.to, "Confirmación de cita - CitasMed", html);
 }
 
 export async function sendAppointmentStatusEmail(data: {
@@ -175,5 +174,5 @@ export async function sendAppointmentStatusEmail(data: {
     </body>
     </html>
   `;
-  await sendBrevoEmail(data.to, `Cita ${statusStyle.label.toLowerCase()} - CitasMed`, html);
+  await sendResendEmail(data.to, `Cita ${statusStyle.label.toLowerCase()} - CitasMed`, html);
 }
