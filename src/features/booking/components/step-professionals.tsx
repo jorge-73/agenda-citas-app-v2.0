@@ -81,7 +81,7 @@ export function StepProfessionals({ specialists, selected, onSelect, isLoading }
                 onClick={() => onSelect(specialist.id)}
                 className={cn(
                   "w-full text-left rounded-2xl border-2 p-4 transition-all duration-200",
-                  "hover:shadow-sm active:scale-[0.99]",
+                  "hover:-translate-y-0.5 hover:shadow-md hover:border-primary/20 active:scale-[0.99]",
                   isSelected
                     ? "border-primary bg-primary/5 shadow-lg shadow-primary/5"
                     : "border-border/40 hover:border-primary/30 bg-card/60"

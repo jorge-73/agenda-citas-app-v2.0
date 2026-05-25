@@ -15,12 +15,12 @@ export default function BookingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/">
-                <Button variant="ghost" size="sm" className="gap-2 rounded-xl">
+              <Button variant="ghost" size="sm" asChild className="gap-2 rounded-xl transition-all duration-200 active:scale-95">
+                <Link href="/">
                   <ArrowLeft className="w-4 h-4" />
                   Volver
-                </Button>
-              </Link>
+                </Link>
+              </Button>
               <div className="hidden sm:flex items-center gap-3">
                 <motion.div
                   whileHover={{ scale: 1.05 }}

@@ -64,8 +64,8 @@ export function StepSpecialties({ specialties, selected, onSelect, isLoading }: 
             transition={{ delay: index * 0.04, duration: 0.3 }}
             onClick={() => onSelect(specialty.name)}
             className={cn(
-              "relative group text-left rounded-2xl border-2 p-4 sm:p-5 transition-all duration-200",
-              "hover:shadow-md active:scale-[0.98]",
+              "relative group text-left rounded-2xl border-2 p-4 sm:p-5 transition-all duration-200 cursor-pointer",
+              "hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]",
               isSelected
                 ? "border-primary bg-gradient-to-br shadow-lg shadow-primary/10"
                 : `${gradient} border-border/40 hover:border-primary/40 bg-card/60`

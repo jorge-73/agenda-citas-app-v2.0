@@ -249,9 +249,9 @@ export function BookingWizard() {
                 onClick={() => s.id < step && setStep(s.id)}
                 disabled={s.id >= step}
                 className={cn(
-                  "flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 rounded-xl min-w-0",
+                  "flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 rounded-xl min-w-0 transition-all duration-200",
                   isActive && "bg-primary/10 shadow-sm",
-                  isCompleted && "hover:bg-primary/5",
+                  isCompleted && "hover:bg-primary/10 active:scale-95",
                   s.id >= step && "opacity-50"
                 )}
               >
