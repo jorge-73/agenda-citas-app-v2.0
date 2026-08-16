@@ -31,7 +31,6 @@ describe("registerSchema", () => {
       email: "juan@example.com",
       password: "123456",
       confirmPassword: "123456",
-      role: "PATIENT",
     });
     expect(result.success).toBe(true);
   });
@@ -42,7 +41,6 @@ describe("registerSchema", () => {
       email: "juan@example.com",
       password: "123456",
       confirmPassword: "654321",
-      role: "PATIENT",
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -56,22 +54,17 @@ describe("registerSchema", () => {
       email: "juan@example.com",
       password: "123456",
       confirmPassword: "123456",
-      role: "PATIENT",
     });
     expect(result.success).toBe(false);
   });
 
-  it("accepts all valid roles", () => {
-    for (const role of ["PATIENT", "SPECIALIST", "RECEPTIONIST"] as const) {
-      const result = registerSchema.safeParse({
-        name: "Test",
-        email: "test@example.com",
-        password: "123456",
-        confirmPassword: "123456",
-        role,
-      });
-      expect(result.success).toBe(true);
-    }
+  it("rejects missing confirmPassword", () => {
+    const result = registerSchema.safeParse({
+      name: "Test",
+      email: "test@example.com",
+      password: "123456",
+    });
+    expect(result.success).toBe(false);
   });
 });
 
