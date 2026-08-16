@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { requirePermission, validateInput } from "@/lib/action-helpers";
 import { TIME_REGEX } from "@/lib/constants";
 import { z } from "zod";
 
@@ -16,6 +16,7 @@ const createScheduleSchema = z.object({
 });
 
 export async function getSpecialistsWithSchedules() {
+  await requirePermission("view:schedules");
   const specialists = await db.specialist.findMany({
     include: {
       user: true,
@@ -45,7 +46,7 @@ export async function createSchedule(data: {
   startTime: string;
   endTime: string;
 }) {
-  await requireAuth();
+  await requirePermission("manage:schedules");
   validateInput(createScheduleSchema, data);
 
   const existing = await db.schedule.findFirst({
@@ -78,7 +79,7 @@ export async function createSchedule(data: {
 }
 
 export async function deleteSchedule(id: string) {
-  await requireAuth();
+  await requirePermission("manage:schedules");
   const parsed = z.string().min(1, "ID requerido").safeParse(id);
   if (!parsed.success) throw new Error("ID de horario inválido");
 

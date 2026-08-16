@@ -2,7 +2,8 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { requireAuth, validateInput } from "@/lib/action-helpers";
+import crypto from "crypto";
+import { requirePermission, validateInput } from "@/lib/action-helpers";
 import { PHONE_REGEX } from "@/lib/constants";
 import { z } from "zod";
 
@@ -32,7 +33,7 @@ export async function createSpecialistAction(data: {
   price?: string;
   isAvailable?: boolean;
 }) {
-  await requireAuth();
+  await requirePermission("manage:specialists");
   validateInput(specialistSchema, data);
 
   const existingUser = await db.user.findUnique({ where: { email: data.email } });
@@ -59,7 +60,7 @@ export async function createSpecialistAction(data: {
       data: {
         email: data.email,
         name: data.name,
-        password: "changeme123",
+        password: crypto.randomBytes(16).toString("hex"),
         role: "SPECIALIST",
       },
     });
@@ -94,7 +95,7 @@ export async function updateSpecialistAction(
     isAvailable?: boolean;
   }
 ) {
-  await requireAuth();
+  await requirePermission("manage:specialists");
   validateInput(specialistSchema, data);
 
   const specialist = await db.specialist.findUnique({

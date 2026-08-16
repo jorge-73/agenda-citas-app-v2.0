@@ -2,21 +2,26 @@
 
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
-import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { requirePermission, validateInput } from "@/lib/action-helpers";
 import { z } from "zod";
 
 const createUserSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-  role: z.string().min(1, "Rol requerido"),
+  role: z.enum(["ADMIN", "SPECIALIST", "RECEPTIONIST", "PATIENT"], "Rol inválido"),
 });
 
 export async function getUsersAction() {
-  await requireAuth();
+  await requirePermission("view:users");
 
   return db.user.findMany({
-    include: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
       patient: { select: { id: true } },
       specialist: { select: { id: true, specialty: true } },
       _count: { select: { accounts: true } },
@@ -31,7 +36,7 @@ export async function createUserAction(data: {
   password: string;
   role: string;
 }) {
-  await requireAuth();
+  await requirePermission("manage:users");
   validateInput(createUserSchema, data);
 
   const existing = await db.user.findUnique({ where: { email: data.email } });
@@ -50,19 +55,22 @@ export async function createUserAction(data: {
 }
 
 export async function updateUserRoleAction(userId: string, role: string) {
-  await requireAuth();
+  await requirePermission("manage:users");
 
   const parsedId = z.string().min(1, "ID requerido").safeParse(userId);
   if (!parsedId.success) throw new Error("ID de usuario inválido");
 
+  const parsedRole = z.enum(["ADMIN", "SPECIALIST", "RECEPTIONIST", "PATIENT"]).safeParse(role);
+  if (!parsedRole.success) throw new Error("Rol inválido");
+
   return db.user.update({
     where: { id: userId },
-    data: { role },
+    data: { role: parsedRole.data },
   });
 }
 
 export async function deleteUserAction(userId: string) {
-  await requireAuth();
+  await requirePermission("manage:users");
 
   const existingUser = await db.user.findUnique({
     where: { id: userId },

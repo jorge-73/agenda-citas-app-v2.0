@@ -9,7 +9,14 @@ export async function getProfileAction() {
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    include: {
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
       patient: true,
       preferences: true,
     },

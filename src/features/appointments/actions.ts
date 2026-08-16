@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import type { AppointmentStatus } from "./types";
 import { format } from "date-fns";
-import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { requirePermission, validateInput } from "@/lib/action-helpers";
 import { APPOINTMENT_STATUSES } from "@/lib/constants";
 import { toUTC, AR_TZ } from "@/lib/date-utils";
 import { appointmentService } from "./services/appointment-service";
@@ -44,6 +44,7 @@ export async function getFilteredAppointmentsAction(filters: {
   startDate?: Date;
   endDate?: Date;
 }) {
+  await requirePermission("view:appointments");
   const appointments = await db.appointment.findMany({
     where: {
       ...(filters.specialistId && { specialistId: filters.specialistId }),
@@ -72,6 +73,7 @@ export async function getFilteredAppointmentsAction(filters: {
 }
 
 export async function getAppointmentsByMonth(year: number, month: number) {
+  await requirePermission("view:appointments");
   const startOfMonth = new Date(year, month, 1);
   const endOfMonth = new Date(year, month + 1, 0);
   
@@ -106,6 +108,7 @@ export async function getAppointmentsByMonth(year: number, month: number) {
 }
 
 export async function getAllAppointments() {
+  await requirePermission("view:appointments");
   const appointments = await db.appointment.findMany({
     include: {
       patient: {
@@ -131,6 +134,7 @@ export async function getAllAppointments() {
 }
 
 export async function getPatientsList() {
+  await requirePermission("view:appointments");
   const patients = await db.patient.findMany({
     include: {
       user: true,
@@ -149,6 +153,7 @@ export async function getPatientsList() {
 }
 
 export async function getSpecialistsList() {
+  await requirePermission("view:appointments");
   const specialists = await db.specialist.findMany({
     where: {
       isAvailable: true,
@@ -177,7 +182,7 @@ export async function createAppointment(data: {
   reason?: string;
   notes?: string;
 }) {
-  await requireAuth();
+  await requirePermission("manage:appointments");
   validateInput(createAppointmentSchema, data);
 
   const appointment = await appointmentService.create({
@@ -209,7 +214,7 @@ export async function createAppointment(data: {
 }
 
 export async function deleteAppointment(id: string) {
-  await requireAuth();
+  await requirePermission("manage:appointments");
   const parsed = z.string().min(1, "ID requerido").safeParse(id);
   if (!parsed.success) throw new Error("ID de cita inválido");
 
@@ -225,7 +230,7 @@ export async function updateAppointment(id: string, data: {
   notes?: string;
   status?: AppointmentStatus;
 }) {
-  await requireAuth();
+  await requirePermission("manage:appointments");
   validateInput(updateAppointmentSchema, data);
 
   const previous = await db.appointment.findUnique({

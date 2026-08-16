@@ -2,6 +2,15 @@ const RESEND_API = "https://api.resend.com/emails";
 const APP_NAME = "CitasMed";
 const FROM_EMAIL = process.env.EMAIL_FROM || "CitasMed <onboarding@resend.dev>";
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 async function sendResendEmail(to: string, subject: string, html: string) {
   const apiKey = process.env.SMTP_PASSWORD;
   if (!apiKey) {
@@ -28,6 +37,7 @@ async function sendResendEmail(to: string, subject: string, html: string) {
 }
 
 export async function sendPasswordResetEmail(email: string, resetLink: string) {
+  const safeLink = escapeHtml(resetLink);
   const html = `
     <!DOCTYPE html>
     <html>
@@ -45,7 +55,7 @@ export async function sendPasswordResetEmail(email: string, resetLink: string) {
             Si no realizaste esta solicitud, puedes ignorar este correo.
           </p>
           <div style="text-align: center; margin: 32px 0;">
-            <a href="${resetLink}" style="display: inline-block; background: #2563eb; color: #ffffff; padding: 14px 32px; border-radius: 12px; text-decoration: none; font-size: 16px; font-weight: 600;">
+            <a href="${safeLink}" style="display: inline-block; background: #2563eb; color: #ffffff; padding: 14px 32px; border-radius: 12px; text-decoration: none; font-size: 16px; font-weight: 600;">
               Restablecer contraseña
             </a>
           </div>
@@ -53,7 +63,7 @@ export async function sendPasswordResetEmail(email: string, resetLink: string) {
             Este enlace expirará en 1 hora. Si el botón no funciona, copia y pega la siguiente URL en tu navegador:
           </p>
           <p style="color: #6b7280; font-size: 14px; word-break: break-all; background: #f9fafb; padding: 12px; border-radius: 8px;">
-            ${resetLink}
+            ${safeLink}
           </p>
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
           <p style="color: #9ca3af; font-size: 12px; line-height: 1.5;">
@@ -77,6 +87,12 @@ export async function sendBookingConfirmationEmail(data: {
   time: string;
   reason?: string;
 }) {
+  const safePatientName = escapeHtml(data.patientName);
+  const safePatientLastname = escapeHtml(data.patientLastname);
+  const safeSpecialistName = escapeHtml(data.specialistName);
+  const safeSpecialty = escapeHtml(data.specialty);
+  const safeReason = data.reason ? escapeHtml(data.reason) : undefined;
+
   const html = `
     <!DOCTYPE html>
     <html>
@@ -89,18 +105,18 @@ export async function sendBookingConfirmationEmail(data: {
         </div>
         <div style="background: #ffffff; padding: 32px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
           <p style="color: #374151; font-size: 16px; line-height: 1.5;">
-            Hola <strong>${data.patientName} ${data.patientLastname}</strong>,
+            Hola <strong>${safePatientName} ${safePatientLastname}</strong>,
           </p>
           <p style="color: #374151; font-size: 16px; line-height: 1.5;">
             Tu cita ha sido agendada exitosamente. Aquí están los detalles:
           </p>
           <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 24px 0;">
             <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Especialista</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${data.specialistName}</td></tr>
-              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Especialidad</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${data.specialty}</td></tr>
+              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Especialista</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${safeSpecialistName}</td></tr>
+              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Especialidad</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${safeSpecialty}</td></tr>
               <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Fecha</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${data.date}</td></tr>
               <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Hora</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${data.time}</td></tr>
-              ${data.reason ? `<tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Motivo</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${data.reason}</td></tr>` : ""}
+              ${safeReason ? `<tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Motivo</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${safeReason}</td></tr>` : ""}
             </table>
           </div>
           <p style="color: #6b7280; font-size: 14px; line-height: 1.5;">
@@ -135,6 +151,11 @@ export async function sendAppointmentStatusEmail(data: {
   };
   const statusStyle = statusColors[data.status] || { bg: "#fefce8", border: "#fef08a", text: "#854d0e", label: data.status };
 
+  const safePatientName = escapeHtml(data.patientName);
+  const safeSpecialistName = escapeHtml(data.specialistName);
+  const safeSpecialty = escapeHtml(data.specialty);
+  const safeStatusLabel = escapeHtml(statusStyle.label);
+
   const html = `
     <!DOCTYPE html>
     <html>
@@ -147,7 +168,7 @@ export async function sendAppointmentStatusEmail(data: {
         </div>
         <div style="background: #ffffff; padding: 32px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
           <p style="color: #374151; font-size: 16px; line-height: 1.5;">
-            Hola <strong>${data.patientName}</strong>,
+            Hola <strong>${safePatientName}</strong>,
           </p>
           <p style="color: #374151; font-size: 16px; line-height: 1.5;">
             El estado de tu cita ha sido actualizado:
@@ -155,12 +176,12 @@ export async function sendAppointmentStatusEmail(data: {
           <div style="background: ${statusStyle.bg}; border: 1px solid ${statusStyle.border}; border-radius: 12px; padding: 20px; margin: 24px 0;">
             <div style="text-align: center; margin-bottom: 16px;">
               <span style="display: inline-block; background: ${statusStyle.bg}; color: ${statusStyle.text}; padding: 6px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; border: 1px solid ${statusStyle.border};">
-                ${statusStyle.label}
+                ${safeStatusLabel}
               </span>
             </div>
             <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Especialista</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${data.specialistName}</td></tr>
-              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Especialidad</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${data.specialty}</td></tr>
+              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Especialista</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${safeSpecialistName}</td></tr>
+              <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Especialidad</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${safeSpecialty}</td></tr>
               <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Fecha</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${data.date}</td></tr>
               <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Hora</td><td style="padding: 8px 0; color: #374151; font-weight: 600; text-align: right;">${data.time}</td></tr>
             </table>

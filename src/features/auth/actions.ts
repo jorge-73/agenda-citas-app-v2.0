@@ -48,7 +48,6 @@ export async function registerAction(data: {
   name: string;
   email: string;
   password: string;
-  role?: string;
 }) {
   const rateKey = getRateLimitKey(data.email, "register");
   const rateCheck = checkRateLimit(rateKey, 3, 60_000);
@@ -72,7 +71,7 @@ export async function registerAction(data: {
         name: data.name,
         email: data.email,
         password: hashedPassword,
-        role: data.role || "PATIENT",
+        role: "PATIENT",
       },
     });
 

@@ -1,4 +1,6 @@
 import { auth } from "@/lib/auth";
+import { hasPermission, type Permission } from "@/lib/permissions";
+import type { UserRole } from "@/types";
 import type { z } from "zod";
 
 export async function requireAuth() {
@@ -7,6 +9,15 @@ export async function requireAuth() {
     throw new Error("No autorizado");
   }
   return session.user;
+}
+
+export async function requirePermission(permission: Permission) {
+  const user = await requireAuth();
+  const role = user.role as UserRole | undefined;
+  if (!hasPermission(role, permission)) {
+    throw new Error("No tienes permisos para realizar esta acción");
+  }
+  return user;
 }
 
 export function validateInput<T extends z.ZodType>(

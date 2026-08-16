@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { MAX_LIMIT } from "@/lib/constants";
+import { requirePermission } from "@/lib/action-helpers";
 import { 
   startOfMonth, 
   endOfMonth, 
@@ -66,6 +67,7 @@ export interface ActivityItem {
 }
 
 export async function getDashboardStats(startDate: Date, endDate: Date): Promise<DashboardStats> {
+  await requirePermission("view:dashboard");
   const [
     totalAppointments,
     cancelledAppointments,
@@ -145,6 +147,7 @@ export async function getDashboardStats(startDate: Date, endDate: Date): Promise
 }
 
 export async function getAppointmentsByDay(startDate: Date, endDate: Date): Promise<ChartDataPoint[]> {
+  await requirePermission("view:dashboard");
   const appointments = await db.appointment.findMany({
     where: {
       startTime: {
@@ -175,6 +178,7 @@ export async function getAppointmentsByDay(startDate: Date, endDate: Date): Prom
 }
 
 export async function getBookingsByDay(startDate: Date, endDate: Date): Promise<ChartDataPoint[]> {
+  await requirePermission("view:dashboard");
   const bookings = await db.booking.findMany({
     where: {
       date: {
@@ -206,6 +210,7 @@ export async function getBookingsByDay(startDate: Date, endDate: Date): Promise<
 }
 
 export async function getRevenueBySpecialist(startDate: Date, endDate: Date): Promise<SpecialistRevenue[]> {
+  await requirePermission("view:dashboard");
   const appointments = await db.appointment.findMany({
     where: {
       startTime: {
@@ -246,6 +251,7 @@ export async function getRevenueBySpecialist(startDate: Date, endDate: Date): Pr
 }
 
 export async function getAppointmentsBySpecialty(startDate: Date, endDate: Date): Promise<ChartDataPoint[]> {
+  await requirePermission("view:dashboard");
   const appointments = await db.appointment.findMany({
     where: {
       startTime: {
@@ -274,6 +280,7 @@ export async function getAppointmentsBySpecialty(startDate: Date, endDate: Date)
 }
 
 export async function getTodayAppointments(): Promise<AppointmentWithDetails[]> {
+  await requirePermission("view:dashboard");
   const today = new Date();
   const dayStart = startOfDay(today);
   const dayEnd = endOfDay(today);
@@ -315,6 +322,7 @@ export async function getTodayAppointments(): Promise<AppointmentWithDetails[]> 
 }
 
 export async function getRecentPatients(limit: number = 10): Promise<RecentPatient[]> {
+  await requirePermission("view:dashboard");
   const patients = await db.patient.findMany({
     include: {
       user: true
@@ -335,6 +343,7 @@ export async function getRecentPatients(limit: number = 10): Promise<RecentPatie
 }
 
 export async function getRecentActivity(limit: number = 20): Promise<ActivityItem[]> {
+  await requirePermission("view:dashboard");
   const [
     recentAppointments,
     recentPatients,

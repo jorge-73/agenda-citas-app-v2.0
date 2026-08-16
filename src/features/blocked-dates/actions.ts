@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { startOfDay, endOfDay } from "date-fns";
-import { requireAuth, validateInput } from "@/lib/action-helpers";
+import { requirePermission, validateInput } from "@/lib/action-helpers";
 import { toUTC, AR_TZ } from "@/lib/date-utils";
 import { z } from "zod";
 
@@ -13,6 +13,7 @@ const blockedDateSchema = z.object({
 });
 
 export async function getBlockedDatesAction() {
+  await requirePermission("view:blocked-dates");
   return db.blockedDate.findMany({
     orderBy: { date: "desc" },
   });
@@ -23,7 +24,7 @@ export async function createBlockedDateAction(data: {
   reason?: string;
   isRecurring?: boolean;
 }) {
-  await requireAuth();
+  await requirePermission("manage:blocked-dates");
   validateInput(blockedDateSchema, data);
 
   const utcDate = startOfDay(toUTC(data.date, AR_TZ));
@@ -51,7 +52,7 @@ export async function createBlockedDateAction(data: {
 }
 
 export async function unblockDateAction(id: string) {
-  await requireAuth();
+  await requirePermission("manage:blocked-dates");
   const parsed = z.string().min(1, "ID requerido").safeParse(id);
   if (!parsed.success) throw new Error("ID de fecha inválido");
 

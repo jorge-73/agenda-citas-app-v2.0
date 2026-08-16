@@ -2,7 +2,8 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { requireAuth, validateInput } from "@/lib/action-helpers";
+import crypto from "crypto";
+import { requirePermission, validateInput } from "@/lib/action-helpers";
 import { PHONE_REGEX } from "@/lib/constants";
 import { z } from "zod";
 
@@ -35,7 +36,7 @@ export async function createPatientAction(data: {
   insurance?: string;
   insuranceNumber?: string;
 }) {
-  await requireAuth();
+  await requirePermission("manage:patients");
   validateInput(patientSchema, data);
 
   const existingUser = await db.user.findUnique({ where: { email: data.email } });
@@ -65,7 +66,7 @@ export async function createPatientAction(data: {
       data: {
         email: data.email,
         name: data.name,
-        password: "changeme123",
+        password: crypto.randomBytes(16).toString("hex"),
         role: "PATIENT",
       },
     });
@@ -106,7 +107,7 @@ export async function updatePatientAction(
     insuranceNumber?: string;
   }
 ) {
-  await requireAuth();
+  await requirePermission("manage:patients");
   validateInput(patientSchema, data);
 
   const patient = await db.patient.findUnique({

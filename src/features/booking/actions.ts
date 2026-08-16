@@ -2,9 +2,10 @@
 
 import { db } from "@/lib/db";
 import { addDays, startOfDay, endOfDay, format, eachDayOfInterval, isSameDay } from "date-fns";
-import { validateInput } from "@/lib/action-helpers";
+import { validateInput, requirePermission } from "@/lib/action-helpers";
 import { PHONE_REGEX, TIME_REGEX, MAX_LIMIT } from "@/lib/constants";
 import { toUTC, AR_TZ } from "@/lib/date-utils";
+import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const createBookingSchema = z.object({
@@ -171,6 +172,12 @@ export async function createBookingAction(data: {
   date: Date;
   time: string;
 }) {
+  const rateKey = getRateLimitKey(data.patientEmail, "booking");
+  const rateCheck = checkRateLimit(rateKey, 3, 300_000);
+  if (!rateCheck.allowed) {
+    throw new Error("Demasiadas reservas. Intenta de nuevo en 5 minutos.");
+  }
+
   validateInput(createBookingSchema, data);
 
   const [hour, min] = data.time.split(":").map(Number);
@@ -260,6 +267,8 @@ export async function getAllBookingsAction(params?: {
   dateFrom?: Date;
   dateTo?: Date;
 }) {
+  await requirePermission("view:bookings");
+
   const where: Record<string, unknown> = {};
   if (params?.status) where.status = params.status;
   if (params?.dateFrom || params?.dateTo) {
@@ -286,6 +295,7 @@ export async function getAllBookingsAction(params?: {
 }
 
 export async function cancelBookingAction(id: string) {
+  await requirePermission("manage:bookings");
   const booking = await db.booking.findUnique({ where: { id } });
   if (!booking) throw new Error("Reserva no encontrada");
   if (booking.status === "CANCELLED") throw new Error("La reserva ya está cancelada");
@@ -297,6 +307,7 @@ export async function cancelBookingAction(id: string) {
 }
 
 export async function confirmBookingAction(id: string) {
+  await requirePermission("manage:bookings");
   const booking = await db.booking.findUnique({ where: { id } });
   if (!booking) throw new Error("Reserva no encontrada");
   if (booking.status !== "PENDING") throw new Error("Solo se pueden confirmar reservas pendientes");
