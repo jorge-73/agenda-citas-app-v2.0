@@ -3,6 +3,7 @@ import { DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
+import { ChatbotWidget } from "@/features/chatbot/components/chatbot-widget";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -32,7 +33,8 @@ export default function RootLayout({
       <body className={`${dmSans.variable} ${dmMono.variable} font-sans`}>
         <Providers>
           {children}
-          <Toaster position="bottom-right" richColors />
+          <Toaster position="bottom-right" richColors offset={88} />
+          <ChatbotWidget />
         </Providers>
       </body>
     </html>

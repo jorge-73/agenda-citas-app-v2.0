@@ -18,9 +18,10 @@ Sistema profesional de gestión de citas médicas construido con Next.js 16.2.6,
 - **Recordarme** en login (sesión extendida 30 días)
 - **Exportación CSV** de citas, pacientes y especialistas
 - **Dark/Light mode** con next-themes
+- **Asistente virtual** global (IA) con contexto por rol y página, sin datos médicos
 - **Diseño premium** con animaciones Framer Motion, glass effect y gradientes
 - **Responsive** para todos los dispositivos
-- **TypeScript** estricto con validaciones Zod (+90 tests unitarios)
+- **TypeScript** estricto con validaciones Zod (+130 tests unitarios)
 
 ## 🛠️ Tech Stack
 
@@ -75,9 +76,10 @@ src/
 │   ├── layout/           # Sidebar, Navbar, PageTransition, etc.
 │   ├── shared/           # EmptyState, LoadingState (reutilizables)
 │   └── providers.tsx     # ThemeProvider
-├── features/             # Arquitectura feature-based (11 módulos)
+├── features/             # Arquitectura feature-based (12 módulos)
 │   ├── auth/              # Autenticación y Server Actions (rate limit + rememberMe)
 │   ├── booking/           # Reservas públicas + gestión dashboard
+│   ├── chatbot/           # Asistente virtual (IA, KB, rate limit, contexto)
 │   ├── dashboard/         # Dashboard con estadísticas y gráficos
 │   ├── appointments/      # Gestión de citas (calendario multi-vista)
 │   ├── patients/          # Gestión de pacientes
@@ -98,7 +100,7 @@ src/
 │   ├── constants.ts     # Constantes (MAX_LIMIT, PHONE_REGEX, TIME_REGEX)
 │   ├── action-helpers.ts# Helpers para server actions (requireAuth, requirePermission)
 │   └── utils.ts         # Helpers (cn, getInitials, etc.)
-├── store/               # Zustand stores (auth, ui)
+├── store/               # Zustand stores (auth, ui, chatbot)
 ├── schemas/              # Zod schemas de autenticación
 ├── types/               # TypeScript types y augmentación NextAuth
 └── prisma/              # Schema, seed y migraciones
@@ -161,6 +163,11 @@ NEXTAUTH_URL="http://localhost:3000"
 # Resend (API Key — https://resend.com/api-keys)
 SMTP_PASSWORD=re_your_resend_api_key
 EMAIL_FROM="CitasMed <onboarding@resend.dev>"
+
+# Asistente virtual (Gemini API Key — https://aistudio.google.com/apikey)
+AI_API_KEY=your_gemini_api_key
+AI_MODEL=gemini-3.1-flash-lite
+AI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
 ```
 
 ### Ejecutar Desarrollo
@@ -229,8 +236,9 @@ npm run db:studio      # Abrir Prisma Studio
 3. Agregar `DIRECT_URL` manualmente en Vercel (usar el valor `DATABASE_URL_UNPOOLED` de Neon)
 4. Configurar Resend y agregar API Key en Vercel (`SMTP_PASSWORD`)
 5. Agregar `NEXTAUTH_SECRET` y `NEXTAUTH_URL` en Vercel
-6. Ejecutar migraciones y seed contra Neon: `npx prisma db push && npm run db:seed`
-7. Hacer push a `main` — Vercel deploya automáticamente
+6. Agregar `AI_API_KEY` en Vercel (asistente virtual; `AI_MODEL` y `AI_BASE_URL` opcionales)
+7. Ejecutar migraciones y seed contra Neon: `npx prisma db push && npm run db:seed`
+8. Hacer push a `main` — Vercel deploya automáticamente
 
 ### Variables de Entorno en Vercel
 
@@ -242,10 +250,23 @@ npm run db:studio      # Abrir Prisma Studio
 | `NEXTAUTH_URL` | `https://tu-proyecto.vercel.app` |
 | `SMTP_PASSWORD` | Resend API Key (ej. `re_...`) |
 | `EMAIL_FROM` | `CitasMed <onboarding@resend.dev>` o dominio verificado |
+| `AI_API_KEY` | Google AI Studio (Gemini API Key) |
+| `AI_MODEL` | `gemini-3.1-flash-lite` (por defecto) |
+| `AI_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai/` |
 
 > **Nota**: El plan gratuito de Resend solo envía a direcciones verificadas. Para enviar a cualquier destinatario, verificar un dominio propio.
 >
 > **Nota**: El rate limiter es in-memory (local). En producción con múltiples instancias serverless, considerar migrar a Redis/Upstash para escalar.
+
+## 🤖 Asistente Virtual (IA)
+
+El asistente CitasMed es un chatbot global visible en todas las páginas (excepto las de autenticación), accesible desde el botón flotante inferior derecho.
+
+- **Proveedor**: Google Gemini (Free Tier) mediante API compatible con OpenAI (`AI_BASE_URL`/`AI_MODEL` configurables, abstracción lista para otros proveedores).
+- **Contexto**: la respuesta se personaliza con el rol y permisos reales del usuario (resuelto en servidor) y la sección donde se encuentra.
+- **Seguridad**: rate limit de 10 mensajes/minuto por cuenta o IP; validación Zod de mensajes; nunca se envía a la IA información médica, datos de pacientes ni de otros usuarios.
+- **Limitaciones del Free Tier**: cuotas de uso (RPM/RPD) limitadas por proyecto; Google puede usar los prompts para mejorar sus modelos. Si el modelo no está disponible, configurar `AI_MODEL=gemini-2.5-flash-lite`.
+- **Sin persistencia**: el historial de conversación vive en memoria (se pierde al recargar la página).
 
 ## 🔄 Base de Datos
 
