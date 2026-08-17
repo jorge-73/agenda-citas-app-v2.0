@@ -17,7 +17,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { logoutAction } from "@/features/auth/actions";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 
@@ -52,13 +51,6 @@ export function Navbar() {
           <div className="lg:hidden">
             <MobileNav />
           </div>
-          <motion.h2
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-sm font-medium text-foreground/80"
-          >
-            Panel de Control
-          </motion.h2>
         </div>
       </div>
 

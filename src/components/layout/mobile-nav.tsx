@@ -14,6 +14,7 @@ import {
   Clock,
   CalendarOff,
   Shield,
+  ClipboardList,
   HeartPulse,
   Menu,
 } from "lucide-react";
@@ -35,6 +36,7 @@ const navItems: { title: string; href: string; icon: React.ComponentType<{ class
   { title: "Especialistas", href: "/dashboard/specialists", icon: Stethoscope, permission: "view:specialists" },
   { title: "Horarios", href: "/dashboard/schedules", icon: Clock, permission: "view:schedules" },
   { title: "Días bloqueados", href: "/dashboard/blocked-dates", icon: CalendarOff, permission: "view:blocked-dates" },
+  { title: "Reservas", href: "/dashboard/bookings", icon: ClipboardList, permission: "view:bookings" },
   { title: "Usuarios", href: "/dashboard/users", icon: Shield, permission: "view:users" },
   { title: "Configuración", href: "/dashboard/settings", icon: Settings, permission: "view:settings" },
 ];
@@ -76,7 +78,7 @@ export function MobileNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium",
+                  "relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium",
                   "transition-all duration-200",
                   isActive
                     ? "bg-primary/10 text-primary"

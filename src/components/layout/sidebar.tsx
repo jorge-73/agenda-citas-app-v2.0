@@ -153,14 +153,6 @@ export function Sidebar() {
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
-                {isActive && (
-                  <motion.div
-                    layoutId="sidebar-active-border"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-gradient-to-b from-primary to-primary/60 rounded-full"
-                    initial={false}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  />
-                )}
                 <motion.div
                   whileHover={{ rotate: [0, -5, 5, 0] }}
                   transition={{ duration: 0.3 }}
