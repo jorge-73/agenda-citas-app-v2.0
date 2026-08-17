@@ -16,7 +16,6 @@ import {
   subDays,
   format,
   isSameMonth,
-  isSameDay,
   eachDayOfInterval
 } from "date-fns";
 import { es } from "date-fns/locale";
@@ -163,8 +162,7 @@ export function useCalendar(options?: UseCalendarOptions) {
 }
 
 export function useCalendarEvents(
-  appointments: Appointment[],
-  view: CalendarView
+  appointments: Appointment[]
 ): CalendarEvent[] {
   return useMemo(() => {
     return appointments.map((apt) => ({
@@ -177,5 +175,5 @@ export function useCalendarEvents(
       specialistName: apt.specialist?.user?.name || "Especialista",
       reason: apt.reason ?? undefined,
     }));
-  }, [appointments, view]);
+  }, [appointments]);
 }

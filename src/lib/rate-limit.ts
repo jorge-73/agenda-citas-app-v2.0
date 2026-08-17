@@ -14,7 +14,7 @@ setInterval(() => {
       store.delete(key);
     }
   }
-}, CLEANUP_INTERVAL);
+}, CLEANUP_INTERVAL).unref();
 
 export function checkRateLimit(
   key: string,
@@ -39,4 +39,8 @@ export function checkRateLimit(
 
 export function getRateLimitKey(email: string, action: string): string {
   return `${action}:${email.toLowerCase().trim()}`;
+}
+
+export function clearRateLimitStore(): void {
+  store.clear();
 }

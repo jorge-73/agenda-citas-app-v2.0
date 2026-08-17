@@ -206,6 +206,7 @@ export function Sidebar() {
           <Button
             variant="ghost"
             size="sm"
+            aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}
             className={cn(
               "w-full justify-center text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
               "transition-all duration-200",

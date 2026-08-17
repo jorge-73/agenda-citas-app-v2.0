@@ -5,20 +5,17 @@ import { isSameDay, isToday, startOfDay, addHours, setHours, setMinutes } from "
 import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { useCalendar, useCalendarEvents, CalendarView } from "../hooks/use-calendar";
+import { useCalendar, useCalendarEvents } from "../hooks/use-calendar";
 import { CalendarToolbar } from "./calendar-toolbar";
 import { AppointmentModal } from "./appointment-modal";
-import type { Appointment, CalendarEvent, AppointmentStatus } from "../types";
+import type { Appointment, CalendarEvent } from "../types";
 import { APPOINTMENT_STATUS_COLORS, APPOINTMENT_STATUS_LABELS } from "../types";
 import { Plus, Clock } from "lucide-react";
 
 interface AppointmentCalendarProps {
   appointments: Appointment[];
   onAppointmentClick?: (appointment: Appointment) => void;
-  onAppointmentCreate?: (startTime: Date, endTime: Date) => void;
 }
 
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 8); // 8:00 - 20:00
@@ -27,7 +24,6 @@ const DAYS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "
 export function AppointmentCalendar({
   appointments,
   onAppointmentClick,
-  onAppointmentCreate,
 }: AppointmentCalendarProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null);
@@ -44,7 +40,7 @@ export function AppointmentCalendar({
     selectDate,
   } = useCalendar();
 
-  const events = useCalendarEvents(appointments, view);
+  const events = useCalendarEvents(appointments);
 
   const handleCellClick = (day: Date, hour: number) => {
     const startTime = setMinutes(setHours(startOfDay(day), hour), 0);

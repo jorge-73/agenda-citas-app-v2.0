@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { setHours, setMinutes, startOfDay } from "date-fns";
 import { timeSlotGenerator } from "../services/time-slot-generator";
-import type { Schedule, TimeSlot } from "../types";
+import type { Schedule } from "../types";
 
 function makeSchedule(overrides?: Partial<Schedule>): Schedule {
   return {

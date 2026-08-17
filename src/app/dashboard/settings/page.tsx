@@ -258,6 +258,7 @@ export default function SettingsPage() {
                     <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
                   <Switch
+                    aria-label={item.label}
                     checked={profile[item.key as keyof typeof profile] as boolean}
                     onCheckedChange={(checked) =>
                       setProfile({ ...profile, [item.key]: checked })

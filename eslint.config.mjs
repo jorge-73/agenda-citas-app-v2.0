@@ -5,6 +5,13 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    rules: {
+      // React Compiler cannot memoize react-hook-form's watch()/useReactTable();
+      // both are core libraries here, so silence the advisory rule.
+      "react-hooks/incompatible-library": "off",
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { addDays, startOfDay, endOfDay, format, isBefore, isSameDay, parseISO, eachDayOfInterval } from "date-fns";
+import { startOfDay, endOfDay, format, isBefore, eachDayOfInterval } from "date-fns";
 import { MAX_LIMIT } from "@/lib/constants";
 import { CreateBookingInput, TimeSlot } from "../types";
 
@@ -184,11 +184,6 @@ export const bookingService = {
     if (!availability.available) {
       throw new Error(availability.reason);
     }
-
-    const specialist = await db.specialist.findUnique({
-      where: { id: input.specialistId },
-      include: { user: true },
-    });
 
     return db.booking.create({
       data: {

@@ -12,7 +12,6 @@ import {
   format,
   isSameMonth,
   isSameDay,
-  addDays,
   eachDayOfInterval,
 } from "date-fns";
 import { es } from "date-fns/locale";
@@ -63,6 +62,7 @@ function Calendar({
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={previousMonth}
+          aria-label="Mes anterior"
           className={buttonVariants({ variant: "ghost", size: "icon" })}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -72,6 +72,7 @@ function Calendar({
         </h2>
         <button
           onClick={nextMonth}
+          aria-label="Mes siguiente"
           className={buttonVariants({ variant: "ghost", size: "icon" })}
         >
           <ChevronRight className="h-4 w-4" />

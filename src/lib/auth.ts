@@ -37,14 +37,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        return {
+        const authorizedUser = {
           id: user.id,
           email: user.email,
           name: user.name,
           image: user.image,
           role: user.role as UserRole,
           rememberMe: credentials.rememberMe === "true",
-        } as any;
+        };
+        return authorizedUser;
       },
     }),
   ],
@@ -55,11 +56,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
-        if ((user as any).rememberMe) {
+        if ((user as { rememberMe?: boolean }).rememberMe) {
           token.rememberMe = true;
         }
       }

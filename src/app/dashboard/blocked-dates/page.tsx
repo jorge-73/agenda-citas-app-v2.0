@@ -148,6 +148,7 @@ export default function BlockedDatesPage() {
             variant="ghost"
             size="sm"
             onClick={() => setDeleteTarget(row.original)}
+            aria-label="Eliminar fecha bloqueada"
             className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
           >
             <Trash2 className="h-4 w-4" />
@@ -205,6 +206,7 @@ export default function BlockedDatesPage() {
                 <p className="text-xs text-muted-foreground">Se bloquea automáticamente cada año en esta fecha</p>
               </div>
               <Switch
+                aria-label="Recurrente cada año"
                 checked={isRecurring}
                 onCheckedChange={(v) => setValue("isRecurring", v)}
               />

@@ -6,9 +6,7 @@ import {
   endOfDay,
   eachDayOfInterval,
   isBefore,
-  isAfter,
-  isSameDay,
-  parseISO
+  isAfter
 } from "date-fns";
 import { db } from "@/lib/db";
 import type { TimeSlot, Schedule } from "../types";

@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { Schedule } from "../types";
-import { addDays, startOfDay, endOfDay, isSameDay } from "date-fns";
+import { startOfDay, endOfDay } from "date-fns";
 
 export const scheduleService = {
   async create(specialistId: string, dayOfWeek: number, startTime: string, endTime: string) {

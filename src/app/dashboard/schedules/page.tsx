@@ -110,6 +110,7 @@ export default function SchedulesPage() {
                             </div>
                             <button
                               onClick={() => handleDeleteSchedule(schedule.id)}
+                              aria-label="Eliminar horario"
                               className="opacity-0 group-hover:opacity-100 transition-all text-destructive/60 hover:text-destructive"
                             >
                               <Trash2 className="h-3.5 w-3.5" />

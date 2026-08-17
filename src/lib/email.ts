@@ -2,7 +2,7 @@ const RESEND_API = "https://api.resend.com/emails";
 const APP_NAME = "CitasMed";
 const FROM_EMAIL = process.env.EMAIL_FROM || "CitasMed <onboarding@resend.dev>";
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

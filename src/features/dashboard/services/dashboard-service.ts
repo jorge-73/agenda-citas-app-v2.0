@@ -4,18 +4,11 @@ import { db } from "@/lib/db";
 import { MAX_LIMIT } from "@/lib/constants";
 import { requirePermission } from "@/lib/action-helpers";
 import { 
-  startOfMonth, 
-  endOfMonth, 
-  startOfWeek, 
-  endOfWeek, 
   startOfDay, 
   endOfDay,
-  subMonths,
   eachDayOfInterval,
   format,
-  isWithinInterval,
-  subWeeks,
-  subDays
+  isWithinInterval
 } from "date-fns";
 
 export interface DashboardStats {

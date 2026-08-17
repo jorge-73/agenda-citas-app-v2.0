@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { formatDate } from "@/lib/utils";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, User, Phone, Calendar, FileText, AlertTriangle, Activity, Stethoscope, Clock, Building2, Syringe, HeartPulse } from "lucide-react";
+import { ArrowLeft, User, Phone, Calendar, FileText, Activity, Stethoscope, Clock, Building2, HeartPulse } from "lucide-react";
 
 export default async function PatientDetailPage({
   params,

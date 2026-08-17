@@ -20,7 +20,7 @@ Sistema profesional de gestión de citas médicas construido con Next.js 16.2.6,
 - **Dark/Light mode** con next-themes
 - **Diseño premium** con animaciones Framer Motion, glass effect y gradientes
 - **Responsive** para todos los dispositivos
-- **TypeScript** estricto con validaciones Zod (+70 tests unitarios)
+- **TypeScript** estricto con validaciones Zod (+90 tests unitarios)
 
 ## 🛠️ Tech Stack
 
@@ -90,13 +90,13 @@ src/
 ├── lib/                  # Utilidades y configuración
 │   ├── auth.ts          # NextAuth config (JWT + timezone + rememberMe)
 │   ├── db.ts            # Prisma client (singleton)
-│   ├── email.ts         # Nodemailer (reset password, confirmaciones)
+│   ├── email.ts         # Resend REST API (reset password, confirmaciones)
 │   ├── export.ts        # Exportación CSV
 │   ├── permissions.ts   # RBAC con 4 roles y 17 permisos
 │   ├── rate-limit.ts    # Rate limiter in-memory (login, register, reset)
 │   ├── date-utils.ts    # Utilidades timezone (toUTC, fromUTC, formatInTz)
 │   ├── constants.ts     # Constantes (MAX_LIMIT, PHONE_REGEX, TIME_REGEX)
-│   ├── action-helpers.ts# Helpers para server actions (validateInput)
+│   ├── action-helpers.ts# Helpers para server actions (requireAuth, requirePermission)
 │   └── utils.ts         # Helpers (cn, getInitials, etc.)
 ├── store/               # Zustand stores (auth, ui)
 ├── schemas/              # Zod schemas de autenticación
@@ -110,7 +110,7 @@ src/
 ## 🏃‍♂️ Inicio Rápido
 
 ### Prerrequisitos
-- Node.js 18+
+- Node.js 20.9+
 - npm o yarn
 - PostgreSQL 16 (nativo o Docker)
 
@@ -158,12 +158,9 @@ DIRECT_URL=postgresql://postgres:postgres@localhost:5432/citamed_db?schema=publi
 NEXTAUTH_SECRET="your-secret-key-here"
 NEXTAUTH_URL="http://localhost:3000"
 
-# SMTP (opcional — Mailtrap para desarrollo, Resend para producción)
-SMTP_HOST=sandbox.smtp.mailtrap.io
-SMTP_PORT=2525
-SMTP_USER=your_mailtrap_user
-SMTP_PASSWORD=your_mailtrap_password
-EMAIL_FROM=noreply@citamed.com
+# Resend (API Key — https://resend.com/api-keys)
+SMTP_PASSWORD=re_your_resend_api_key
+EMAIL_FROM="CitasMed <onboarding@resend.dev>"
 ```
 
 ### Ejecutar Desarrollo

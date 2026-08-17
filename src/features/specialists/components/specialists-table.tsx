@@ -17,10 +17,10 @@ const columnHelper = createColumnHelper<Specialist>();
 interface SpecialistsTableProps {
   specialists: Specialist[];
   isLoading?: boolean;
-  onCreateNew?: () => void;
 }
 
-export function SpecialistsTable({ specialists, isLoading, onCreateNew }: SpecialistsTableProps) {
+export function SpecialistsTable({ specialists, isLoading }: SpecialistsTableProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns: ColumnDef<Specialist, any>[] = [
     columnHelper.accessor("user", {
       header: "Especialista",
@@ -76,7 +76,7 @@ export function SpecialistsTable({ specialists, isLoading, onCreateNew }: Specia
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acciones del especialista">
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

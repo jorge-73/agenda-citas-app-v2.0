@@ -175,6 +175,7 @@ export function SpecialistModal({
             </div>
             <div className="space-y-2 flex items-center gap-2 pt-6">
               <Switch
+                aria-label="Disponible para citas"
                 checked={watch("isAvailable")}
                 onCheckedChange={(checked) => setValue("isAvailable", checked)}
               />

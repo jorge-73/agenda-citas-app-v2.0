@@ -136,7 +136,7 @@ export function AppointmentModal({
 
       onOpenChange(false);
       onSuccess?.();
-    } catch (error) {
+    } catch {
       toast.error("Error al guardar la cita");
     } finally {
       setIsLoading(false);
@@ -294,6 +294,7 @@ export function AppointmentModal({
                   type="button"
                   variant="outline"
                   disabled={deleteLoading}
+                  aria-label="Eliminar cita"
                   onClick={async () => {
                     setDeleteLoading(true);
                     await onDelete(initialData.id!);

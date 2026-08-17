@@ -73,7 +73,7 @@ export function ScheduleModal({ open, onOpenChange, onSuccess }: ScheduleModalPr
       onOpenChange(false);
       onSuccess?.();
       reset();
-    } catch (error) {
+    } catch {
       toast.error("Error al crear el horario");
     } finally {
       setIsLoading(false);

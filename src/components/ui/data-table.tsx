@@ -19,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: ColumnDef<TData, any>[];
   data: TData[];
   isLoading?: boolean;
@@ -175,6 +176,7 @@ export function DataTable<TData>({
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage() || isLoading}
+            aria-label="Página anterior"
             className="rounded-xl h-9 w-9 p-0"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -187,6 +189,7 @@ export function DataTable<TData>({
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage() || isLoading}
+            aria-label="Página siguiente"
             className="rounded-xl h-9 w-9 p-0"
           >
             <ChevronRight className="h-4 w-4" />

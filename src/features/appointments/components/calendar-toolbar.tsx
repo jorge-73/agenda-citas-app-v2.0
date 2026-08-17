@@ -30,10 +30,10 @@ export function CalendarToolbar({
           Hoy
         </Button>
         <div className="flex items-center border rounded-md">
-          <Button variant="ghost" size="icon" onClick={onPrevious}>
+          <Button variant="ghost" size="icon" onClick={onPrevious} aria-label="Periodo anterior">
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onNext}>
+          <Button variant="ghost" size="icon" onClick={onNext} aria-label="Periodo siguiente">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

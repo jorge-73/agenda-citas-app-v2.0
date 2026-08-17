@@ -18,10 +18,10 @@ const columnHelper = createColumnHelper<Patient>();
 interface PatientsTableProps {
   patients: Patient[];
   isLoading?: boolean;
-  onCreateNew?: () => void;
 }
 
-export function PatientsTable({ patients, isLoading, onCreateNew }: PatientsTableProps) {
+export function PatientsTable({ patients, isLoading }: PatientsTableProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns: ColumnDef<Patient, any>[] = [
     columnHelper.accessor("user", {
       header: "Paciente",
@@ -63,7 +63,7 @@ export function PatientsTable({ patients, isLoading, onCreateNew }: PatientsTabl
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Acciones del paciente">
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

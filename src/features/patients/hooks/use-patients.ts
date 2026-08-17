@@ -40,6 +40,7 @@ export function usePatients(options?: UsePatientsOptions) {
   }, [filters, pagination.page, pagination.limit]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPatients();
   }, [fetchPatients]);
 
