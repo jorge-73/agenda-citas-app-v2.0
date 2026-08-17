@@ -48,14 +48,14 @@ export function ChatbotGreeting() {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="fixed bottom-24 right-4 z-40"
         >
-          <div className="relative flex items-start gap-2 rounded-2xl rounded-br-md border border-border/70 bg-chat-bubble px-4 py-3 shadow-lg animate-[float_3s_ease-in-out_infinite]">
+          <div className="relative flex items-start gap-2 rounded-2xl rounded-br-md border border-chat-border/70 bg-chat-bubble px-4 py-3 shadow-lg animate-[float_3s_ease-in-out_infinite]">
             <button
               type="button"
               onClick={handleOpen}
               aria-label="Abrir asistente virtual: hola, puedo ayudarte en algo"
               className="min-w-[240px] max-w-[240px] text-left"
             >
-              <span className="text-sm leading-snug text-foreground">
+              <span className="text-sm leading-snug text-chat-foreground">
                 Hola <span aria-hidden>👋</span> ¿Puedo ayudarte en algo?
               </span>
             </button>
@@ -63,13 +63,13 @@ export function ChatbotGreeting() {
               type="button"
               onClick={handleDismiss}
               aria-label="Descartar mensaje de saludo"
-              className="-m-1 p-1 text-muted-foreground/70 transition-colors hover:text-foreground"
+              className="-m-1 p-1 text-chat-muted-foreground/70 transition-colors hover:text-chat-foreground"
             >
               <X className="h-3.5 w-3.5" />
             </button>
             <span
               aria-hidden
-              className="absolute -bottom-1.5 right-7 h-3 w-3 rotate-45 rounded-[2px] border-b border-r border-border/70 bg-chat-bubble"
+              className="absolute -bottom-1.5 right-7 h-3 w-3 rotate-45 rounded-[2px] border-b border-r border-chat-border/70 bg-chat-bubble"
             />
           </div>
         </motion.div>

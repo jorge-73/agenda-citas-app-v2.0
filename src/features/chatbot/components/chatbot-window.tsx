@@ -78,15 +78,15 @@ export function ChatbotWindow() {
           transition={{ duration: 0.18, ease: "easeOut" }}
           role="dialog"
           aria-label="Asistente virtual CitasMed"
-          className="fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-chat-bg ring-1 ring-foreground/5 shadow-[0_24px_60px_-16px_oklch(0.2_0.02_155/0.35),0_8px_24px_-8px_oklch(0.2_0.02_155/0.25)] dark:ring-white/10 dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.65),0_8px_24px_-8px_rgba(0,0,0,0.45)] max-sm:inset-x-3 max-sm:top-20 max-sm:bottom-24 max-sm:h-auto sm:bottom-24 sm:right-4 sm:h-[560px] sm:w-[380px]"
+          className="fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-chat-border/70 bg-chat-bg text-chat-foreground ring-1 ring-chat-foreground/10 shadow-[0_24px_60px_-16px_oklch(0.2_0.02_155/0.35),0_8px_24px_-8px_oklch(0.2_0.02_155/0.25)] dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.65),0_8px_24px_-8px_rgba(0,0,0,0.45)] max-sm:inset-x-3 max-sm:top-20 max-sm:bottom-24 max-sm:h-auto sm:bottom-24 sm:right-4 sm:h-[560px] sm:w-[380px]"
         >
-          <div className="flex items-center gap-3 border-b border-primary-foreground/10 bg-gradient-to-b from-primary to-primary/85 px-4 py-3 text-primary-foreground">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15 ring-1 ring-primary-foreground/20">
+          <div className="flex items-center gap-3 border-b border-chat-accent-foreground/10 bg-gradient-to-b from-chat-accent to-chat-accent/85 px-4 py-3 text-chat-accent-foreground">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-chat-accent-foreground/15 ring-1 ring-chat-accent-foreground/20">
               <Bot className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold leading-tight">Asistente CitasMed</p>
-              <p className="flex items-center gap-1.5 text-xs text-primary-foreground/85">
+              <p className="flex items-center gap-1.5 text-xs text-chat-accent-foreground/85">
                 <span
                   className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-[pulse-soft_2.4s_ease-in-out_infinite]"
                   aria-hidden
@@ -98,7 +98,7 @@ export function ChatbotWindow() {
               type="button"
               onClick={resetConversation}
               aria-label="Nueva conversación"
-              className="rounded-lg p-2 transition-colors hover:bg-primary-foreground/10"
+              className="rounded-lg p-2 transition-colors hover:bg-chat-accent-foreground/10"
             >
               <RotateCcw className="h-4 w-4" />
             </button>
@@ -106,7 +106,7 @@ export function ChatbotWindow() {
               type="button"
               onClick={close}
               aria-label="Cerrar asistente"
-              className="rounded-lg p-2 transition-colors hover:bg-primary-foreground/10"
+              className="rounded-lg p-2 transition-colors hover:bg-chat-accent-foreground/10"
             >
               <X className="h-4 w-4" />
             </button>
@@ -119,12 +119,12 @@ export function ChatbotWindow() {
           >
             {messages.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/15">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-chat-accent/10 text-chat-accent ring-1 ring-chat-accent/15">
                   <Bot className="h-6 w-6" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold">Hola, soy el Asistente CitasMed</p>
-                  <p className="mx-auto mt-1 max-w-[280px] text-[13px] leading-relaxed text-muted-foreground/90">
+                  <p className="mx-auto mt-1 max-w-[280px] text-[13px] leading-relaxed text-chat-muted-foreground/90">
                     Puedo ayudarte a usar la plataforma: cómo sacar una cita, gestionar
                     horarios, reservas online y más.
                   </p>
@@ -145,8 +145,8 @@ export function ChatbotWindow() {
             )}
           </div>
 
-          <div className="border-t border-border/70 p-3">
-            <div className="flex items-end gap-2 rounded-xl border border-border/70 bg-chat-bubble px-3 py-2 transition-all focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/15">
+          <div className="border-t border-chat-border/70 p-3">
+            <div className="flex items-end gap-2 rounded-xl border border-chat-border/70 bg-chat-bubble px-3 py-2 transition-all focus-within:border-chat-accent/50 focus-within:ring-2 focus-within:ring-chat-accent/15">
               <textarea
                 ref={inputRef}
                 rows={1}
@@ -162,19 +162,19 @@ export function ChatbotWindow() {
                 }}
                 placeholder="Escribí tu consulta…"
                 aria-label="Mensaje para el asistente"
-                className="max-h-32 min-h-[24px] flex-1 resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
+                className="max-h-32 min-h-[24px] flex-1 resize-none bg-transparent text-sm outline-none placeholder:text-chat-muted-foreground/70"
               />
               <button
                 type="button"
                 onClick={handleSend}
                 disabled={!canSend}
                 aria-label="Enviar mensaje"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-sm shadow-primary/20 transition-opacity hover:opacity-90 disabled:opacity-40"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-chat-accent to-chat-accent/90 text-chat-accent-foreground shadow-sm shadow-chat-accent/20 transition-opacity hover:opacity-90 disabled:opacity-40"
               >
                 <ArrowUp className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-1.5 px-1 text-[11px] text-muted-foreground/80">
+            <p className="mt-1.5 px-1 text-[11px] text-chat-muted-foreground/80">
               Enter para enviar · Shift+Enter para salto de línea
             </p>
           </div>

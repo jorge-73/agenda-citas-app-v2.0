@@ -71,9 +71,15 @@
     --status-completed: oklch(55% 0.14 240);
     --status-absent: oklch(55% 0.02 260);
 
-    /* Chat surface (asistente virtual) */
-    --chat-bg: oklch(96.5% 0.015 155);
-    --chat-bubble: oklch(100% 0 0);
+    /* Chat surface (asistente virtual) - invertida: sitio claro = chat oscuro */
+    --chat-bg: oklch(16% 0.015 260);
+    --chat-bubble: oklch(24% 0.02 260);
+    --chat-foreground: oklch(92% 0.008 260);
+    --chat-muted: oklch(26% 0.02 260);
+    --chat-muted-foreground: oklch(60% 0.015 260);
+    --chat-border: oklch(32% 0.02 260);
+    --chat-accent: oklch(72% 0.12 160);
+    --chat-accent-foreground: oklch(18% 0.015 260);
   }
 
 /* ---------- DARK MODE - Premium Slate ---------- */
@@ -138,9 +144,15 @@
     --status-completed: oklch(62% 0.12 240);
     --status-absent: oklch(60% 0.02 260);
 
-    /* Chat surface (asistente virtual) */
-    --chat-bg: oklch(18% 0.02 260);
-    --chat-bubble: oklch(24% 0.02 260);
+    /* Chat surface (asistente virtual) - invertida: sitio oscuro = chat claro */
+    --chat-bg: oklch(96.5% 0.015 155);
+    --chat-bubble: oklch(100% 0 0);
+    --chat-foreground: oklch(22% 0.015 40);
+    --chat-muted: oklch(95% 0.015 40);
+    --chat-muted-foreground: oklch(52% 0.015 40);
+    --chat-border: oklch(88% 0.015 40);
+    --chat-accent: oklch(50% 0.09 155);
+    --chat-accent-foreground: oklch(100% 0 0);
   }
 }
 
@@ -240,6 +252,12 @@
   /* Chat surface */
   --color-chat-bg: oklch(var(--chat-bg));
   --color-chat-bubble: oklch(var(--chat-bubble));
+  --color-chat-foreground: oklch(var(--chat-foreground));
+  --color-chat-muted: oklch(var(--chat-muted));
+  --color-chat-muted-foreground: oklch(var(--chat-muted-foreground));
+  --color-chat-border: oklch(var(--chat-border));
+  --color-chat-accent: oklch(var(--chat-accent));
+  --color-chat-accent-foreground: oklch(var(--chat-accent-foreground));
 }
 
 /* =============================================
