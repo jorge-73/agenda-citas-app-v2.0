@@ -73,7 +73,7 @@ export function DataTable<TData>({
             placeholder={searchPlaceholder}
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="pl-10 h-10 rounded-xl bg-card/60 border-border/40"
+            className="pl-10 h-10 rounded-lg bg-card/60 border-border/40"
           />
         </div>
         {onExport && (
@@ -81,7 +81,7 @@ export function DataTable<TData>({
             variant="outline"
             size="sm"
             onClick={onExport}
-            className="rounded-xl gap-2 h-10"
+            className="rounded-lg gap-2 h-10"
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">{exportLabel}</span>
@@ -89,7 +89,7 @@ export function DataTable<TData>({
         )}
       </div>
 
-      <div className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-sm overflow-hidden hover:shadow-lg transition-all duration-300">
+      <div className="rounded-xl border border-border/40 bg-card/70 backdrop-blur-sm overflow-hidden hover:shadow-md transition-all duration-300">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -177,7 +177,7 @@ export function DataTable<TData>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage() || isLoading}
             aria-label="Página anterior"
-            className="rounded-xl h-9 w-9 p-0"
+            className="rounded-lg h-9 w-9 p-0"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -190,7 +190,7 @@ export function DataTable<TData>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage() || isLoading}
             aria-label="Página siguiente"
-            className="rounded-xl h-9 w-9 p-0"
+            className="rounded-lg h-9 w-9 p-0"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

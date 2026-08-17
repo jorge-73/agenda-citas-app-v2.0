@@ -49,8 +49,7 @@ const TabsContent = React.forwardRef<
     ref={ref}
     className={cn(
       "mt-4 focus:outline-none",
-      "data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=active]:zoom-in-95",
-      "data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0 data-[state=inactive]:zoom-out-95",
+      "data-[state=active]:animate-in data-[state=inactive]:animate-out",
       className
     )}
     {...props}
