@@ -16,7 +16,7 @@ export function ChatbotButton() {
       aria-expanded={isOpen}
       whileHover={{ scale: 1.06 }}
       whileTap={{ scale: 0.94 }}
-      className="fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-colors hover:bg-primary/90"
+      className="fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-b from-primary to-primary/85 text-primary-foreground shadow-lg shadow-primary/25 ring-1 ring-white/20 transition-colors hover:bg-primary/90 dark:ring-primary-foreground/10"
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span

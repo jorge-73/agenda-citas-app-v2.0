@@ -64,13 +64,17 @@
     --sidebar-border: oklch(88% 0.015 40);
   --sidebar-ring: oklch(50% 0.09 155);
 
-  /* Status colors for appointments */
-  --status-pending: oklch(72% 0.13 80);
-  --status-confirmed: oklch(62% 0.15 145);
-  --status-cancelled: oklch(58% 0.18 25);
-  --status-completed: oklch(55% 0.14 240);
-  --status-absent: oklch(55% 0.02 260);
-}
+/* Status colors for appointments */
+    --status-pending: oklch(72% 0.13 80);
+    --status-confirmed: oklch(62% 0.15 145);
+    --status-cancelled: oklch(58% 0.18 25);
+    --status-completed: oklch(55% 0.14 240);
+    --status-absent: oklch(55% 0.02 260);
+
+    /* Chat surface (asistente virtual) */
+    --chat-bg: oklch(96.5% 0.015 155);
+    --chat-bubble: oklch(100% 0 0);
+  }
 
 /* ---------- DARK MODE - Premium Slate ---------- */
   .dark {
@@ -127,13 +131,17 @@
     --sidebar-border: oklch(32% 0.02 260);
   --sidebar-ring: oklch(72% 0.12 160);
 
-  /* Status colors for dark mode */
-  --status-pending: oklch(75% 0.12 80);
-  --status-confirmed: oklch(68% 0.14 145);
-  --status-cancelled: oklch(65% 0.16 25);
-  --status-completed: oklch(62% 0.12 240);
-  --status-absent: oklch(60% 0.02 260);
-}
+/* Status colors for dark mode */
+    --status-pending: oklch(75% 0.12 80);
+    --status-confirmed: oklch(68% 0.14 145);
+    --status-cancelled: oklch(65% 0.16 25);
+    --status-completed: oklch(62% 0.12 240);
+    --status-absent: oklch(60% 0.02 260);
+
+    /* Chat surface (asistente virtual) */
+    --chat-bg: oklch(18% 0.02 260);
+    --chat-bubble: oklch(24% 0.02 260);
+  }
 }
 
 /* =============================================
@@ -228,6 +236,10 @@
   --color-status-cancelled: var(--status-cancelled);
   --color-status-completed: var(--status-completed);
   --color-status-absent: var(--status-absent);
+
+  /* Chat surface */
+  --color-chat-bg: oklch(var(--chat-bg));
+  --color-chat-bubble: oklch(var(--chat-bubble));
 }
 
 /* =============================================
