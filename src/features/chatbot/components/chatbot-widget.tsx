@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { ChatbotButton } from "./chatbot-button";
+import { ChatbotGreeting } from "./chatbot-greeting";
 import { ChatbotWindow } from "./chatbot-window";
 
 const EXCLUDED_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
@@ -15,6 +16,7 @@ export function ChatbotWidget() {
 
   return (
     <>
+      <ChatbotGreeting />
       <ChatbotButton />
       <ChatbotWindow />
     </>

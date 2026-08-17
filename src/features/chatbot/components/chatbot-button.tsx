@@ -14,20 +14,25 @@ export function ChatbotButton() {
       onClick={toggle}
       aria-label={isOpen ? "Cerrar asistente virtual" : "Abrir asistente virtual"}
       aria-expanded={isOpen}
-      whileHover={{ scale: 1.06 }}
-      whileTap={{ scale: 0.94 }}
-      className="fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-b from-primary to-primary/85 text-primary-foreground shadow-lg shadow-primary/25 ring-1 ring-white/20 transition-colors hover:bg-primary/90 dark:ring-primary-foreground/10"
+      layout
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 500, damping: 35 }}
+      className="fixed bottom-4 right-4 z-50 flex h-14 items-center rounded-full bg-gradient-to-b from-primary to-primary/85 pl-4 pr-5 text-primary-foreground shadow-lg shadow-primary/25 ring-1 ring-white/20 transition-colors hover:bg-primary/90 dark:ring-primary-foreground/10"
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={isOpen ? "close" : "open"}
-          initial={{ rotate: -90, opacity: 0 }}
-          animate={{ rotate: 0, opacity: 1 }}
-          exit={{ rotate: 90, opacity: 0 }}
+          initial={{ opacity: 0, x: isOpen ? -6 : 6 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: isOpen ? 6 : -6 }}
           transition={{ duration: 0.15 }}
-          className="flex"
+          className="flex items-center gap-2.5"
         >
-          {isOpen ? <X className="h-6 w-6" /> : <Bot className="h-6 w-6" />}
+          {isOpen ? <X className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
+          <span className="whitespace-nowrap text-sm font-semibold">
+            {isOpen ? "Cerrar" : "¿Necesitás ayuda?"}
+          </span>
         </motion.span>
       </AnimatePresence>
     </motion.button>
