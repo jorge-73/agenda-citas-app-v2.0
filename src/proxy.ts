@@ -40,7 +40,10 @@ export default async function proxy(request: NextRequest) {
   if (route) {
     const permission = ROUTE_PERMISSIONS[route];
     if (!hasPermission(role as UserRole, permission)) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      const fallback = Object.keys(ROUTE_PERMISSIONS).find((r) =>
+        hasPermission(role as UserRole, ROUTE_PERMISSIONS[r])
+      );
+      return NextResponse.redirect(new URL(fallback ?? "/login", request.url));
     }
   }
 
