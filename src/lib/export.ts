@@ -30,7 +30,7 @@ export function exportToCSV(
 
 export function formatDateForExport(date: Date | string): string {
   const d = new Date(date);
-  return d.toLocaleDateString("es-CL", {
+  return d.toLocaleDateString("es-AR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -39,7 +39,7 @@ export function formatDateForExport(date: Date | string): string {
 
 export function formatTimeForExport(date: Date | string): string {
   const d = new Date(date);
-  return d.toLocaleTimeString("es-CL", {
+  return d.toLocaleTimeString("es-AR", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,

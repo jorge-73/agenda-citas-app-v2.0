@@ -66,9 +66,9 @@ const TESTIMONIALS = [
 ];
 
 const CONTACT_INFO = [
-  { icon: Phone, label: "Teléfono", value: "+52 (55) 1234-5678" },
-  { icon: Mail, label: "Email", value: "contacto@citamed.com" },
-  { icon: MapPin, label: "Dirección", value: "Av. Principal 123, Ciudad de México" },
+{ icon: Phone, label: "Teléfono", value: "+54 11 5555-1234" },
+  { icon: Mail, label: "Email", value: "contacto@citasmed.com.ar" },
+  { icon: MapPin, label: "Dirección", value: "Av. Corrientes 1234, Buenos Aires" },
   { icon: Clock, label: "Horario", value: "Lun-Vie: 8AM-8PM | Sáb-Dom: 9AM-5PM" },
 ];
 

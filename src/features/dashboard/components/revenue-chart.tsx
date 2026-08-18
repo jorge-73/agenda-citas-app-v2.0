@@ -36,9 +36,9 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
   const totalRevenue = data.reduce((sum, d) => sum + d.revenue, 0);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("es-MX", {
+    return new Intl.NumberFormat("es-AR", {
       style: "currency",
-      currency: "MXN",
+      currency: "ARS",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(value);

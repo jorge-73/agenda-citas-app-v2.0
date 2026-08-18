@@ -129,7 +129,7 @@ export function StepReview({
               value={patientData.phone}
               onChange={(e) => onPatientDataChange({ phone: e.target.value })}
               className={cn("h-11 text-sm", errors.phone && "border-destructive")}
-              placeholder="+56 9 1234 5678"
+              placeholder="+54 9 11 1234-5678"
             />
             {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
           </div>

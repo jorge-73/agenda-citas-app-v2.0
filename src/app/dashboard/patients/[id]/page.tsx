@@ -170,7 +170,7 @@ export default async function PatientDetailPage({
                           </p>
                           <p className="text-xs text-muted-foreground">{apt.specialist.specialty}</p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            {formatDate(apt.startTime)} - {new Date(apt.startTime).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}
+                            {formatDate(apt.startTime)} - {new Date(apt.startTime).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
                           </p>
                           {apt.reason && (
                             <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">

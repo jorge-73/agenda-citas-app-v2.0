@@ -100,7 +100,7 @@ export function StepProfessionals({ specialists, selected, onSelect, isLoading }
                     <div className="flex items-center gap-3 mt-1.5">
                       {specialist.price && (
                         <span className="text-xs font-medium text-success">
-                          ${specialist.price.toLocaleString("es-CL")}
+                          ${specialist.price.toLocaleString("es-AR")}
                         </span>
                       )}
                     </div>

@@ -118,7 +118,7 @@ export default async function SpecialistDetailPage({
                 <div>
                   <p className="text-xs text-muted-foreground">Precio consulta</p>
                   <p className="text-sm font-medium">
-                    {specialist.price ? `$${specialist.price.toLocaleString("es-CL")}` : "—"}
+                    {specialist.price ? `$${specialist.price.toLocaleString("es-AR")}` : "—"}
                   </p>
                 </div>
               </div>
@@ -191,7 +191,7 @@ export default async function SpecialistDetailPage({
                           </p>
                           <p className="text-xs text-muted-foreground">{apt.patient.user.email}</p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            {formatDate(apt.startTime)} - {new Date(apt.startTime).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}
+                            {formatDate(apt.startTime)} - {new Date(apt.startTime).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
                           </p>
                           {apt.reason && (
                             <p className="text-xs text-muted-foreground mt-1">{apt.reason}</p>

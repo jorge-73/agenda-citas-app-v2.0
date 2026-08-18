@@ -59,14 +59,14 @@ const STATS_CONFIG = [
 export function StatsCards({ stats, isLoading }: StatsCardsProps) {
   const formatValue = (key: string, value: number) => {
     if (key === "totalRevenue") {
-      return new Intl.NumberFormat("es-MX", {
+      return new Intl.NumberFormat("es-AR", {
         style: "currency",
-        currency: "MXN",
+        currency: "ARS",
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(value);
     }
-    return value.toLocaleString("es-MX");
+    return value.toLocaleString("es-AR");
   };
 
   return (

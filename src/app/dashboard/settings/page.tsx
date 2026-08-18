@@ -30,7 +30,7 @@ export default function SettingsPage() {
     name: "",
     email: "",
     phone: "",
-    timezone: "america-mexico_city",
+    timezone: "america-argentina_buenos_aires",
     emailNotifications: true,
     appointmentReminders: true,
     newBookingAlerts: true,
@@ -50,7 +50,7 @@ export default function SettingsPage() {
           name: user.name || "",
           email: user.email,
           phone: user.patient?.phone || "",
-          timezone: user.preferences?.timezone || "america-mexico_city",
+          timezone: user.preferences?.timezone || "america-argentina_buenos_aires",
           emailNotifications: user.preferences?.emailNotifications ?? true,
           appointmentReminders: user.preferences?.appointmentReminders ?? true,
           newBookingAlerts: user.preferences?.newBookingAlerts ?? true,
@@ -209,9 +209,11 @@ export default function SettingsPage() {
                     <SelectValue placeholder="Selecciona zona horaria" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="america-mexico_city">Ciudad de México (GMT-6)</SelectItem>
-                    <SelectItem value="america-guadalajara">Guadalajara (GMT-6)</SelectItem>
-                    <SelectItem value="america-monterrey">Monterrey (GMT-6)</SelectItem>
+                    <SelectItem value="america-argentina_buenos_aires">Buenos Aires (GMT-3)</SelectItem>
+                    <SelectItem value="america-argentina_cordoba">Córdoba (GMT-3)</SelectItem>
+                    <SelectItem value="america-argentina_mendoza">Mendoza (GMT-3)</SelectItem>
+                    <SelectItem value="america-argentina_salta">Salta (GMT-3)</SelectItem>
+                    <SelectItem value="america-argentina_ushuaia">Ushuaia (GMT-3)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -296,12 +298,12 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <Label>Idioma</Label>
-                <Select defaultValue="es-MX">
+                <Select defaultValue="es-AR">
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona idioma" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="es-MX">Español (México)</SelectItem>
+                    <SelectItem value="es-AR">Español (Argentina)</SelectItem>
                     <SelectItem value="es-ES">Español (España)</SelectItem>
                     <SelectItem value="en">English</SelectItem>
                   </SelectContent>
