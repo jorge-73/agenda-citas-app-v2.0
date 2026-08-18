@@ -28,14 +28,14 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
   }));
 
   const colors = {
-    appointments: "#10b981",
-    bookings: "#06b6d4",
+    appointments: "#1f68bc",
+    bookings: "#5a9ae6",
     grid: "oklch(var(--border) / 0.5)",
   };
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm">
+      <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm">
         <div className="p-6 pb-2">
           <h3 className="text-lg font-semibold">Citas y Reservas</h3>
           <p className="text-sm text-muted-foreground">Comparación de citas vs reservas online</p>
@@ -48,7 +48,7 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
   }
 
   return (
-    <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
+    <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
       <div className="p-6 pb-2 flex flex-row items-center justify-between">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold">Citas y Reservas</h3>

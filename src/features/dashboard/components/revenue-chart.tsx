@@ -20,8 +20,8 @@ interface RevenueChartProps {
 }
 
 const COLORS = [
-  "#3b82f6", "#10b981", "#8b5cf6", "#f97316", "#ec4899",
-  "#14b8a6", "#6366f1", "#84cc16", "#06b6d4", "#a855f7"
+  "#1f68bc", "#3a7fd6", "#5a9ae6", "#7db2f0", "#a3caf7",
+  "#3a7fd6", "#5a9ae6", "#7db2f0", "#1f68bc", "#a3caf7"
 ];
 
 export function RevenueChart({ data, isLoading }: RevenueChartProps) {
@@ -51,7 +51,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm">
+        <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm">
           <div className="p-6 pb-2 flex flex-row items-center justify-between">
             <h3 className="text-base font-semibold">Ingresos por Especialista</h3>
           </div>
@@ -71,7 +71,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
+      <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
         <div className="p-6 pb-2 flex flex-row items-center justify-between">
           <h3 className="text-base font-semibold">Ingresos por Especialista</h3>
           <span className="text-sm font-medium text-muted-foreground">
@@ -95,7 +95,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   layout="vertical"
                   margin={{ top: 10, right: 30, left: 80, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="oklch(var(--border))" />
                   <XAxis 
                     type="number"
                     tick={{ fontSize: 11, fill: "currentColor" }}

@@ -4,30 +4,13 @@ import { motion } from "framer-motion";
 import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { Clock } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { AppointmentWithDetails } from "../services/dashboard-service";
 
 interface TodayAppointmentsProps {
   appointments: AppointmentWithDetails[];
   isLoading?: boolean;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20",
-  CONFIRMED: "bg-green-500/10 text-green-700 border-green-500/20",
-  COMPLETED: "bg-blue-500/10 text-blue-700 border-blue-500/20",
-  CANCELLED: "bg-red-500/10 text-red-700 border-red-500/20",
-  NO_SHOW: "bg-gray-500/10 text-gray-700 border-gray-500/20"
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  PENDING: "Pendiente",
-  CONFIRMED: "Confirmada",
-  COMPLETED: "Completada",
-  CANCELLED: "Cancelada",
-  NO_SHOW: "No asistió"
-};
 
 export function TodayAppointments({ appointments, isLoading }: TodayAppointmentsProps) {
   const pendingCount = appointments.filter(a => a.status === "PENDING").length;
@@ -39,17 +22,17 @@ export function TodayAppointments({ appointments, isLoading }: TodayAppointments
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.7 }}
     >
-      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm h-full">
+      <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm h-full">
         <div className="p-6 pb-3">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold">Citas de Hoy</h3>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-yellow-500" />
+                <span className="w-2 h-2 rounded-full bg-warning" />
                 {pendingCount}
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="w-2 h-2 rounded-full bg-success" />
                 {confirmedCount}
               </span>
             </div>
@@ -86,12 +69,7 @@ export function TodayAppointments({ appointments, isLoading }: TodayAppointments
                       </p>
                     </div>
                   </div>
-                  <Badge 
-                    variant="outline" 
-                    className={cn("text-xs", STATUS_COLORS[apt.status])}
-                  >
-                    {STATUS_LABELS[apt.status] || apt.status}
-                  </Badge>
+                  <StatusBadge status={apt.status === "NO_SHOW" ? "ABSENT" : apt.status} />
                 </motion.div>
               ))}
             </div>

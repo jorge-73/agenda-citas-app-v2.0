@@ -7,7 +7,7 @@ import { es } from "date-fns/locale";
 import { PageHeader } from "@/components/layout/page-header";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { Calendar, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { getAllBookingsAction, cancelBookingAction, confirmBookingAction } from "@/features/booking/actions";
@@ -28,12 +28,6 @@ interface BookingWithSpecialist {
   createdAt: Date;
   specialist: { user: { name: string } } | null;
 }
-
-const statusBadge: Record<string, { label: string; variant: "warning" | "success" | "destructive" }> = {
-  PENDING: { label: "Pendiente", variant: "warning" },
-  CONFIRMED: { label: "Confirmada", variant: "success" },
-  CANCELLED: { label: "Cancelada", variant: "destructive" },
-};
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<BookingWithSpecialist[]>([]);
@@ -110,10 +104,7 @@ export default function BookingsPage() {
     {
       header: "Estado",
       accessorKey: "status",
-      cell: ({ row }) => {
-        const badge = statusBadge[row.original.status];
-        return <Badge variant={badge.variant}>{badge.label}</Badge>;
-      },
+      cell: ({ row }) => <StatusBadge status={row.original.status} />,
     },
     {
       header: "Acciones",
@@ -128,7 +119,7 @@ export default function BookingsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => handleConfirm(id)}
-                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                  className="text-success hover:text-success hover:bg-success/10"
                 >
                   <CheckCircle className="h-4 w-4 mr-1" />
                   Confirmar
@@ -137,7 +128,7 @@ export default function BookingsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => handleCancel(id)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                   <XCircle className="h-4 w-4 mr-1" />
                   Cancelar
@@ -149,7 +140,7 @@ export default function BookingsPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleCancel(id)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 <XCircle className="h-4 w-4 mr-1" />
                 Cancelar

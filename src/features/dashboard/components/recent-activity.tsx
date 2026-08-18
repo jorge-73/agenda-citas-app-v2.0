@@ -21,10 +21,10 @@ const ACTIVITY_ICONS = {
 };
 
 const ACTIVITY_COLORS = {
-  appointment: "text-blue-500 bg-blue-500/10",
-  patient: "text-purple-500 bg-purple-500/10",
-  booking: "text-orange-500 bg-orange-500/10",
-  specialist: "text-cyan-500 bg-cyan-500/10"
+  appointment: "text-primary bg-primary/10",
+  patient: "text-info bg-info/10",
+  booking: "text-primary bg-primary/10",
+  specialist: "text-info bg-info/10"
 };
 
 export function RecentActivity({ activities, isLoading }: RecentActivityProps) {
@@ -34,7 +34,7 @@ export function RecentActivity({ activities, isLoading }: RecentActivityProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.6 }}
     >
-      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm h-full hover:shadow-xl hover:border-primary/10 transition-all duration-300">
+      <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm h-full hover:shadow-xl hover:border-primary/10 transition-all duration-300">
         <div className="p-6 pb-3">
           <h3 className="text-base font-semibold">Actividad Reciente</h3>
         </div>

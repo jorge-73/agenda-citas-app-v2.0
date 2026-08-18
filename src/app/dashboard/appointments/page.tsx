@@ -132,7 +132,7 @@ export default function AppointmentsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="rounded-2xl border border-border/40 bg-card/70 p-6 space-y-4"
+            className="rounded-xl border border-border/40 bg-card/70 p-6 space-y-4"
           >
             <div className="flex items-center justify-between">
               <Skeleton className="h-8 w-48" />

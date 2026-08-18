@@ -18,9 +18,9 @@ interface SpecialtyChartProps {
 }
 
 const COLORS = [
-  "#3b82f6", "#10b981", "#8b5cf6", "#f97316", "#ec4899",
-  "#14b8a6", "#6366f1", "#84cc16", "#06b6d4", "#a855f7",
-  "#f43f5e", "#0ea5e9", "#22c55e", "#eab308", "#d946ef"
+  "#1f68bc", "#3a7fd6", "#5a9ae6", "#7db2f0", "#a3caf7",
+  "#3a7fd6", "#5a9ae6", "#7db2f0", "#1f68bc", "#a3caf7",
+  "#2a76cf", "#5a9ae6", "#7db2f0", "#8fbeeb", "#a3caf7"
 ];
 
 export function SpecialtyChart({ data, isLoading }: SpecialtyChartProps) {
@@ -31,7 +31,7 @@ export function SpecialtyChart({ data, isLoading }: SpecialtyChartProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm">
+        <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm">
           <div className="p-6 pb-2 flex flex-row items-center justify-between">
             <h3 className="text-base font-semibold">Citas por Especialidad</h3>
           </div>
@@ -58,7 +58,7 @@ export function SpecialtyChart({ data, isLoading }: SpecialtyChartProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
     >
-      <div className="rounded-2xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
+      <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
         <div className="p-6 pb-2 flex flex-row items-center justify-between">
           <h3 className="text-base font-semibold">Citas por Especialidad</h3>
           <span className="text-sm text-muted-foreground">

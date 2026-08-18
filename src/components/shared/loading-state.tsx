@@ -51,7 +51,7 @@ export function LoadingState({
         className={cn("grid gap-4 md:grid-cols-2 lg:grid-cols-3", className)}
       >
         {Array.from({ length: count }).map((_, i) => (
-          <motion.div key={i} variants={itemVariants} className="rounded-2xl border border-border/40 bg-card/70 p-5 space-y-3">
+          <motion.div key={i} variants={itemVariants} className="rounded-xl border border-border/40 bg-card/70 p-5 space-y-3">
             <Skeleton className="h-5 w-1/2" />
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
@@ -67,7 +67,7 @@ export function LoadingState({
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className={cn("rounded-2xl border border-border/40 bg-card/70 overflow-hidden", className)}
+        className={cn("rounded-xl border border-border/40 bg-card/70 overflow-hidden", className)}
       >
         <Skeleton className="h-12 w-full rounded-none" />
         {Array.from({ length: count }).map((_, i) => (
