@@ -259,9 +259,9 @@ export function BookingWizard() {
                   className={cn(
                     "h-7 w-7 sm:h-8 sm:w-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-all duration-300",
                     isCompleted
-                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                      ? "bg-primary text-primary-foreground"
                       : isActive
-                        ? "border-2 border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                        ? "border-2 border-primary bg-primary text-primary-foreground"
                         : "border-2 border-border/50 bg-muted/40 text-muted-foreground"
                   )}
                 >
@@ -403,7 +403,7 @@ export function BookingWizard() {
             size="lg"
             onClick={handleSubmit}
             disabled={isSubmitting || !canProceed()}
-            className="rounded-xl px-6 h-12 shadow-lg shadow-primary/20"
+            className="rounded-xl px-6 h-12"
           >
             {isSubmitting ? (
               <>

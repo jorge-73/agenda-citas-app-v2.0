@@ -101,7 +101,7 @@ export function AppointmentCalendar({
                 <div
                   className={cn(
                     "text-sm font-medium mb-1",
-                    isToday(day) && "bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center"
+                    isToday(day) && "bg-success text-success-foreground rounded-full w-7 h-7 flex items-center justify-center"
                   )}
                 >
                   {formatInTz(day, "d", AR_TZ)}
@@ -265,7 +265,7 @@ export function AppointmentCalendar({
               <div
                 className={cn(
                   "text-lg font-semibold",
-                  isToday(day) && "bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center mx-auto"
+                  isToday(day) && "bg-success text-success-foreground rounded-full w-8 h-8 flex items-center justify-center mx-auto"
                 )}
               >
                 {formatInTz(day, "d", AR_TZ)}

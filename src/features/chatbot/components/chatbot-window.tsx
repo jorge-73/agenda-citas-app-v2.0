@@ -78,7 +78,7 @@ export function ChatbotWindow() {
           transition={{ duration: 0.18, ease: "easeOut" }}
           role="dialog"
           aria-label="Asistente virtual CitasMed"
-          className="fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-chat-border/70 bg-chat-bg text-chat-foreground ring-1 ring-chat-foreground/10 shadow-[0_24px_60px_-16px_oklch(0.2_0.02_250/0.35),0_8px_24px_-8px_oklch(0.2_0.02_250/0.25)] dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.65),0_8px_24px_-8px_rgba(0,0,0,0.45)] max-sm:inset-x-3 max-sm:top-20 max-sm:bottom-24 max-sm:h-auto sm:bottom-24 sm:right-4 sm:h-[560px] sm:w-[380px]"
+          className="fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-chat-border/70 bg-chat-bg text-chat-foreground ring-1 ring-chat-foreground/10 shadow-[0_24px_60px_-16px_oklch(0.2_0.02_220/0.35),0_8px_24px_-8px_oklch(0.2_0.02_220/0.25)] dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.65),0_8px_24px_-8px_rgba(0,0,0,0.45)] max-sm:inset-x-3 max-sm:top-20 max-sm:bottom-24 max-sm:h-auto sm:bottom-24 sm:right-4 sm:h-[560px] sm:w-[380px]"
         >
           <div className="flex items-center gap-3 border-b border-chat-accent-foreground/10 bg-gradient-to-b from-chat-accent to-chat-accent/85 px-4 py-3 text-chat-accent-foreground">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-chat-accent-foreground/15 ring-1 ring-chat-accent-foreground/20">

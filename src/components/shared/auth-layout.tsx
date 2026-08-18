@@ -74,7 +74,7 @@ export function AuthLayout({ children, title, subtitle, orbs = defaultOrbs, show
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
-          className="rounded-3xl border border-border/40 bg-card p-8 shadow-2xl shadow-foreground/5"
+          className="rounded-3xl border border-border/40 bg-card p-8 shadow-[0_4px_16px_rgba(0,0,0,0.04)]"
         >
           {children}
         </motion.div>

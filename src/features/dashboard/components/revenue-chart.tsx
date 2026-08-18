@@ -20,8 +20,8 @@ interface RevenueChartProps {
 }
 
 const COLORS = [
-  "#1f68bc", "#3a7fd6", "#5a9ae6", "#7db2f0", "#a3caf7",
-  "#3a7fd6", "#5a9ae6", "#7db2f0", "#1f68bc", "#a3caf7"
+  "#4E8598", "#5C93A5", "#6FA3B2", "#88B7C3", "#A5CCD6",
+  "#5C93A5", "#6FA3B2", "#88B7C3", "#4E8598", "#A5CCD6"
 ];
 
 export function RevenueChart({ data, isLoading }: RevenueChartProps) {
@@ -71,7 +71,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
+      <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:border-primary/10 transition-all duration-300">
         <div className="p-6 pb-2 flex flex-row items-center justify-between">
           <h3 className="text-base font-semibold">Ingresos por Especialista</h3>
           <span className="text-sm font-medium text-muted-foreground">
@@ -95,7 +95,7 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   layout="vertical"
                   margin={{ top: 10, right: 30, left: 80, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="oklch(var(--border))" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                   <XAxis 
                     type="number"
                     tick={{ fontSize: 11, fill: "currentColor" }}
@@ -114,11 +114,11 @@ export function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   <Tooltip 
                     contentStyle={{ 
                       borderRadius: 16, 
-                      border: "1px solid oklch(var(--border))",
-                      background: "oklch(var(--card) / 0.85)",
+                      border: "1px solid var(--border)",
+                      background: "color-mix(in oklab, var(--card) 85%, transparent)",
                       backdropFilter: "blur(12px)",
                       WebkitBackdropFilter: "blur(12px)",
-                      boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
+                      boxShadow: "0 8px 32px color-mix(in oklab, var(--foreground) 12%, transparent)"
                     }}
                     formatter={(value) => [formatCurrency(Number(value) || 0), "Ingresos"]}
                   />

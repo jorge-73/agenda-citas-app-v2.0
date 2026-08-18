@@ -61,7 +61,7 @@ export function StepDateTime({
                   "snap-start shrink-0 flex flex-col items-center gap-1.5 px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[72px]",
                   "hover:shadow-sm active:scale-95",
                   isSelected
-                    ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                    ? "border-success bg-success text-success-foreground"
                     : "border-border/40 hover:border-primary/40 bg-card/60"
                 )}
               >
@@ -121,7 +121,7 @@ export function StepDateTime({
                         !slot.available
                           ? "border-border/20 bg-muted/30 text-muted-foreground/40 line-through cursor-not-allowed"
                           : selectedTime === slot.time
-                            ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                            ? "border-success bg-success text-success-foreground"
                             : "border-border/40 hover:border-primary/40 bg-card/60 hover:shadow-sm cursor-pointer"
                       )}
                     >
@@ -150,7 +150,7 @@ export function StepDateTime({
                         !slot.available
                           ? "border-border/20 bg-muted/30 text-muted-foreground/40 line-through cursor-not-allowed"
                           : selectedTime === slot.time
-                            ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                            ? "border-success bg-success text-success-foreground"
                             : "border-border/40 hover:border-primary/40 bg-card/60 hover:shadow-sm cursor-pointer"
                       )}
                     >

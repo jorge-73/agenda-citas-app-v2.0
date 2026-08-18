@@ -72,14 +72,14 @@ export function ConfirmationClient({ booking }: ConfirmationClientProps) {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-3xl border border-border/50 bg-card shadow-xl overflow-hidden"
+            className="rounded-3xl border border-border/50 bg-card shadow-[0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden"
           >
             <div className="bg-gradient-to-br from-primary/10 to-primary/3 p-8 pb-6">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-primary/25"
+                className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-5 "
               >
                 <CheckCircle2 className="w-10 h-10 text-primary-foreground" />
               </motion.div>

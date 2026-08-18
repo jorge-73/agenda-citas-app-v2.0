@@ -169,7 +169,7 @@ export default function PublicLandingPage() {
 
                 <motion.div variants={itemVariants} className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button size="lg" className="w-full sm:w-auto px-8 text-base bg-gradient-to-br from-primary to-primary/95 shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30" asChild>
+                    <Button size="lg" className="w-full sm:w-auto px-8 text-base bg-gradient-to-br from-primary to-primary/95 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)]" asChild>
                       <Link href="/booking">
                         <Calendar className="w-5 h-5" />
                         Reservar Cita
@@ -199,7 +199,7 @@ export default function PublicLandingPage() {
                 transition={{ delay: 0.4, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const }}
                 className="mt-20 max-w-5xl mx-auto"
               >
-                <div className="relative rounded-2xl border border-border/40 bg-card/80 backdrop-blur-xl shadow-2xl shadow-primary/10 p-6 sm:p-8 text-left">
+                <div className="relative rounded-2xl border border-border/40 bg-card/80 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] p-6 sm:p-8 text-left">
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
@@ -334,7 +334,7 @@ export default function PublicLandingPage() {
                     variants={cardVariants}
                     whileHover={{ y: -8, scale: 1.02 }}
                     className={cn(
-                      "rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 text-center cursor-pointer transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/5 group relative overflow-hidden",
+                      "rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 text-center cursor-pointer transition-all duration-300 shadow-[0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.07)] group relative overflow-hidden",
                       "hover:border-primary/20"
                     )}
                   >
@@ -386,7 +386,7 @@ export default function PublicLandingPage() {
                     key={feature.title}
                     variants={itemVariants}
                     whileHover={{ y: -4 }}
-                    className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary/20"
+                    className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 shadow-[0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.07)] transition-all duration-300 hover:border-primary/20"
                   >
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                       <Icon className="w-6 h-6 text-primary" />
@@ -434,7 +434,7 @@ export default function PublicLandingPage() {
                   <div>
                     <div className="flex gap-1 mb-4">
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-amber-500 text-amber-500" />
+                        <Star key={i} className="w-4 h-4 fill-[#F4B400] text-[#F4B400]" />
                       ))}
                     </div>
                     <p className="text-sm text-muted-foreground mb-6 leading-relaxed italic">
@@ -468,7 +468,7 @@ export default function PublicLandingPage() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={containerVariants}
-              className="rounded-2xl border border-border/20 shadow-2xl bg-card/50 backdrop-blur-xl p-8 md:p-16 text-center max-w-4xl mx-auto"
+              className="rounded-2xl border border-border/20 shadow-[0_4px_16px_rgba(0,0,0,0.04)] bg-card/50 backdrop-blur-xl p-8 md:p-16 text-center max-w-4xl mx-auto"
             >
               <motion.h2 variants={itemVariants} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-4">
                 ¿Listo para agendar tu cita?
@@ -479,7 +479,7 @@ export default function PublicLandingPage() {
               </motion.p>
               <motion.div variants={itemVariants}>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button size="lg" className="px-10 text-base shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30" asChild>
+                  <Button size="lg" className="px-10 text-base shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)]" asChild>
                     <Link href="/booking">
                       <Calendar className="w-5 h-5" />
                       Reservar Ahora
@@ -522,7 +522,7 @@ export default function PublicLandingPage() {
                   <motion.div
                     key={contact.label}
                     variants={itemVariants}
-                    className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 text-center shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary/20"
+                    className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 text-center shadow-[0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.07)] transition-all duration-300 hover:border-primary/20"
                   >
                     <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <Icon className="w-5.5 h-5.5 text-primary" />

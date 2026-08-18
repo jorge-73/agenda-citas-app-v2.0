@@ -30,7 +30,7 @@ export function Logo({
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className={cn(
-          "bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm shadow-primary/20 shrink-0",
+          "bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shrink-0",
           classes.box
         )}
       >

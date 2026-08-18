@@ -89,7 +89,7 @@ export function DataTable<TData>({
         )}
       </div>
 
-      <div className="rounded-xl border border-border/40 bg-card/70 backdrop-blur-sm overflow-hidden hover:shadow-md transition-all duration-300">
+      <div className="rounded-xl border border-border/40 bg-card/70 backdrop-blur-sm overflow-hidden hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>

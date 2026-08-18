@@ -106,7 +106,7 @@ export function Sidebar() {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-sm shadow-primary/20"
+              className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shrink-0"
             >
               <HeartPulse className="h-5 w-5 text-primary-foreground" />
             </motion.div>

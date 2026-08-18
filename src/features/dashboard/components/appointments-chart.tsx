@@ -28,9 +28,9 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
   }));
 
   const colors = {
-    appointments: "#1f68bc",
-    bookings: "#5a9ae6",
-    grid: "oklch(var(--border) / 0.5)",
+    appointments: "#4E8598",
+    bookings: "#6FA3B2",
+    grid: "color-mix(in oklab, var(--border) 50%, transparent)",
   };
 
   if (isLoading) {
@@ -48,7 +48,7 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
   }
 
   return (
-    <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-xl hover:border-primary/10 transition-all duration-300">
+    <div className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-sm hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:border-primary/10 transition-all duration-300">
       <div className="p-6 pb-2 flex flex-row items-center justify-between">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold">Citas y Reservas</h3>
@@ -97,13 +97,13 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
                   <Tooltip 
                     contentStyle={{ 
                       borderRadius: "16px", 
-                      border: "1px solid oklch(var(--border))",
-                      background: "oklch(var(--card) / 0.85)",
+                      border: "1px solid var(--border)",
+                      background: "color-mix(in oklab, var(--card) 85%, transparent)",
                       backdropFilter: "blur(12px)",
                       WebkitBackdropFilter: "blur(12px)",
-                      boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
+                      boxShadow: "0 8px 32px color-mix(in oklab, var(--foreground) 12%, transparent)"
                     }}
-                    cursor={{ fill: "oklch(var(--muted) / 0.5)" }}
+                    cursor={{ fill: "color-mix(in oklab, var(--muted) 50%, transparent)" }}
                   />
                 <Legend 
                   wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }}
@@ -152,11 +152,11 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
                   <Tooltip 
                     contentStyle={{ 
                       borderRadius: "16px", 
-                      border: "1px solid oklch(var(--border))",
-                      background: "oklch(var(--card) / 0.85)",
+                      border: "1px solid var(--border)",
+                      background: "color-mix(in oklab, var(--card) 85%, transparent)",
                       backdropFilter: "blur(12px)",
                       WebkitBackdropFilter: "blur(12px)",
-                      boxShadow: "0 8px 32px oklch(var(--foreground) / 0.12)"
+                      boxShadow: "0 8px 32px color-mix(in oklab, var(--foreground) 12%, transparent)"
                     }}
                   />
                 <Legend 
@@ -181,7 +181,7 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
                   stroke={colors.appointments} 
                   strokeWidth={3}
                   dot={{ fill: colors.appointments, strokeWidth: 0, r: 4, stroke: colors.appointments }}
-                  activeDot={{ r: 6, stroke: colors.appointments, strokeWidth: 2, fill: "oklch(var(--card))" }}
+                  activeDot={{ r: 6, stroke: colors.appointments, strokeWidth: 2, fill: "var(--card)" }}
                 />
                 <Line 
                   type="monotone" 
@@ -190,7 +190,7 @@ export function AppointmentsChart({ appointmentsData, bookingsData, isLoading }:
                   stroke={colors.bookings} 
                   strokeWidth={3}
                   dot={{ fill: colors.bookings, strokeWidth: 0, r: 4, stroke: colors.bookings }}
-                  activeDot={{ r: 6, stroke: colors.bookings, strokeWidth: 2, fill: "oklch(var(--card))" }}
+                  activeDot={{ r: 6, stroke: colors.bookings, strokeWidth: 2, fill: "var(--card)" }}
                 />
               </LineChart>
             )}

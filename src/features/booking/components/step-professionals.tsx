@@ -83,7 +83,7 @@ export function StepProfessionals({ specialists, selected, onSelect, isLoading }
                   "w-full text-left rounded-xl border-2 p-4 transition-all duration-200",
                   "hover:-translate-y-0.5 hover:shadow-md hover:border-primary/20 active:scale-[0.99]",
                   isSelected
-                    ? "border-primary bg-primary/5 shadow-lg shadow-primary/5"
+                    ? "border-primary bg-primary/5"
                     : "border-border/40 hover:border-primary/30 bg-card/60"
                 )}
               >

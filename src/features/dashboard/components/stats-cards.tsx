@@ -81,7 +81,7 @@ export function StatsCards({ stats, isLoading }: StatsCardsProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
           >
-            <div className="rounded-xl border border-border/40 bg-card/70 backdrop-blur-sm relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 hover:border-primary/20 transition-all duration-300">
+            <div className="rounded-xl border border-border/40 bg-card/70 backdrop-blur-sm relative overflow-hidden group hover:shadow-[0_8px_24px_rgba(0,0,0,0.07)] hover:-translate-y-1.5 hover:border-primary/20 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="p-5 relative z-10">
                 <div className="flex items-start justify-between">
@@ -95,7 +95,7 @@ export function StatsCards({ stats, isLoading }: StatsCardsProps) {
                       ) : formatValue(stat.key, value)}
                     </p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-primary/10 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/10">
+                  <div className="p-2.5 rounded-xl bg-primary/10 transition-all duration-300 group-hover:scale-110">
                     <stat.icon className="h-5 w-5 text-primary" />
                   </div>
                 </div>

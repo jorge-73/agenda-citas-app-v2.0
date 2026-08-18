@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { DM_Sans, DM_Mono } from "next/font/google";
+import { Inter, DM_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { ChatbotWidget } from "@/features/chatbot/components/chatbot-widget";
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${dmSans.variable} ${dmMono.variable} font-sans`}>
+      <body className={`${inter.variable} ${dmMono.variable} font-sans`}>
         <Providers>
           {children}
           <Toaster position="bottom-right" richColors offset={88} />

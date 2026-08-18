@@ -46,7 +46,7 @@ export function PublicHeader({ navLinks = DEFAULT_LINKS }: PublicHeaderProps) {
               <Button variant="ghost" size="sm" className="px-4" asChild>
                 <Link href="/login">Iniciar sesión</Link>
               </Button>
-              <Button size="sm" className="px-4 shadow-lg shadow-primary/10" asChild>
+              <Button size="sm" className="px-4" asChild>
                 <Link href="/booking">Reservar Cita</Link>
               </Button>
             </div>
@@ -86,7 +86,7 @@ export function PublicHeader({ navLinks = DEFAULT_LINKS }: PublicHeaderProps) {
                   Iniciar sesión
                 </Link>
               </Button>
-              <Button size="sm" className="w-full shadow-lg shadow-primary/10" asChild>
+              <Button size="sm" className="w-full" asChild>
                 <Link href="/booking" onClick={() => setMobileMenuOpen(false)}>
                   Reservar Cita
                 </Link>

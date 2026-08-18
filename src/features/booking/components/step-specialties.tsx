@@ -48,7 +48,7 @@ export function StepSpecialties({ specialties, selected, onSelect, isLoading }: 
               "relative group text-left rounded-xl border-2 p-4 sm:p-5 transition-all duration-200 cursor-pointer",
               "hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]",
               isSelected
-                ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                ? "border-primary bg-primary/5"
                 : "border-border/40 hover:border-primary/40 bg-card/60"
             )}
           >
