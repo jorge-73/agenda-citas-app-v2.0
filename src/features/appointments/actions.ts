@@ -44,11 +44,17 @@ export async function getFilteredAppointmentsAction(filters: {
   startDate?: Date;
   endDate?: Date;
 }) {
-  await requirePermission("view:appointments");
+  const user = await requirePermission("view:appointments");
+  let scopedPatientId: string | undefined = filters.patientId;
+  if (user.role === "PATIENT") {
+    const patient = await db.patient.findUnique({ where: { userId: user.id }, select: { id: true } });
+    if (!patient) return [];
+    scopedPatientId = patient.id;
+  }
   const appointments = await db.appointment.findMany({
     where: {
       ...(filters.specialistId && { specialistId: filters.specialistId }),
-      ...(filters.patientId && { patientId: filters.patientId }),
+      ...(scopedPatientId && { patientId: scopedPatientId }),
       ...(filters.status && { status: filters.status }),
       ...(filters.startDate || filters.endDate
         ? {
@@ -73,12 +79,19 @@ export async function getFilteredAppointmentsAction(filters: {
 }
 
 export async function getAppointmentsByMonth(year: number, month: number) {
-  await requirePermission("view:appointments");
+  const user = await requirePermission("view:appointments");
+  let scopedPatientId: string | undefined;
+  if (user.role === "PATIENT") {
+    const patient = await db.patient.findUnique({ where: { userId: user.id }, select: { id: true } });
+    if (!patient) return [];
+    scopedPatientId = patient.id;
+  }
   const startOfMonth = new Date(year, month, 1);
   const endOfMonth = new Date(year, month + 1, 0);
   
   const appointments = await db.appointment.findMany({
     where: {
+      ...(scopedPatientId && { patientId: scopedPatientId }),
       startTime: {
         gte: startOfMonth,
         lte: endOfMonth,
@@ -108,8 +121,15 @@ export async function getAppointmentsByMonth(year: number, month: number) {
 }
 
 export async function getAllAppointments() {
-  await requirePermission("view:appointments");
+  const user = await requirePermission("view:appointments");
+  let scopedPatientId: string | undefined;
+  if (user.role === "PATIENT") {
+    const patient = await db.patient.findUnique({ where: { userId: user.id }, select: { id: true } });
+    if (!patient) return [];
+    scopedPatientId = patient.id;
+  }
   const appointments = await db.appointment.findMany({
+    where: scopedPatientId ? { patientId: scopedPatientId } : undefined,
     include: {
       patient: {
         include: {
@@ -134,7 +154,10 @@ export async function getAllAppointments() {
 }
 
 export async function getPatientsList() {
-  await requirePermission("view:appointments");
+  const user = await requirePermission("view:appointments");
+  if (user.role === "PATIENT") {
+    throw new Error("No tienes permisos para realizar esta acción");
+  }
   const patients = await db.patient.findMany({
     include: {
       user: true,
@@ -153,7 +176,10 @@ export async function getPatientsList() {
 }
 
 export async function getSpecialistsList() {
-  await requirePermission("view:appointments");
+  const user = await requirePermission("view:appointments");
+  if (user.role === "PATIENT") {
+    throw new Error("No tienes permisos para realizar esta acción");
+  }
   const specialists = await db.specialist.findMany({
     where: {
       isAvailable: true,
@@ -219,6 +245,64 @@ export async function deleteAppointment(id: string) {
   if (!parsed.success) throw new Error("ID de cita inválido");
 
   return db.appointment.delete({ where: { id } });
+}
+
+export async function cancelOwnAppointmentAction(appointmentId: string) {
+  const user = await requirePermission("manage:own-appointments");
+
+  const parsedId = z.string().min(1, "ID requerido").safeParse(appointmentId);
+  if (!parsedId.success) throw new Error("ID de cita inválido");
+
+  const patient = await db.patient.findUnique({ where: { userId: user.id } });
+  if (!patient) throw new Error("Paciente no encontrado");
+
+  const appointment = await db.appointment.findUnique({
+    where: { id: appointmentId },
+    include: {
+      patient: { include: { user: true } },
+      specialist: { include: { user: true } },
+    },
+  });
+
+  if (!appointment) throw new Error("Turno no encontrado");
+  if (appointment.patientId !== patient.id) {
+    throw new Error("No puedes cancelar el turno de otro paciente");
+  }
+  if (appointment.status === "CANCELLED") {
+    throw new Error("El turno ya está cancelado");
+  }
+  if (appointment.status === "COMPLETED" || appointment.status === "ABSENT") {
+    throw new Error("El turno ya finalizó");
+  }
+  if (new Date(appointment.startTime) <= new Date()) {
+    throw new Error("Solo se pueden cancelar turnos futuros");
+  }
+
+  const updated = await db.appointment.update({
+    where: { id: appointmentId },
+    data: { status: "CANCELLED" },
+    include: {
+      patient: { include: { user: true } },
+      specialist: { include: { user: true } },
+    },
+  });
+
+  try {
+    const { sendAppointmentStatusEmail } = await import("@/lib/email");
+    await sendAppointmentStatusEmail({
+      to: updated.patient.user.email,
+      patientName: updated.patient.user.name || "Paciente",
+      specialistName: updated.specialist.user.name || "Especialista",
+      specialty: updated.specialist.specialty,
+      date: format(new Date(updated.startTime), "dd/MM/yyyy"),
+      time: format(new Date(updated.startTime), "HH:mm"),
+      status: "CANCELLED",
+    });
+  } catch (emailError) {
+    console.error("Error sending cancellation email:", emailError);
+  }
+
+  return updated;
 }
 
 export async function updateAppointment(id: string, data: {

@@ -44,10 +44,15 @@ const navItems: { title: string; href: string; icon: React.ComponentType<{ class
 export function MobileNav() {
   const pathname = usePathname();
   const userRole = useAuthStore((state) => state.user?.role);
+  const isPatient = userRole === "PATIENT";
 
-  const visibleItems = navItems.filter(
-    (item) => hasPermission(userRole, item.permission)
-  );
+  const visibleItems = navItems
+    .filter((item) => hasPermission(userRole, item.permission))
+    .map((item) =>
+      isPatient && item.href === "/dashboard/appointments"
+        ? { ...item, title: "Mis turnos" }
+        : item
+    );
 
   return (
     <Sheet>
@@ -105,7 +110,7 @@ export function MobileNav() {
         
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-muted/20">
           <p className="text-xs text-muted-foreground text-center">
-            Panel de Administración v1.0.0
+            {isPatient ? "CitasMed v1.0.0" : "Panel de Administración v1.0.0"}
           </p>
         </div>
       </SheetContent>

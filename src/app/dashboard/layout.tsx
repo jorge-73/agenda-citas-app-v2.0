@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/layout/navbar";
 import { PageTransition } from "@/components/layout/page-transition";
 import { AuthInit } from "@/store/auth-init";
+import { PatientGuard } from "@/components/layout/patient-guard";
 import type { UserRole } from "@/types";
 
 export default async function DashboardLayout({
@@ -38,7 +39,9 @@ export default async function DashboardLayout({
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar />
         <main className="flex-1 overflow-y-auto bg-background p-4 md:p-6">
-          <PageTransition>{children}</PageTransition>
+          <PageTransition>
+            <PatientGuard role={authUser?.role}>{children}</PatientGuard>
+          </PageTransition>
         </main>
       </div>
     </div>

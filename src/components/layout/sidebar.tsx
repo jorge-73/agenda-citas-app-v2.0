@@ -87,10 +87,15 @@ export function Sidebar() {
   const userRole = useAuthStore((state) => state.user?.role);
   const collapsed = useUIStore((state) => state.sidebarCollapsed);
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
+  const isPatient = userRole === "PATIENT";
 
-  const visibleItems = navItems.filter(
-    (item) => !item.permission || hasPermission(userRole, item.permission)
-  );
+  const visibleItems = navItems
+    .filter((item) => !item.permission || hasPermission(userRole, item.permission))
+    .map((item) =>
+      isPatient && item.href === "/dashboard/appointments"
+        ? { ...item, title: "Mis turnos" }
+        : item
+    );
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -102,7 +107,7 @@ export function Sidebar() {
       >
         {/* Logo */}
         <div className="flex h-16 items-center border-b border-sidebar-border px-3">
-          <Link href="/dashboard" className="flex items-center gap-3">
+          <Link href={isPatient ? "/dashboard/appointments" : "/dashboard"} className="flex items-center gap-3">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -225,7 +230,9 @@ export function Sidebar() {
                 transition={{ duration: 0.2 }}
                 className="rounded-xl bg-sidebar-accent/30 p-3"
               >
-                <p className="text-xs text-sidebar-foreground/50">Panel de Administración</p>
+                <p className="text-xs text-sidebar-foreground/50">
+                  {isPatient ? "CitasMed" : "Panel de Administración"}
+                </p>
                 <p className="text-xs font-medium text-sidebar-foreground/70 mt-1">Versión 1.0.0</p>
               </motion.div>
             )}

@@ -17,7 +17,8 @@ export type Permission =
   | "manage:blocked-dates"
   | "manage:bookings"
   | "manage:settings"
-  | "manage:users";
+  | "manage:users"
+  | "manage:own-appointments";
 
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   ADMIN: [
@@ -66,9 +67,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "manage:bookings",
   ],
   PATIENT: [
-    "view:dashboard",
     "view:appointments",
-    "view:settings",
+    "manage:own-appointments",
   ],
 };
 

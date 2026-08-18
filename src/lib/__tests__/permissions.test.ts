@@ -74,13 +74,14 @@ describe("hasPermission", () => {
   });
 
   describe("PATIENT", () => {
-    it("has basic view permissions", () => {
-      expect(hasPermission("PATIENT", "view:dashboard")).toBe(true);
+    it("has own appointments permissions only", () => {
       expect(hasPermission("PATIENT", "view:appointments")).toBe(true);
-      expect(hasPermission("PATIENT", "view:settings")).toBe(true);
+      expect(hasPermission("PATIENT", "manage:own-appointments")).toBe(true);
     });
 
-    it("does NOT have management or sensitive permissions", () => {
+    it("does NOT have dashboard, settings or management permissions", () => {
+      expect(hasPermission("PATIENT", "view:dashboard")).toBe(false);
+      expect(hasPermission("PATIENT", "view:settings")).toBe(false);
       expect(hasPermission("PATIENT", "view:users")).toBe(false);
       expect(hasPermission("PATIENT", "view:patients")).toBe(false);
       expect(hasPermission("PATIENT", "manage:appointments")).toBe(false);
