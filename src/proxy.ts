@@ -35,7 +35,9 @@ export default async function proxy(request: NextRequest) {
   }
 
   const role = (session.user as { role?: string }).role;
-  const route = Object.keys(ROUTE_PERMISSIONS).find((r) => pathname === r || pathname.startsWith(`${r}/`));
+  const route = Object.keys(ROUTE_PERMISSIONS)
+    .filter((r) => pathname === r || pathname.startsWith(`${r}/`))
+    .sort((a, b) => b.length - a.length)[0];
 
   if (route) {
     const permission = ROUTE_PERMISSIONS[route];
