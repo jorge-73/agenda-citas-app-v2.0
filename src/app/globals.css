@@ -339,37 +339,6 @@
 }
 
 /* =============================================
-   PREMIUM CARD STYLES
-   ============================================= */
-.premium-card {
-  @apply bg-card border border-border/50;
-  box-shadow: 0 1px 3px oklch(var(--foreground) / 0.04), 0 1px 2px oklch(var(--foreground) / 0.03);
-  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.premium-card:hover {
-  box-shadow: 0 4px 12px oklch(var(--foreground) / 0.08), 0 2px 4px oklch(var(--foreground) / 0.04);
-  transform: translateY(-1px);
-}
-
-.premium-card-interactive {
-  @apply bg-card border border-border/50;
-  box-shadow: 0 1px 3px oklch(var(--foreground) / 0.04), 0 1px 2px oklch(var(--foreground) / 0.03);
-  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-}
-
-.premium-card-interactive:hover {
-  box-shadow: 0 8px 24px oklch(var(--foreground) / 0.1), 0 4px 8px oklch(var(--foreground) / 0.05);
-  transform: translateY(-2px);
-}
-
-.premium-card-interactive:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px oklch(var(--foreground) / 0.06);
-}
-
-/* =============================================
    RESPONSIVE UTILITIES
    ============================================= */
 @layer utilities {
