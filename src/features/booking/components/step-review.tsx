@@ -37,7 +37,7 @@ export function StepReview({
 }: StepReviewProps) {
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-border/40 bg-gradient-to-br from-primary/5 via-muted/20 to-transparent p-5">
+      <div className="rounded-xl border border-border/40 bg-gradient-to-br from-primary/5 via-muted/20 to-transparent p-5">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Resumen de tu cita</p>
         <div className="space-y-3">
           <div className="flex items-center gap-3">
@@ -91,7 +91,7 @@ export function StepReview({
               id="rw-name"
               value={patientData.name}
               onChange={(e) => onPatientDataChange({ name: e.target.value })}
-              className={cn("h-11 rounded-xl text-sm", errors.name && "border-destructive")}
+              className={cn("h-11 text-sm", errors.name && "border-destructive")}
               placeholder="Tu nombre"
             />
             {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
@@ -102,7 +102,7 @@ export function StepReview({
               id="rw-lastname"
               value={patientData.lastname}
               onChange={(e) => onPatientDataChange({ lastname: e.target.value })}
-              className={cn("h-11 rounded-xl text-sm", errors.lastname && "border-destructive")}
+              className={cn("h-11 text-sm", errors.lastname && "border-destructive")}
               placeholder="Tu apellido"
             />
             {errors.lastname && <p className="text-xs text-destructive">{errors.lastname}</p>}
@@ -116,7 +116,7 @@ export function StepReview({
               type="email"
               value={patientData.email}
               onChange={(e) => onPatientDataChange({ email: e.target.value })}
-              className={cn("h-11 rounded-xl text-sm", errors.email && "border-destructive")}
+              className={cn("h-11 text-sm", errors.email && "border-destructive")}
               placeholder="tu@email.com"
             />
             {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
@@ -128,7 +128,7 @@ export function StepReview({
               type="tel"
               value={patientData.phone}
               onChange={(e) => onPatientDataChange({ phone: e.target.value })}
-              className={cn("h-11 rounded-xl text-sm", errors.phone && "border-destructive")}
+              className={cn("h-11 text-sm", errors.phone && "border-destructive")}
               placeholder="+56 9 1234 5678"
             />
             {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}

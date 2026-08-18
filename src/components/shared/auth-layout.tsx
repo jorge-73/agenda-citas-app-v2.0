@@ -3,9 +3,9 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { HeartPulse } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { AuthOrb } from "./auth-orb";
+import { Logo } from "@/components/public/logo";
 
 interface OrbConfig {
   className: string;
@@ -46,14 +46,8 @@ export function AuthLayout({ children, title, subtitle, orbs = defaultOrbs, show
         </div>
         {showHeader && title && (
           <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/25"
-              >
-                <HeartPulse className="h-6 w-6 text-primary-foreground" />
-              </motion.div>
+            <Link href="/" className="inline-flex justify-center mb-6 group">
+              <Logo size="lg" showWordmark={false} />
             </Link>
             <motion.h1
               initial={{ opacity: 0, y: 10 }}

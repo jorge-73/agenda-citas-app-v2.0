@@ -76,7 +76,7 @@ export default function RegisterPage() {
             <Input
               id="name"
               placeholder="Juan Pérez"
-              className="pl-11 h-12 rounded-xl"
+              className="pl-11 h-12"
               {...register("name")}
             />
           </div>
@@ -93,7 +93,7 @@ export default function RegisterPage() {
               id="email"
               type="email"
               placeholder="correo@ejemplo.com"
-              className="pl-11 h-12 rounded-xl"
+              className="pl-11 h-12"
               {...register("email")}
             />
           </div>
@@ -133,7 +133,7 @@ export default function RegisterPage() {
           registration={register("confirmPassword")}
         />
 
-        <Button size="lg" className="w-full text-base rounded-2xl" type="submit" disabled={isLoading}>
+        <Button size="lg" className="w-full text-base" type="submit" disabled={isLoading}>
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />

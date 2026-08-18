@@ -130,7 +130,7 @@ function ResetPasswordForm() {
           registration={register("confirmPassword")}
         />
 
-        <Button size="lg" className="w-full text-base rounded-2xl" type="submit" disabled={isLoading}>
+        <Button size="lg" className="w-full text-base" type="submit" disabled={isLoading}>
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />

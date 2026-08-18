@@ -301,8 +301,8 @@ export function BookingWizard() {
             {step === 1 && (
               <div>
                 <div className="mb-5 sm:mb-6 text-center sm:text-left">
-                  <p className="text-lg sm:text-xl font-semibold text-foreground">Selecciona una especialidad</p>
-                  <p className="text-sm text-muted-foreground mt-1">Elige el tipo de atención médica que necesitas</p>
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">Seleccioná una especialidad</p>
+                  <p className="text-sm text-muted-foreground mt-1">Elegí el tipo de atención médica que necesitás</p>
                 </div>
                 <StepSpecialties
                   specialties={specialties}
@@ -316,7 +316,7 @@ export function BookingWizard() {
             {step === 2 && (
               <div>
                 <div className="mb-5 sm:mb-6 text-center sm:text-left">
-                  <p className="text-lg sm:text-xl font-semibold text-foreground">Selecciona un profesional</p>
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">Seleccioná un profesional</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     {filteredSpecialists.length} {filteredSpecialists.length === 1 ? "especialista disponible" : "especialistas disponibles"} en {selectedSpecialty}
                   </p>
@@ -333,8 +333,8 @@ export function BookingWizard() {
             {step === 3 && (
               <div>
                 <div className="mb-5 sm:mb-6 text-center sm:text-left">
-                  <p className="text-lg sm:text-xl font-semibold text-foreground">Selecciona fecha y hora</p>
-                  <p className="text-sm text-muted-foreground mt-1">Elige el horario disponible que más te convenga</p>
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">Seleccioná fecha y hora</p>
+                  <p className="text-sm text-muted-foreground mt-1">Elegí el horario disponible que más te convenga</p>
                 </div>
                 {isLoadingDates ? (
                   <div className="flex items-center justify-center py-16">
@@ -361,8 +361,8 @@ export function BookingWizard() {
             {step === 4 && (
               <div>
                 <div className="mb-5 sm:mb-6 text-center sm:text-left">
-                  <p className="text-lg sm:text-xl font-semibold text-foreground">Confirma tu cita</p>
-                  <p className="text-sm text-muted-foreground mt-1">Revisa los detalles y completa tus datos</p>
+                  <p className="text-lg sm:text-xl font-semibold text-foreground">Confirmá tu cita</p>
+                  <p className="text-sm text-muted-foreground mt-1">Revisá los detalles y completá tus datos</p>
                 </div>
                 <StepReview
                   specialty={selectedSpecialty || ""}

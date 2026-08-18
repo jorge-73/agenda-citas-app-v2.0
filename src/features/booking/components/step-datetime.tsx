@@ -40,7 +40,7 @@ export function StepDateTime({
       <div>
         <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
           <CalendarDays className="h-4 w-4 text-primary" />
-          Selecciona una fecha
+          Seleccioná una fecha
         </p>
 
         <div className="flex gap-2 pb-2 overflow-x-auto scrollbar-none snap-x snap-mandatory -mx-1 px-1">
@@ -58,7 +58,7 @@ export function StepDateTime({
                 transition={{ delay: index * 0.02 }}
                 onClick={() => onSelectDate(date)}
                 className={cn(
-                  "snap-start shrink-0 flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border-2 transition-all duration-200 min-w-[72px]",
+                  "snap-start shrink-0 flex flex-col items-center gap-1.5 px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[72px]",
                   "hover:shadow-sm active:scale-95",
                   isSelected
                     ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
@@ -185,7 +185,7 @@ export function StepDateTime({
           >
             <Clock className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">No hay horarios disponibles para esta fecha.</p>
-            <p className="text-xs text-muted-foreground/60 mt-1">Selecciona otra fecha.</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">Seleccioná otra fecha.</p>
           </motion.div>
         ) : null}
       </AnimatePresence>

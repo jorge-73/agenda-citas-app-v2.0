@@ -11,15 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthLayout } from "@/components/shared/auth-layout";
 import { AuthError } from "@/components/shared/auth-error";
-import { AuthOrb } from "@/components/shared/auth-orb";
 
 import { Mail, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
-
-const sentOrbs = [
-  { className: "top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/12" },
-  { className: "bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent/8", delay: 3 },
-];
 
 export default function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null);
@@ -52,41 +46,29 @@ export default function ForgotPasswordPage() {
 
   if (isSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-mesh">
-        <div className="absolute inset-0 -z-10">
-          {sentOrbs.map((orb, i) => (
-            <AuthOrb key={i} className={orb.className} delay={orb.delay} />
-          ))}
+      <AuthLayout showHeader={false}>
+        <div className="text-center">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
+          >
+            <CheckCircle2 className="h-8 w-8 text-primary" />
+          </motion.div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Revisá tu correo</h2>
+          <p className="text-muted-foreground mb-6">
+            Si existe una cuenta con ese email, recibirás un enlace para restablecer tu contraseña.
+          </p>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver al inicio de sesión
+          </Link>
         </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="w-full max-w-md"
-        >
-          <div className="rounded-3xl border border-border/40 bg-card/70 backdrop-blur-2xl p-8 shadow-2xl shadow-foreground/5 text-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
-            >
-              <CheckCircle2 className="h-8 w-8 text-primary" />
-            </motion.div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Revisa tu correo</h2>
-            <p className="text-muted-foreground mb-6">
-              Si existe una cuenta con ese email, recibirás un enlace para restablecer tu contraseña.
-            </p>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Volver al inicio de sesión
-            </Link>
-          </div>
-        </motion.div>
-      </div>
+      </AuthLayout>
     );
   }
 
@@ -106,7 +88,7 @@ export default function ForgotPasswordPage() {
               id="email"
               type="email"
               placeholder="correo@ejemplo.com"
-              className="pl-11 h-12 rounded-xl"
+              className="pl-11 h-12"
               {...register("email")}
             />
           </div>
@@ -115,7 +97,7 @@ export default function ForgotPasswordPage() {
           )}
         </div>
 
-        <Button size="lg" className="w-full text-base rounded-2xl" type="submit" disabled={isLoading}>
+        <Button size="lg" className="w-full text-base" type="submit" disabled={isLoading}>
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />

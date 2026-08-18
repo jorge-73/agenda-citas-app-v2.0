@@ -4,7 +4,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { PublicHeader } from "@/components/public/header";
+import { Logo } from "@/components/public/logo";
 import { cn } from "@/lib/utils";
 import {
   Calendar,
@@ -26,22 +27,21 @@ import {
   ClipboardList,
   Award,
   Building2,
-  Menu,
-  X,
   Sparkles,
   Users,
+  Plus,
+  Video,
 } from "lucide-react";
-import { useState } from "react";
 
 const SPECIALTIES = [
-  { name: "Medicina General", icon: Stethoscope, description: "Atención primaria y preventiva", color: "text-emerald-500", bg: "bg-emerald-500/10", border: "hover:border-emerald-500/30", gradient: "from-emerald-500/10" },
-  { name: "Cardiología", icon: Heart, description: "Enfermedades cardiovasculares", color: "text-rose-500", bg: "bg-rose-500/10", border: "hover:border-rose-500/30", gradient: "from-rose-500/10" },
-  { name: "Neurología", icon: Brain, description: "Trastornos del sistema nervioso", color: "text-violet-500", bg: "bg-violet-500/10", border: "hover:border-violet-500/30", gradient: "from-violet-500/10" },
-  { name: "Oftalmología", icon: Eye, description: "Cirugías oculares y visión", color: "text-sky-500", bg: "bg-sky-500/10", border: "hover:border-sky-500/30", gradient: "from-sky-500/10" },
-  { name: "Pediatría", icon: Baby, description: "Atención para niños", color: "text-amber-500", bg: "bg-amber-500/10", border: "hover:border-amber-500/30", gradient: "from-amber-500/10" },
-  { name: "Dermatología", icon: Activity, description: "Tratamientos de piel", color: "text-teal-500", bg: "bg-teal-500/10", border: "hover:border-teal-500/30", gradient: "from-teal-500/10" },
-  { name: "Ginecología", icon: HeartPulse, description: "Salud femenina", color: "text-pink-500", bg: "bg-pink-500/10", border: "hover:border-pink-500/30", gradient: "from-pink-500/10" },
-  { name: "Ortopedia", icon: Award, description: "Lesiones óseas", color: "text-indigo-500", bg: "bg-indigo-500/10", border: "hover:border-indigo-500/30", gradient: "from-indigo-500/10" },
+  { name: "Medicina General", icon: Stethoscope, description: "Atención primaria y preventiva" },
+  { name: "Cardiología", icon: Heart, description: "Enfermedades cardiovasculares" },
+  { name: "Neurología", icon: Brain, description: "Trastornos del sistema nervioso" },
+  { name: "Oftalmología", icon: Eye, description: "Cirugías oculares y visión" },
+  { name: "Pediatría", icon: Baby, description: "Atención para niños" },
+  { name: "Dermatología", icon: Activity, description: "Tratamientos de piel" },
+  { name: "Ginecología", icon: HeartPulse, description: "Salud femenina" },
+  { name: "Ortopedia", icon: Award, description: "Lesiones óseas" },
 ];
 
 const FEATURES = [
@@ -70,13 +70,6 @@ const CONTACT_INFO = [
   { icon: Mail, label: "Email", value: "contacto@citamed.com" },
   { icon: MapPin, label: "Dirección", value: "Av. Principal 123, Ciudad de México" },
   { icon: Clock, label: "Horario", value: "Lun-Vie: 8AM-8PM | Sáb-Dom: 9AM-5PM" },
-];
-
-const navLinks = [
-  { href: "#specialties", label: "Especialidades" },
-  { href: "#features", label: "Servicios" },
-  { href: "#testimonials", label: "Testimonios" },
-  { href: "#contact", label: "Contacto" },
 ];
 
 function FloatingOrb({ className, delay = 0 }: { className: string; delay?: number }) {
@@ -127,8 +120,6 @@ const cardVariants = {
 };
 
 export default function PublicLandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
     <div className="min-h-screen bg-background relative">
       {/* Animated Background Orbs */}
@@ -139,85 +130,7 @@ export default function PublicLandingPage() {
       </div>
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] dark:opacity-[0.04] pointer-events-none -z-10" />
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border/20 bg-background/60 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20"
-              >
-                <HeartPulse className="h-5.5 w-5.5 text-primary-foreground" />
-              </motion.div>
-              <span className="text-xl font-bold tracking-tight text-foreground">CitasMed</span>
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <div className="hidden sm:flex items-center gap-2.5">
-                <Button variant="ghost" size="sm" className="text-sm rounded-xl px-4" asChild>
-                  <Link href="/login">Iniciar sesión</Link>
-                </Button>
-                <Button size="sm" className="text-sm rounded-xl px-4 shadow-lg shadow-primary/10" asChild>
-                  <Link href="/booking">Reservar Cita</Link>
-                </Button>
-              </div>
-
-              <button
-                className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Abrir menú"
-              >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-border/20 bg-background/95 backdrop-blur-2xl"
-          >
-            <div className="px-4 py-5 space-y-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="block py-2 text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="pt-4 border-t border-border/20 flex flex-col gap-2.5">
-                <Button variant="ghost" size="sm" className="w-full rounded-xl" asChild>
-                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Iniciar sesión</Link>
-                </Button>
-                <Button size="sm" className="w-full rounded-xl shadow-lg shadow-primary/10" asChild>
-                  <Link href="/booking" onClick={() => setMobileMenuOpen(false)}>Reservar Cita</Link>
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </header>
+      <PublicHeader />
 
       <main>
         {/* Hero Section */}
@@ -231,7 +144,7 @@ export default function PublicLandingPage() {
               >
                 <motion.div variants={itemVariants}>
                   <Badge variant="secondary" className="mb-6 py-1.5 px-4 bg-primary/5 text-primary border-primary/20 rounded-full font-medium inline-flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                    <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
                     Sistema de gestión médica premium
                   </Badge>
                 </motion.div>
@@ -241,7 +154,7 @@ export default function PublicLandingPage() {
                   className="text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl lg:text-7xl leading-tight"
                 >
                   Tu salud,{" "}
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-emerald-500/70 to-teal-500">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/75 to-info">
                     a un clic de distancia
                   </span>
                 </motion.h1>
@@ -256,7 +169,7 @@ export default function PublicLandingPage() {
 
                 <motion.div variants={itemVariants} className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button size="lg" className="w-full sm:w-auto px-8 text-base rounded-2xl bg-gradient-to-br from-primary to-primary/95 shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30" asChild>
+                    <Button size="lg" className="w-full sm:w-auto px-8 text-base bg-gradient-to-br from-primary to-primary/95 shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30" asChild>
                       <Link href="/booking">
                         <Calendar className="w-5 h-5" />
                         Reservar Cita
@@ -264,7 +177,7 @@ export default function PublicLandingPage() {
                       </Link>
                     </Button>
                   </motion.div>
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 text-base rounded-2xl border-border/80 hover:bg-muted/50" asChild>
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 text-base border-border/80 hover:bg-muted/50" asChild>
                     <Link href="#specialties">Ver Especialistas</Link>
                   </Button>
                 </motion.div>
@@ -272,11 +185,90 @@ export default function PublicLandingPage() {
                 <motion.div variants={itemVariants} className="mt-14 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
                   {["Sin filas de espera", "Confirmación inmediata", "100% seguro"].map((text) => (
                     <div key={text} className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4.5 h-4.5 text-emerald-500" />
+                      <CheckCircle2 className="w-4.5 h-4.5 text-primary" />
                       <span className="font-medium">{text}</span>
                     </div>
                   ))}
                 </motion.div>
+              </motion.div>
+
+              {/* Product preview */}
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const }}
+                className="mt-20 max-w-5xl mx-auto"
+              >
+                <div className="relative rounded-2xl border border-border/40 bg-card/80 backdrop-blur-xl shadow-2xl shadow-primary/10 p-6 sm:p-8 text-left">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                        Resumen de tu agenda
+                      </p>
+                      <p className="text-lg font-bold text-foreground">
+                        Tus próximas citas en un vistazo
+                      </p>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-2">
+                      <span className="rounded-full bg-primary/10 text-primary border border-primary/25 px-3 py-1 text-xs font-medium">
+                        Confirmada
+                      </span>
+                      <span className="rounded-full bg-muted text-muted-foreground border border-border px-3 py-1 text-xs font-medium">
+                        Pendiente
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="rounded-xl border border-border/60 bg-card p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <Stethoscope className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">Dr. Martín Pérez</p>
+                            <p className="text-xs text-muted-foreground">Cardiología · Hoy 09:30</p>
+                          </div>
+                        </div>
+                        <span className="rounded-full bg-success/15 text-success px-2.5 py-0.5 text-xs font-medium">
+                          Confirmada
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-3 border-t border-border/40">
+                        <span className="text-xs text-muted-foreground">Control cardiovascular</span>
+                        <Button size="sm" variant="soft" className="h-8 px-3 text-xs">
+                          <Video className="h-3.5 w-3.5 mr-1.5" />
+                          Unirme
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl border border-border/60 bg-card p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-xl bg-info/10 flex items-center justify-center">
+                            <Plus className="h-5 w-5 text-info" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">Nueva consulta</p>
+                            <p className="text-xs text-muted-foreground">Elegí especialista y horario</p>
+                          </div>
+                        </div>
+                        <Button size="sm" className="h-8 px-3 text-xs" asChild>
+                          <Link href="/booking">
+                            <Calendar className="h-3.5 w-3.5 mr-1.5" />
+                            Reservar
+                          </Link>
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between pt-3 border-t border-border/40">
+                        <span className="text-xs text-muted-foreground">8 especialidades disponibles</span>
+                        <span className="text-xs font-medium text-primary">Sin esperas</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             </div>
         </section>
@@ -342,21 +334,14 @@ export default function PublicLandingPage() {
                     variants={cardVariants}
                     whileHover={{ y: -8, scale: 1.02 }}
                     className={cn(
-                      "rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 text-center cursor-pointer transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/5 group relative overflow-hidden",
-                      "hover:border-primary/20",
-                      specialty.border
+                      "rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 text-center cursor-pointer transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/5 group relative overflow-hidden",
+                      "hover:border-primary/20"
                     )}
                   >
-                    <div className={cn(
-                      "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
-                      specialty.gradient
-                    )} />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="relative z-10">
-                      <div className={cn(
-                        "w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300",
-                        specialty.bg
-                      )}>
-                        <Icon className={cn("w-7 h-7", specialty.color)} />
+                      <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <Icon className="w-7 h-7 text-primary" />
                       </div>
                       <h3 className="font-bold text-base mb-1.5 text-foreground">{specialty.name}</h3>
                       <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{specialty.description}</p>
@@ -401,7 +386,7 @@ export default function PublicLandingPage() {
                     key={feature.title}
                     variants={itemVariants}
                     whileHover={{ y: -4 }}
-                    className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary/20"
+                    className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary/20"
                   >
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                       <Icon className="w-6 h-6 text-primary" />
@@ -444,7 +429,7 @@ export default function PublicLandingPage() {
                 <motion.div
                   key={testimonial.name}
                   variants={itemVariants}
-                  className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 hover:border-primary/20"
+                  className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 hover:border-primary/20"
                 >
                   <div>
                     <div className="flex gap-1 mb-4">
@@ -483,7 +468,7 @@ export default function PublicLandingPage() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={containerVariants}
-              className="rounded-3xl border border-border/20 shadow-2xl bg-card/50 backdrop-blur-xl p-8 md:p-16 text-center max-w-4xl mx-auto"
+              className="rounded-2xl border border-border/20 shadow-2xl bg-card/50 backdrop-blur-xl p-8 md:p-16 text-center max-w-4xl mx-auto"
             >
               <motion.h2 variants={itemVariants} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-4">
                 ¿Listo para agendar tu cita?
@@ -494,7 +479,7 @@ export default function PublicLandingPage() {
               </motion.p>
               <motion.div variants={itemVariants}>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button size="lg" className="px-10 text-base rounded-2xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30" asChild>
+                  <Button size="lg" className="px-10 text-base shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30" asChild>
                     <Link href="/booking">
                       <Calendar className="w-5 h-5" />
                       Reservar Ahora
@@ -537,7 +522,7 @@ export default function PublicLandingPage() {
                   <motion.div
                     key={contact.label}
                     variants={itemVariants}
-                    className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 text-center shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary/20"
+                    className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-6 text-center shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary/20"
                   >
                     <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <Icon className="w-5.5 h-5.5 text-primary" />
@@ -558,13 +543,8 @@ export default function PublicLandingPage() {
           <div className="py-16">
             <div className="grid md:grid-cols-4 gap-10 mb-12">
               <div className="md:col-span-2">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shadow-sm">
-                    <HeartPulse className="h-5 w-5 text-primary-foreground" />
-                  </div>
-                  <span className="text-lg font-bold tracking-tight text-foreground">CitasMed</span>
-                </div>
-                <p className="text-sm text-muted-foreground max-w-sm mb-4 leading-relaxed">
+                <Logo href="/" size="sm" className="mb-5" />
+                <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
                   Plataforma médica de última generación para la organización de consultas, especialidades y expedientes de pacientes.
                 </p>
               </div>

@@ -4,8 +4,9 @@ import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { motion } from "framer-motion";
-import { CheckCircle2, Calendar, Clock, User, Mail, ArrowLeft, Home, HeartPulse, Stethoscope } from "lucide-react";
+import { CheckCircle2, Calendar, Clock, User, Mail, ArrowLeft, Home, Stethoscope } from "lucide-react";
 import Link from "next/link";
+import { Logo } from "@/components/public/logo";
 
 interface ConfirmationClientProps {
   booking: {
@@ -50,20 +51,13 @@ export function ConfirmationClient({ booking }: ConfirmationClientProps) {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/">
-                <Button variant="ghost" size="sm" className="gap-2 rounded-xl">
+                <Button variant="ghost" size="sm" className="gap-2">
                   <ArrowLeft className="w-4 h-4" />
                   Volver
                 </Button>
               </Link>
-              <div className="hidden sm:flex items-center gap-3">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center shadow-sm shadow-primary/20"
-                >
-                  <HeartPulse className="h-5 w-5 text-primary-foreground" />
-                </motion.div>
-                <span className="text-lg font-semibold text-foreground">CitasMed</span>
+              <div className="hidden sm:flex items-center">
+                <Logo href="/" size="sm" />
               </div>
             </div>
             <div className="flex items-center gap-3">
