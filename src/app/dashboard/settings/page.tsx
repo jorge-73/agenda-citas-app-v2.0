@@ -160,7 +160,7 @@ export default function SettingsPage() {
         </TabsList>
 
         <TabsContent value="profile">
-          <div className="rounded-2xl border border-border/50 bg-card">
+          <div className="rounded-xl border border-border/50 bg-card">
             <div className="p-6 pb-2">
               <h3 className="text-lg font-semibold">Información del Perfil</h3>
               <p className="text-sm text-muted-foreground">Actualiza tu información personal</p>
@@ -174,7 +174,7 @@ export default function SettingsPage() {
                     placeholder="Tu nombre"
                     value={profile.name}
                     onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                    className="rounded-xl"
+                   
                   />
                 </div>
                 <div className="space-y-2">
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                     placeholder="tu@email.com"
                     value={profile.email}
                     onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                    className="rounded-xl"
+                   
                   />
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function SettingsPage() {
                   placeholder="+1234567890"
                   value={profile.phone}
                   onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                  className="rounded-xl"
+                 
                 />
               </div>
               <div className="space-y-2">
@@ -205,7 +205,7 @@ export default function SettingsPage() {
                   value={profile.timezone}
                   onValueChange={(value) => setProfile({ ...profile, timezone: value })}
                 >
-                  <SelectTrigger className="rounded-xl">
+                  <SelectTrigger>
                     <SelectValue placeholder="Selecciona zona horaria" />
                   </SelectTrigger>
                   <SelectContent>
@@ -215,7 +215,7 @@ export default function SettingsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleProfileSave} disabled={isLoading} className="rounded-xl">
+              <Button onClick={handleProfileSave} disabled={isLoading}>
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
@@ -224,7 +224,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="notifications">
-          <div className="rounded-2xl border border-border/50 bg-card">
+          <div className="rounded-xl border border-border/50 bg-card">
             <div className="p-6 pb-2">
               <h3 className="text-lg font-semibold">Configuración de Notificaciones</h3>
               <p className="text-sm text-muted-foreground">Administra cómo recibes notificaciones</p>
@@ -266,7 +266,7 @@ export default function SettingsPage() {
                   />
                 </div>
               ))}
-              <Button onClick={handlePreferencesSave} disabled={isLoading} className="rounded-xl">
+              <Button onClick={handlePreferencesSave} disabled={isLoading}>
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Guardando..." : "Guardar cambios"}
               </Button>
@@ -275,7 +275,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="appearance">
-          <div className="rounded-2xl border border-border/50 bg-card">
+          <div className="rounded-xl border border-border/50 bg-card">
             <div className="p-6 pb-2">
               <h3 className="text-lg font-semibold">Apariencia</h3>
               <p className="text-sm text-muted-foreground">Personaliza la apariencia del sistema</p>
@@ -284,7 +284,7 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label>Tema</Label>
                 <Select value={theme} onValueChange={setTheme}>
-                  <SelectTrigger className="rounded-xl">
+                  <SelectTrigger>
                     <SelectValue placeholder="Selecciona tema" />
                   </SelectTrigger>
                   <SelectContent>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label>Idioma</Label>
                 <Select defaultValue="es-MX">
-                  <SelectTrigger className="rounded-xl">
+                  <SelectTrigger>
                     <SelectValue placeholder="Selecciona idioma" />
                   </SelectTrigger>
                   <SelectContent>
@@ -312,7 +312,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="security">
-          <div className="rounded-2xl border border-border/50 bg-card">
+          <div className="rounded-xl border border-border/50 bg-card">
             <div className="p-6 pb-2">
               <h3 className="text-lg font-semibold">Seguridad</h3>
               <p className="text-sm text-muted-foreground">Configura las opciones de seguridad</p>
@@ -327,7 +327,7 @@ export default function SettingsPage() {
                     placeholder="••••••••"
                     value={passwordForm.currentPassword}
                     onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                    className="rounded-xl"
+                   
                   />
                 </div>
                 <div className="space-y-2">
@@ -338,7 +338,7 @@ export default function SettingsPage() {
                     placeholder="••••••••"
                     value={passwordForm.newPassword}
                     onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                    className="rounded-xl"
+                   
                   />
                 </div>
                 <div className="space-y-2">
@@ -349,13 +349,13 @@ export default function SettingsPage() {
                     placeholder="••••••••"
                     value={passwordForm.confirmPassword}
                     onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                    className="rounded-xl"
+                   
                   />
                 </div>
                 <Button
                   onClick={handlePasswordChange}
                   disabled={passwordLoading}
-                  className="rounded-xl"
+                 
                 >
                   {passwordLoading ? (
                     <>

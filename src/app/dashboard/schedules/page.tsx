@@ -71,7 +71,7 @@ export default function SchedulesPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {specialists.map((specialist) => (
-            <div key={specialist.id} className="rounded-2xl border border-border/50 bg-card">
+            <div key={specialist.id} className="rounded-xl border border-border/50 bg-card">
               <div className="p-5 pb-2">
                 <div className="flex items-center justify-between">
                   <div>
@@ -142,7 +142,7 @@ export default function SchedulesPage() {
       )}
 
       {specialists.length === 0 && !isLoading && (
-        <div className="rounded-2xl border border-border/50 bg-card py-12 text-center">
+        <div className="rounded-xl border border-border/50 bg-card py-12 text-center">
           <div className="p-6">
             <Clock className="h-12 w-12 mx-auto text-muted-foreground/40 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Sin especialistas</h3>

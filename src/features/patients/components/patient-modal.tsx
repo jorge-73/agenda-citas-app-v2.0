@@ -143,12 +143,12 @@ export function PatientModal({
             <div className="space-y-2">
               <Label htmlFor="name">Nombre completo *</Label>
               <Input {...register("name")} placeholder="Juan Pérez" />
-              {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+              {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email *</Label>
               <Input type="email" {...register("email")} placeholder="juan@ejemplo.com" />
-              {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Teléfono</Label>

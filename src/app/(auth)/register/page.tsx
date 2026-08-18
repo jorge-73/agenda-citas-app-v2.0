@@ -116,7 +116,7 @@ export default function RegisterPage() {
                 key={req.label}
                 className={cn(
                   "flex items-center gap-1 text-xs",
-                  req.test(password) ? "text-green-600" : "text-muted-foreground"
+                  req.test(password) ? "text-success" : "text-muted-foreground"
                 )}
               >
                 <CheckCircle2 className="h-3 w-3 shrink-0" />

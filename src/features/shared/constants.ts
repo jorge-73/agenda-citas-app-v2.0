@@ -8,10 +8,10 @@ export const ROLE_LABELS: Record<string, string> = {
 };
 
 export const ROLE_COLORS: Record<string, string> = {
-  ADMIN: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-  SPECIALIST: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  RECEPTIONIST: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  PATIENT: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  ADMIN: "bg-primary/15 text-primary border border-primary/25",
+  SPECIALIST: "bg-info/15 text-info border border-info/25",
+  RECEPTIONIST: "bg-warning/15 text-warning border border-warning/25",
+  PATIENT: "bg-success/15 text-success border border-success/25",
 };
 
 // ─── Days of Week ──────────────────────────────────────────────────

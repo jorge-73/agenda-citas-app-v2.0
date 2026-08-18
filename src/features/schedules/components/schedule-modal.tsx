@@ -115,7 +115,7 @@ export function ScheduleModal({ open, onOpenChange, onSuccess }: ScheduleModalPr
               </SelectContent>
             </Select>
             {errors.specialistId && (
-              <p className="text-sm text-red-500">{errors.specialistId.message}</p>
+              <p className="text-sm text-destructive">{errors.specialistId.message}</p>
             )}
           </div>
 
@@ -137,7 +137,7 @@ export function ScheduleModal({ open, onOpenChange, onSuccess }: ScheduleModalPr
               </SelectContent>
             </Select>
             {errors.dayOfWeek && (
-              <p className="text-sm text-red-500">{errors.dayOfWeek.message}</p>
+              <p className="text-sm text-destructive">{errors.dayOfWeek.message}</p>
             )}
           </div>
 
@@ -146,14 +146,14 @@ export function ScheduleModal({ open, onOpenChange, onSuccess }: ScheduleModalPr
               <Label htmlFor="startTime">Hora de inicio</Label>
               <Input type="time" {...register("startTime")} />
               {errors.startTime && (
-                <p className="text-sm text-red-500">{errors.startTime.message}</p>
+                <p className="text-sm text-destructive">{errors.startTime.message}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="endTime">Hora de fin</Label>
               <Input type="time" {...register("endTime")} />
               {errors.endTime && (
-                <p className="text-sm text-red-500">{errors.endTime.message}</p>
+                <p className="text-sm text-destructive">{errors.endTime.message}</p>
               )}
             </div>
           </div>

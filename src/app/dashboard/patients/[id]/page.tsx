@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { formatDate } from "@/lib/utils";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { ArrowLeft, User, Phone, Calendar, FileText, Activity, Stethoscope, Clock, Building2, HeartPulse } from "lucide-react";
 
 export default async function PatientDetailPage({
@@ -30,21 +31,6 @@ export default async function PatientDetailPage({
 
   if (!patient) notFound();
 
-  const statusColors: Record<string, string> = {
-    PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-    CONFIRMED: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-    CANCELLED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    COMPLETED: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-    ABSENT: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400",
-  };
-  const statusLabels: Record<string, string> = {
-    PENDING: "Pendiente",
-    CONFIRMED: "Confirmada",
-    CANCELLED: "Cancelada",
-    COMPLETED: "Finalizada",
-    ABSENT: "Ausente",
-  };
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -67,7 +53,7 @@ export default async function PatientDetailPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
-          <div className="rounded-2xl border border-border/50 bg-card overflow-hidden">
+          <div className="rounded-xl border border-border/50 bg-card overflow-hidden">
             <div className="bg-gradient-to-br from-primary/20 via-primary/5 to-transparent p-6 text-center">
               <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
                 <User className="h-10 w-10 text-primary" />
@@ -124,7 +110,7 @@ export default async function PatientDetailPage({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border/50 bg-card p-5">
+          <div className="rounded-xl border border-border/50 bg-card p-5">
             <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
               <HeartPulse className="h-4 w-4 text-primary" />
               Información médica
@@ -155,7 +141,7 @@ export default async function PatientDetailPage({
         </div>
 
         <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-2xl border border-border/50 bg-card">
+          <div className="rounded-xl border border-border/50 bg-card">
             <div className="p-5 border-b border-border/50 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <Clock className="h-4 w-4 text-primary" />
@@ -194,9 +180,7 @@ export default async function PatientDetailPage({
                           )}
                         </div>
                       </div>
-                      <span className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${statusColors[apt.status] || ""}`}>
-                        {statusLabels[apt.status] || apt.status}
-                      </span>
+                      <StatusBadge status={apt.status} />
                     </div>
                   </div>
                 ))}

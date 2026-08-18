@@ -132,7 +132,7 @@ export default function BlockedDatesPage() {
       header: "Recurrente",
       cell: ({ row }) =>
         row.original.isRecurring ? (
-          <span className="text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 px-2.5 py-1 rounded-full border border-amber-200 dark:border-amber-800">
+          <span className="text-xs font-medium text-warning bg-warning/15 dark:bg-warning/15 px-2.5 py-1 rounded-full border border-warning/25">
             Cada año
           </span>
         ) : (
