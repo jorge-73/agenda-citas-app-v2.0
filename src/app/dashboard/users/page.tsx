@@ -135,24 +135,41 @@ export default function UsersPage() {
     }),
     columnHelper.accessor("role", {
       header: "Rol",
-      cell: ({ row }) => (
-        <Select
-          value={row.original.role}
-          onValueChange={(value) => handleRoleChange(row.original.id, value)}
-        >
-          <SelectTrigger className={cn(
-            "w-36 h-8 text-xs rounded-lg font-medium",
-            ROLE_COLORS[row.original.role] || ""
-          )}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(ROLE_LABELS).map(([key, label]) => (
-              <SelectItem key={key} value={key}>{label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      ),
+      cell: ({ row }) => {
+        const isAdmin = row.original.role === "ADMIN";
+        return isAdmin ? (
+          <Select value="ADMIN" disabled>
+            <SelectTrigger className={cn(
+              "w-36 h-8 text-xs rounded-lg font-medium",
+              ROLE_COLORS.ADMIN || ""
+            )}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ADMIN">Administrador</SelectItem>
+            </SelectContent>
+          </Select>
+        ) : (
+          <Select
+            value={row.original.role}
+            onValueChange={(value) => handleRoleChange(row.original.id, value)}
+          >
+            <SelectTrigger className={cn(
+              "w-36 h-8 text-xs rounded-lg font-medium",
+              ROLE_COLORS[row.original.role] || ""
+            )}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(ROLE_LABELS)
+                .filter(([key]) => key !== "ADMIN")
+                .map(([key, label]) => (
+                  <SelectItem key={key} value={key}>{label}</SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        );
+      },
     }),
     columnHelper.accessor("createdAt", {
       header: "Registro",
@@ -229,9 +246,11 @@ export default function UsersPage() {
                   <SelectValue placeholder="Seleccionar rol" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(ROLE_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
-                  ))}
+                  {Object.entries(ROLE_LABELS)
+                    .filter(([key]) => key !== "ADMIN")
+                    .map(([key, label]) => (
+                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               {errors.role && <p className="text-xs text-destructive">{errors.role.message}</p>}

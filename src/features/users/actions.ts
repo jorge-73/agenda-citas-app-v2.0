@@ -39,6 +39,10 @@ export async function createUserAction(data: {
   await requirePermission("manage:users");
   validateInput(createUserSchema, data);
 
+  if (data.role === "ADMIN") {
+    throw new Error("Solo puede existir un administrador");
+  }
+
   const existing = await db.user.findUnique({ where: { email: data.email } });
   if (existing) throw new Error("El email ya está registrado");
 
@@ -63,6 +67,18 @@ export async function updateUserRoleAction(userId: string, role: string) {
   const parsedRole = z.enum(["ADMIN", "SPECIALIST", "RECEPTIONIST", "PATIENT"]).safeParse(role);
   if (!parsedRole.success) throw new Error("Rol inválido");
 
+  const targetUser = await db.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+  if (!targetUser) throw new Error("Usuario no encontrado");
+  if (targetUser.role === "ADMIN") {
+    throw new Error("No se puede modificar el rol del administrador");
+  }
+  if (parsedRole.data === "ADMIN") {
+    throw new Error("Solo puede existir un administrador");
+  }
+
   return db.user.update({
     where: { id: userId },
     data: { role: parsedRole.data },
@@ -82,6 +98,10 @@ export async function deleteUserAction(userId: string) {
   });
 
   if (!existingUser) throw new Error("Usuario no encontrado");
+
+  if (existingUser.role === "ADMIN") {
+    throw new Error("No se puede eliminar el administrador");
+  }
 
   const relatedAppointments = await db.appointment.count({
     where: {
