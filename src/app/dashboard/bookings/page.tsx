@@ -62,8 +62,12 @@ export default function BookingsPage() {
 
   const handleConfirm = async (id: string) => {
     try {
-      await confirmBookingAction(id);
-      toast.success("Reserva confirmada correctamente");
+      const result = await confirmBookingAction(id);
+      if (result.appointmentCreated) {
+        toast.success("Reserva confirmada y cita creada en el calendario");
+      } else {
+        toast.success("Reserva confirmada. El paciente no tiene cuenta registrada, no se creó cita automáticamente");
+      }
       fetchBookings();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error al confirmar reserva");

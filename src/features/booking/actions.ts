@@ -315,5 +315,30 @@ export async function confirmBookingAction(id: string) {
     where: { id },
     data: { status: "CONFIRMED" },
   });
-  return { success: true };
+
+  const user = await db.user.findUnique({
+    where: { email: booking.patientEmail },
+    include: { patient: true },
+  });
+
+  if (user?.patient) {
+    const [hours, minutes] = booking.time.split(":").map(Number);
+    const startTime = new Date(booking.date);
+    startTime.setUTCHours(hours, minutes, 0, 0);
+    const endTime = new Date(startTime);
+    endTime.setUTCHours(hours, minutes + 30, 0, 0);
+
+    await db.appointment.create({
+      data: {
+        patientId: user.patient.id,
+        specialistId: booking.specialistId,
+        startTime,
+        endTime,
+        reason: booking.reason || `Consulta - ${booking.specialty}`,
+        status: "PENDING",
+      },
+    });
+  }
+
+  return { success: true, appointmentCreated: !!user?.patient };
 }
