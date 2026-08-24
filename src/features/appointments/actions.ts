@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import type { AppointmentStatus } from "./types";
-import { format } from "date-fns";
+import { format, endOfDay } from "date-fns";
 import { requirePermission, validateInput } from "@/lib/action-helpers";
 import { APPOINTMENT_STATUSES } from "@/lib/constants";
 import { toUTC, AR_TZ } from "@/lib/date-utils";
@@ -87,7 +87,7 @@ export async function getAppointmentsByMonth(year: number, month: number) {
     scopedPatientId = patient.id;
   }
   const startOfMonth = new Date(year, month, 1);
-  const endOfMonth = new Date(year, month + 1, 0);
+  const endOfMonth = endOfDay(new Date(year, month + 1, 0));
   
   const appointments = await db.appointment.findMany({
     where: {

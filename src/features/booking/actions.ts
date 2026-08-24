@@ -64,11 +64,12 @@ export async function getAvailableDatesAction(specialistId: string) {
   const days = eachDayOfInterval({ start: today, end: endDate });
 
   for (const day of days) {
-    const dayOfWeek = day.getDay();
+    const arMidnight = toUTC(startOfDay(day), AR_TZ);
+    const dayOfWeek = arMidnight.getDay();
     const schedule = schedules.find((s) => s.dayOfWeek === dayOfWeek);
 
-    if (schedule && !blockedDatesSet.has(format(day, "yyyy-MM-dd"))) {
-      availableDates.push(day);
+    if (schedule && !blockedDatesSet.has(format(arMidnight, "yyyy-MM-dd"))) {
+      availableDates.push(arMidnight);
     }
   }
 
@@ -188,10 +189,8 @@ export async function createBookingAction(data: {
     throw new Error("La fecha y hora de la cita deben ser futuras");
   }
 
-  const utcDate = toUTC(data.date, AR_TZ);
-
-  const dayStart = startOfDay(utcDate);
-  const dayEnd = endOfDay(utcDate);
+  const dayStart = startOfDay(data.date);
+  const dayEnd = endOfDay(data.date);
 
   const booking = await db.$transaction(async (tx) => {
     const existingAppointment = await tx.appointment.findFirst({
@@ -231,7 +230,7 @@ export async function createBookingAction(data: {
         specialistId: data.specialistId,
         specialty: data.specialty,
         reason: data.reason,
-        date: utcDate,
+        date: data.date,
         time: data.time,
         status: "PENDING",
       },
@@ -251,7 +250,7 @@ export async function createBookingAction(data: {
       patientLastname: data.patientLastname,
       specialistName: specialist?.user.name || "Especialista",
       specialty: data.specialty,
-      date: format(utcDate, "dd/MM/yyyy"),
+      date: format(data.date, "dd/MM/yyyy"),
       time: data.time,
       reason: data.reason,
     });
@@ -323,10 +322,10 @@ export async function confirmBookingAction(id: string) {
 
   if (user?.patient) {
     const [hours, minutes] = booking.time.split(":").map(Number);
-    const startTime = new Date(booking.date);
-    startTime.setUTCHours(hours, minutes, 0, 0);
-    const endTime = new Date(startTime);
-    endTime.setUTCHours(hours, minutes + 30, 0, 0);
+    const slotDate = new Date(booking.date);
+    slotDate.setHours(hours, minutes, 0, 0);
+    const startTime = toUTC(slotDate, AR_TZ);
+    const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
 
     await db.appointment.create({
       data: {
