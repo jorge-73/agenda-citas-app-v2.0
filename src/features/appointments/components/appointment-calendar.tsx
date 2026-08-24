@@ -16,6 +16,7 @@ import { Plus, Clock } from "lucide-react";
 interface AppointmentCalendarProps {
   appointments: Appointment[];
   onAppointmentClick?: (appointment: Appointment) => void;
+  onDateChange?: (date: Date) => void;
 }
 
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 8); // 8:00 - 20:00
@@ -24,6 +25,7 @@ const DAYS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "
 export function AppointmentCalendar({
   appointments,
   onAppointmentClick,
+  onDateChange,
 }: AppointmentCalendarProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null);
@@ -38,7 +40,7 @@ export function AppointmentCalendar({
     goToToday,
     changeView,
     selectDate,
-  } = useCalendar();
+  } = useCalendar({ onDateChange });
 
   const events = useCalendarEvents(appointments);
 

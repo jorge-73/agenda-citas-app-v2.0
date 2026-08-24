@@ -30,6 +30,7 @@ export default function AppointmentsPage() {
   const [filters, setFilters] = useState<AppointmentFiltersState>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const role = useAuthStore((s) => s.user?.role);
   const isPatient = role === "PATIENT";
@@ -47,13 +48,12 @@ export default function AppointmentsPage() {
         setIsLoading(false);
       });
     } else {
-      const now = new Date();
-      getAppointmentsByMonth(now.getFullYear(), now.getMonth()).then((data) => {
+      getAppointmentsByMonth(currentDate.getFullYear(), currentDate.getMonth()).then((data) => {
         setAppointments(data);
         setIsLoading(false);
       });
     }
-  }, [filters]);
+  }, [filters, currentDate]);
 
   useEffect(() => {
     fetchAppointments();
@@ -162,6 +162,7 @@ export default function AppointmentsPage() {
             <AppointmentCalendar
               appointments={appointments}
               onAppointmentClick={handleAppointmentClick}
+              onDateChange={setCurrentDate}
             />
           </motion.div>
         )}
