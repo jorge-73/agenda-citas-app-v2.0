@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { requirePermission, validateInput } from "@/lib/action-helpers";
 import { TIME_REGEX } from "@/lib/constants";
+import { publicUserSelect } from "@/lib/prisma-selects";
 import { z } from "zod";
 
 const createScheduleSchema = z.object({
@@ -16,10 +17,16 @@ const createScheduleSchema = z.object({
 });
 
 export async function getSpecialistsWithSchedules() {
-  await requirePermission("view:schedules");
+  const user = await requirePermission("view:schedules");
+  const specialistScope =
+    user.role === "SPECIALIST"
+      ? await db.specialist.findUnique({ where: { userId: user.id }, select: { id: true } })
+      : null;
+  if (user.role === "SPECIALIST" && !specialistScope) return [];
   const specialists = await db.specialist.findMany({
+    where: specialistScope ? { id: specialistScope.id } : undefined,
     include: {
-      user: true,
+      user: { select: publicUserSelect },
     },
     orderBy: {
       user: { name: "asc" },
@@ -46,13 +53,22 @@ export async function createSchedule(data: {
   startTime: string;
   endTime: string;
 }) {
-  await requirePermission("manage:schedules");
-  validateInput(createScheduleSchema, data);
+  const user = await requirePermission("manage:schedules");
+  const parsedData = validateInput(createScheduleSchema, data);
+  if (user.role === "SPECIALIST") {
+    const specialist = await db.specialist.findUnique({
+      where: { userId: user.id },
+      select: { id: true },
+    });
+    if (!specialist || specialist.id !== parsedData.specialistId) {
+      throw new Error("No puedes modificar el horario de otro especialista");
+    }
+  }
 
   const existing = await db.schedule.findFirst({
     where: {
-      specialistId: data.specialistId,
-      dayOfWeek: data.dayOfWeek,
+      specialistId: parsedData.specialistId,
+      dayOfWeek: parsedData.dayOfWeek,
     },
   });
 
@@ -60,18 +76,18 @@ export async function createSchedule(data: {
     await db.schedule.update({
       where: { id: existing.id },
       data: {
-        startTime: data.startTime,
-        endTime: data.endTime,
+        startTime: parsedData.startTime,
+        endTime: parsedData.endTime,
         isActive: true,
       },
     });
   } else {
     await db.schedule.create({
       data: {
-        specialistId: data.specialistId,
-        dayOfWeek: data.dayOfWeek,
-        startTime: data.startTime,
-        endTime: data.endTime,
+        specialistId: parsedData.specialistId,
+        dayOfWeek: parsedData.dayOfWeek,
+        startTime: parsedData.startTime,
+        endTime: parsedData.endTime,
         isActive: true,
       },
     });
@@ -79,9 +95,19 @@ export async function createSchedule(data: {
 }
 
 export async function deleteSchedule(id: string) {
-  await requirePermission("manage:schedules");
+  const user = await requirePermission("manage:schedules");
   const parsed = z.string().min(1, "ID requerido").safeParse(id);
   if (!parsed.success) throw new Error("ID de horario inválido");
+
+  if (user.role === "SPECIALIST") {
+    const schedule = await db.schedule.findUnique({
+      where: { id },
+      select: { specialist: { select: { userId: true } } },
+    });
+    if (!schedule || schedule.specialist.userId !== user.id) {
+      throw new Error("No puedes eliminar el horario de otro especialista");
+    }
+  }
 
   await db.schedule.update({
     where: { id },

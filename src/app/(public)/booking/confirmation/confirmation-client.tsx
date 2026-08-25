@@ -25,23 +25,11 @@ interface ConfirmationClientProps {
 }
 
 export function ConfirmationClient({ booking }: ConfirmationClientProps) {
-  const maskEmail = (email: string) => {
-    const [user, domain] = email.split("@");
-    if (!domain) return email;
-    const visible = user.slice(0, 3);
-    return `${visible}${"*".repeat(Math.max(user.length - 3, 3))}@${domain}`;
-  };
-
-  const maskPhone = (phone: string) => {
-    if (phone.length < 6) return phone;
-    return `${phone.slice(0, 3)}${"*".repeat(Math.max(phone.length - 6, 3))}${phone.slice(-3)}`;
-  };
-
   const details = [
     { icon: User, label: "Profesional", value: booking.specialist?.user?.name || "Especialista", sub: booking.specialist?.specialty },
     { icon: Calendar, label: "Fecha", value: formatInTz(new Date(booking.date), "EEEE d 'de' MMMM 'de' yyyy", AR_TZ) },
     { icon: Clock, label: "Hora", value: booking.time },
-    { icon: Mail, label: "Email de contacto", value: maskEmail(booking.patientEmail), sub: maskPhone(booking.patientPhone) },
+    { icon: Mail, label: "Email de contacto", value: booking.patientEmail, sub: booking.patientPhone },
   ];
 
   return (

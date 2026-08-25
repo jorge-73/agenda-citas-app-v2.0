@@ -87,7 +87,8 @@ export function useCalendar(options?: UseCalendarOptions) {
   const selectDate = useCallback((date: Date) => {
     setSelectedDate(date);
     setCurrentDate(date);
-  }, []);
+    options?.onDateChange?.(date);
+  }, [options]);
 
   const dateRange = useMemo(() => {
     switch (view) {

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 import { MAX_LIMIT } from "@/lib/constants";
+import { contactUserSelect } from "@/lib/prisma-selects";
 import { SpecialistFilters, CreateSpecialistInput, UpdateSpecialistInput } from "../types";
 
 export const specialistService = {
@@ -12,7 +13,7 @@ export const specialistService = {
         isAvailable: input.isAvailable ?? true,
       },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
         schedules: true,
       },
     });
@@ -27,7 +28,7 @@ export const specialistService = {
         updatedAt: new Date(),
       },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
         schedules: true,
       },
     });
@@ -43,7 +44,7 @@ export const specialistService = {
     return db.specialist.findUnique({
       where: { id },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
         schedules: {
           where: { isActive: true },
           orderBy: { dayOfWeek: "asc" },
@@ -52,7 +53,7 @@ export const specialistService = {
           include: {
             patient: {
               include: {
-                user: true,
+                user: { select: contactUserSelect },
               },
             },
           },
@@ -88,7 +89,7 @@ export const specialistService = {
       db.specialist.findMany({
         where,
         include: {
-          user: true,
+          user: { select: contactUserSelect },
           schedules: {
             where: { isActive: true },
           },
@@ -124,7 +125,7 @@ export const specialistService = {
         ],
       },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
       },
       take: Math.min(limit, MAX_LIMIT),
     });
@@ -134,7 +135,7 @@ export const specialistService = {
     return db.specialist.findUnique({
       where: { userId },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
         schedules: true,
       },
     });
@@ -171,7 +172,7 @@ export const specialistService = {
         updatedAt: new Date(),
       },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
       },
     });
   },
@@ -184,7 +185,7 @@ export const specialistService = {
     return db.specialist.findMany({
       where: { isAvailable: true },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
         schedules: {
           where: { isActive: true },
         },

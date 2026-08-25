@@ -80,7 +80,7 @@ export async function sendChatMessage(input: unknown): Promise<ChatServiceResult
   const permissions = role ? ROLE_PERMISSIONS[role] ?? [] : [];
 
   const rateLimitKey = await getRateLimitKey();
-  const rateLimit = checkRateLimit(
+  const rateLimit = await checkRateLimit(
     rateLimitKey,
     CHATBOT_RATE_LIMIT.max,
     CHATBOT_RATE_LIMIT.windowMs

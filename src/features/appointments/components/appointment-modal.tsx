@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { addMinutes } from "date-fns";
 import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -109,15 +108,12 @@ export function AppointmentModal({
   const onSubmit = async (data: AppointmentFormData) => {
     setIsLoading(true);
     try {
-      const startDateTime = new Date(`${data.date}T${data.startTime}`);
-      const endDateTime = addMinutes(startDateTime, 30);
-
       if (isEdit && initialData?.id) {
         await updateAppointment(initialData.id, {
           patientId: data.patientId,
           specialistId: data.specialistId,
-          startTime: startDateTime,
-          endTime: endDateTime,
+          date: data.date,
+          time: data.startTime,
           reason: data.reason,
           notes: data.notes,
         });
@@ -126,8 +122,8 @@ export function AppointmentModal({
         await createAppointment({
           patientId: data.patientId,
           specialistId: data.specialistId,
-          startTime: startDateTime,
-          endTime: endDateTime,
+          date: data.date,
+          time: data.startTime,
           reason: data.reason,
           notes: data.notes,
         });
@@ -169,7 +165,7 @@ export function AppointmentModal({
                 value={watch("patientId")}
                 onValueChange={(value) => setValue("patientId", value)}
               >
-                <SelectTrigger className={cn(
+                <SelectTrigger id="patientId" className={cn(
                   "h-11 bg-card border-border",
                   errors.patientId && "border-destructive focus:border-destructive"
                 )}>
@@ -201,7 +197,7 @@ export function AppointmentModal({
                 value={watch("specialistId")}
                 onValueChange={(value) => setValue("specialistId", value)}
               >
-                <SelectTrigger className={cn(
+                <SelectTrigger id="specialistId" className={cn(
                   "h-11 bg-card border-border",
                   errors.specialistId && "border-destructive focus:border-destructive"
                 )}>

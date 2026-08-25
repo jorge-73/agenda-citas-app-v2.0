@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { MAX_LIMIT } from "@/lib/constants";
 import { requirePermission } from "@/lib/action-helpers";
+import { contactUserSelect, publicUserSelect } from "@/lib/prisma-selects";
 import { 
   startOfDay, 
   endOfDay,
@@ -118,7 +119,7 @@ export async function getDashboardStats(startDate: Date, endDate: Date): Promise
       include: {
         specialist: {
           include: {
-            user: true
+            user: { select: publicUserSelect }
           }
         }
       }
@@ -215,7 +216,7 @@ export async function getRevenueBySpecialist(startDate: Date, endDate: Date): Pr
     include: {
       specialist: {
         include: {
-          user: true
+          user: { select: publicUserSelect }
         }
       }
     }
@@ -288,12 +289,12 @@ export async function getTodayAppointments(): Promise<AppointmentWithDetails[]> 
     include: {
       patient: {
         include: {
-          user: true
+          user: { select: contactUserSelect }
         }
       },
       specialist: {
         include: {
-          user: true
+          user: { select: publicUserSelect }
         }
       }
     },
@@ -318,7 +319,7 @@ export async function getRecentPatients(limit: number = 10): Promise<RecentPatie
   await requirePermission("view:dashboard");
   const patients = await db.patient.findMany({
     include: {
-      user: true
+      user: { select: contactUserSelect }
     },
     orderBy: {
       createdAt: "desc"
@@ -346,14 +347,14 @@ export async function getRecentActivity(limit: number = 20): Promise<ActivityIte
       take: 10,
       orderBy: { createdAt: "desc" },
       include: {
-        patient: { include: { user: true } },
-        specialist: { include: { user: true } }
+        patient: { include: { user: { select: publicUserSelect } } },
+        specialist: { include: { user: { select: publicUserSelect } } }
       }
     }),
     db.patient.findMany({
       take: 5,
       orderBy: { createdAt: "desc" },
-      include: { user: true }
+      include: { user: { select: publicUserSelect } }
     }),
     db.booking.findMany({
       take: 5,

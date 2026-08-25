@@ -2,11 +2,12 @@ import { Suspense } from "react";
 import { db } from "@/lib/db";
 import { LoadingState } from "@/components/shared/loading-state";
 import { SpecialistsPageClient } from "./specialists-page-client";
+import { contactUserSelect } from "@/lib/prisma-selects";
 
 async function getSpecialists() {
   return db.specialist.findMany({
     include: {
-      user: true,
+      user: { select: contactUserSelect },
       schedules: {
         where: { isActive: true },
       },

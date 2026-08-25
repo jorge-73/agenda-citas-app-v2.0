@@ -2,7 +2,7 @@ datasource db {
   provider     = "postgresql"
   url          = env("DATABASE_URL")
   directUrl    = env("DIRECT_URL")
-  relationMode = "prisma"
+  relationMode = "foreignKeys"
 }
 
 generator client {
@@ -98,6 +98,7 @@ model Patient {
 
 model Appointment {
   id            String   @id @default(cuid())
+  bookingId     String?  @unique
   patientId     String
   specialistId  String
   startTime     DateTime
@@ -107,11 +108,13 @@ model Appointment {
   notes         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  booking       Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   patient       Patient  @relation(fields: [patientId], references: [id])
   specialist    Specialist @relation(fields: [specialistId], references: [id])
 
   @@index([startTime])
   @@index([specialistId])
+  @@index([specialistId, startTime])
   @@index([patientId])
 }
 
@@ -146,6 +149,15 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 }
 
+model RateLimit {
+  key       String   @id
+  count     Int
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([resetAt])
+}
+
 model BlockedDate {
   id          String    @id @default(cuid())
   date        DateTime
@@ -169,7 +181,9 @@ model Booking {
   time             String
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+  appointment      Appointment?
 
   @@index([specialistId])
   @@index([date])
+  @@index([specialistId, date, time])
 }

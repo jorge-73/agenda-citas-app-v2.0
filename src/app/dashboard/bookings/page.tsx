@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { formatInTz, AR_TZ } from "@/lib/date-utils";
 import { PageHeader } from "@/components/layout/page-header";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
@@ -99,7 +98,7 @@ export default function BookingsPage() {
     },
     {
       header: "Fecha",
-      accessorFn: (row) => format(new Date(row.date), "dd/MM/yyyy", { locale: es }),
+      accessorFn: (row) => formatInTz(new Date(row.date), "dd/MM/yyyy", AR_TZ),
     },
     {
       header: "Hora",

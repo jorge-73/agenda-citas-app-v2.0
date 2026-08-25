@@ -4,9 +4,12 @@ import {
   CreateAppointmentInput,
   UpdateAppointmentInput,
   AppointmentFilters,
-  AppointmentStatus
+  AppointmentStatus,
 } from "../types";
 import { MAX_LIMIT } from "@/lib/constants";
+import { AR_TZ, formatInTz, getZonedDayRange } from "@/lib/date-utils";
+import { contactUserSelect } from "@/lib/prisma-selects";
+import { lockAppointmentSlot } from "@/lib/slot-lock";
 
 const VALID_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
   PENDING: ["CONFIRMED", "CANCELLED"],
@@ -16,6 +19,19 @@ const VALID_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
   ABSENT: [],
 };
 
+const appointmentDetailsInclude = {
+  patient: {
+    include: {
+      user: { select: contactUserSelect },
+    },
+  },
+  specialist: {
+    include: {
+      user: { select: contactUserSelect },
+    },
+  },
+} as const;
+
 function validateTransition(from: AppointmentStatus, to: AppointmentStatus): void {
   if (from === to) return;
   const allowed = VALID_TRANSITIONS[from];
@@ -24,19 +40,81 @@ function validateTransition(from: AppointmentStatus, to: AppointmentStatus): voi
   }
 }
 
+async function syncLinkedBooking(
+  tx: Prisma.TransactionClient,
+  current: { bookingId: string | null },
+  data: {
+    patientId?: string;
+    specialistId?: string;
+    startTime?: Date;
+    reason?: string | null;
+    status?: AppointmentStatus;
+  }
+) {
+  if (!current.bookingId) return;
+
+  const bookingData: Prisma.BookingUpdateInput = {};
+  if (data.patientId !== undefined) bookingData.patientId = data.patientId;
+  if (data.reason !== undefined) bookingData.reason = data.reason;
+  if (data.startTime) {
+    const { start } = getZonedDayRange(data.startTime, AR_TZ);
+    bookingData.date = start;
+    bookingData.time = formatInTz(data.startTime, "HH:mm", AR_TZ);
+  }
+  if (data.specialistId) {
+    const specialist = await tx.specialist.findUnique({
+      where: { id: data.specialistId },
+      select: { specialty: true },
+    });
+    if (!specialist) throw new Error("Especialista no encontrado");
+    bookingData.specialistId = data.specialistId;
+    bookingData.specialty = specialist.specialty;
+  }
+  if (data.status === "CANCELLED") bookingData.status = "CANCELLED";
+  if (data.status === "CONFIRMED") bookingData.status = "CONFIRMED";
+
+  if (Object.keys(bookingData).length > 0) {
+    await tx.booking.update({
+      where: { id: current.bookingId },
+      data: bookingData,
+    });
+  }
+}
+
+function getOverlapWhere(
+  specialistId: string,
+  startTime: Date,
+  endTime: Date,
+  excludeId?: string
+): Prisma.AppointmentWhereInput {
+  return {
+    id: excludeId ? { not: excludeId } : undefined,
+    specialistId,
+    status: { not: "CANCELLED" },
+    startTime: { lt: endTime },
+    endTime: { gt: startTime },
+  };
+}
+
 export const appointmentService = {
   async create(input: CreateAppointmentInput) {
     return db.$transaction(async (tx) => {
+      await lockAppointmentSlot(tx, input.specialistId, input.startTime);
+
       const conflict = await this.checkConflictTx(
         tx,
         input.specialistId,
         input.startTime,
         input.endTime
       );
+      if (conflict) throw new Error("Ya existe una cita en este horario");
 
-      if (conflict) {
-        throw new Error("Ya existe una cita en este horario");
-      }
+      const bookingConflict = await this.checkBookingConflictTx(
+        tx,
+        input.specialistId,
+        input.startTime
+      );
+      if (bookingConflict) throw new Error("Ya existe una reserva en este horario");
 
       return tx.appointment.create({
         data: {
@@ -48,18 +126,7 @@ export const appointmentService = {
           notes: input.notes,
           status: "PENDING",
         },
-        include: {
-          patient: {
-            include: {
-              user: true,
-            },
-          },
-          specialist: {
-            include: {
-              user: true,
-            },
-          },
-        },
+        include: appointmentDetailsInclude,
       });
     }, { isolationLevel: "Serializable" });
   },
@@ -70,23 +137,39 @@ export const appointmentService = {
       const current = await tx.appointment.findUnique({ where: { id } });
       if (!current) throw new Error("Cita no encontrada");
 
-      if (data.startTime || data.endTime) {
+      if (data.startTime || data.endTime || data.specialistId) {
+        const nextStartTime = data.startTime || current.startTime;
+        const nextEndTime = data.endTime || current.endTime;
+        const nextSpecialistId = data.specialistId || current.specialistId;
+        if (nextEndTime <= nextStartTime) {
+          throw new Error("La fecha de fin debe ser posterior a la de inicio");
+        }
+
+        await lockAppointmentSlot(tx, nextSpecialistId, nextStartTime);
+
         const conflict = await this.checkConflictTx(
           tx,
-          data.specialistId || current.specialistId,
-          data.startTime || current.startTime,
-          data.endTime || current.endTime,
+          nextSpecialistId,
+          nextStartTime,
+          nextEndTime,
           id
         );
+        if (conflict) throw new Error("Ya existe una cita en este horario");
 
-        if (conflict) {
-          throw new Error("Ya existe una cita en este horario");
-        }
+        const bookingConflict = await this.checkBookingConflictTx(
+          tx,
+          nextSpecialistId,
+          nextStartTime,
+          current.bookingId || undefined
+        );
+        if (bookingConflict) throw new Error("Ya existe una reserva en este horario");
       }
 
       if (data.status) {
         validateTransition(current.status as AppointmentStatus, data.status);
       }
+
+      await syncLinkedBooking(tx, current, data);
 
       return tx.appointment.update({
         where: { id },
@@ -94,18 +177,7 @@ export const appointmentService = {
           ...data,
           updatedAt: new Date(),
         },
-        include: {
-          patient: {
-            include: {
-              user: true,
-            },
-          },
-          specialist: {
-            include: {
-              user: true,
-            },
-          },
-        },
+        include: appointmentDetailsInclude,
       });
     }, { isolationLevel: "Serializable" });
   },
@@ -117,12 +189,15 @@ export const appointmentService = {
 
       validateTransition(current.status as AppointmentStatus, "CANCELLED");
 
+      await syncLinkedBooking(tx, current, { status: "CANCELLED" });
+
       return tx.appointment.update({
         where: { id },
         data: {
           status: "CANCELLED",
           updatedAt: new Date(),
         },
+        include: appointmentDetailsInclude,
       });
     }, { isolationLevel: "Serializable" });
   },
@@ -136,7 +211,11 @@ export const appointmentService = {
       if (nonReschedulable.includes(current.status as AppointmentStatus)) {
         throw new Error("No se puede reagendar una cita cancelada, finalizada o con ausencia");
       }
+      if (endTime <= startTime) {
+        throw new Error("La fecha de fin debe ser posterior a la de inicio");
+      }
 
+      await lockAppointmentSlot(tx, current.specialistId, startTime);
       const conflict = await this.checkConflictTx(
         tx,
         current.specialistId,
@@ -144,10 +223,17 @@ export const appointmentService = {
         endTime,
         id
       );
+      if (conflict) throw new Error("Ya existe una cita en este horario");
 
-      if (conflict) {
-        throw new Error("Ya existe una cita en este horario");
-      }
+      const bookingConflict = await this.checkBookingConflictTx(
+        tx,
+        current.specialistId,
+        startTime,
+        current.bookingId || undefined
+      );
+      if (bookingConflict) throw new Error("Ya existe una reserva en este horario");
+
+      await syncLinkedBooking(tx, current, { startTime });
 
       return tx.appointment.update({
         where: { id },
@@ -156,18 +242,7 @@ export const appointmentService = {
           endTime,
           updatedAt: new Date(),
         },
-        include: {
-          patient: {
-            include: {
-              user: true,
-            },
-          },
-          specialist: {
-            include: {
-              user: true,
-            },
-          },
-        },
+        include: appointmentDetailsInclude,
       });
     }, { isolationLevel: "Serializable" });
   },
@@ -179,20 +254,29 @@ export const appointmentService = {
     endTime: Date,
     excludeId?: string
   ) {
-    const overlapping = await tx.appointment.findFirst({
-      where: {
-        id: excludeId ? { not: excludeId } : undefined,
-        specialistId,
-        status: { not: "CANCELLED" },
-        OR: [
-          { startTime: { lte: startTime }, endTime: { gt: startTime } },
-          { startTime: { lt: endTime }, endTime: { gte: endTime } },
-          { startTime: { gte: startTime }, endTime: { lte: endTime } },
-        ],
-      },
+    return tx.appointment.findFirst({
+      where: getOverlapWhere(specialistId, startTime, endTime, excludeId),
+      select: { id: true },
     });
+  },
 
-    return overlapping !== null;
+  async checkBookingConflictTx(
+    tx: Prisma.TransactionClient,
+    specialistId: string,
+    startTime: Date,
+    excludeBookingId?: string
+  ) {
+    const { start, end } = getZonedDayRange(startTime, AR_TZ);
+    return tx.booking.findFirst({
+      where: {
+        id: excludeBookingId ? { not: excludeBookingId } : undefined,
+        specialistId,
+        date: { gte: start, lte: end },
+        time: formatInTz(startTime, "HH:mm", AR_TZ),
+        status: { in: ["PENDING", "CONFIRMED"] },
+      },
+      select: { id: true },
+    });
   },
 
   async checkConflict(
@@ -202,16 +286,8 @@ export const appointmentService = {
     excludeId?: string
   ) {
     const overlapping = await db.appointment.findFirst({
-      where: {
-        id: excludeId ? { not: excludeId } : undefined,
-        specialistId,
-        status: { not: "CANCELLED" },
-        OR: [
-          { startTime: { lte: startTime }, endTime: { gt: startTime } },
-          { startTime: { lt: endTime }, endTime: { gte: endTime } },
-          { startTime: { gte: startTime }, endTime: { lte: endTime } },
-        ],
-      },
+      where: getOverlapWhere(specialistId, startTime, endTime, excludeId),
+      select: { id: true },
     });
 
     return overlapping !== null;
@@ -220,18 +296,7 @@ export const appointmentService = {
   async getById(id: string) {
     return db.appointment.findUnique({
       where: { id },
-      include: {
-        patient: {
-          include: {
-            user: true,
-          },
-        },
-        specialist: {
-          include: {
-            user: true,
-          },
-        },
-      },
+      include: appointmentDetailsInclude,
     });
   },
 
@@ -243,35 +308,14 @@ export const appointmentService = {
       },
     };
 
-    if (filters?.specialistId) {
-      where.specialistId = filters.specialistId;
-    }
-
-    if (filters?.patientId) {
-      where.patientId = filters.patientId;
-    }
-
-    if (filters?.status) {
-      where.status = filters.status;
-    }
+    if (filters?.specialistId) where.specialistId = filters.specialistId;
+    if (filters?.patientId) where.patientId = filters.patientId;
+    if (filters?.status) where.status = filters.status;
 
     return db.appointment.findMany({
       where,
-      include: {
-        patient: {
-          include: {
-            user: true,
-          },
-        },
-        specialist: {
-          include: {
-            user: true,
-          },
-        },
-      },
-      orderBy: {
-        startTime: "asc",
-      },
+      include: appointmentDetailsInclude,
+      orderBy: { startTime: "asc" },
       take: MAX_LIMIT,
     });
   },
@@ -279,18 +323,9 @@ export const appointmentService = {
   async getAll(filters?: AppointmentFilters) {
     const where: Prisma.AppointmentWhereInput = {};
 
-    if (filters?.specialistId) {
-      where.specialistId = filters.specialistId;
-    }
-
-    if (filters?.patientId) {
-      where.patientId = filters.patientId;
-    }
-
-    if (filters?.status) {
-      where.status = filters.status;
-    }
-
+    if (filters?.specialistId) where.specialistId = filters.specialistId;
+    if (filters?.patientId) where.patientId = filters.patientId;
+    if (filters?.status) where.status = filters.status;
     if (filters?.startDate || filters?.endDate) {
       where.startTime = {
         ...(filters.startDate ? { gte: filters.startDate } : {}),
@@ -300,47 +335,20 @@ export const appointmentService = {
 
     return db.appointment.findMany({
       where,
-      include: {
-        patient: {
-          include: {
-            user: true,
-          },
-        },
-        specialist: {
-          include: {
-            user: true,
-          },
-        },
-      },
-      orderBy: {
-        startTime: "desc",
-      },
+      include: appointmentDetailsInclude,
+      orderBy: { startTime: "desc" },
       take: MAX_LIMIT,
     });
   },
 
   async getUpcoming(limit: number = 10) {
-    const now = new Date();
     return db.appointment.findMany({
       where: {
-        startTime: { gte: now },
+        startTime: { gte: new Date() },
         status: { in: ["PENDING", "CONFIRMED"] },
       },
-      include: {
-        patient: {
-          include: {
-            user: true,
-          },
-        },
-        specialist: {
-          include: {
-            user: true,
-          },
-        },
-      },
-      orderBy: {
-        startTime: "asc",
-      },
+      include: appointmentDetailsInclude,
+      orderBy: { startTime: "asc" },
       take: Math.min(limit, MAX_LIMIT),
     });
   },
@@ -352,12 +360,15 @@ export const appointmentService = {
 
       validateTransition(current.status as AppointmentStatus, status);
 
+      await syncLinkedBooking(tx, current, { status });
+
       return tx.appointment.update({
         where: { id },
         data: {
           status,
           updatedAt: new Date(),
         },
+        include: appointmentDetailsInclude,
       });
     }, { isolationLevel: "Serializable" });
   },

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { isSameDay, isToday, startOfDay, addHours, setHours, setMinutes } from "date-fns";
-import { formatInTz, AR_TZ } from "@/lib/date-utils";
+import { startOfDay, addHours, setHours, setMinutes } from "date-fns";
+import { formatInTz, isSameDayTz, AR_TZ } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,14 +52,16 @@ export function AppointmentCalendar({
   };
 
   const getEventsForDay = (day: Date) => {
-    return events.filter((event) => isSameDay(new Date(event.start), day));
+    return events.filter((event) => isSameDayTz(new Date(event.start), day, AR_TZ));
   };
 
   const getEventPosition = (event: CalendarEvent) => {
     const start = new Date(event.start);
     const end = new Date(event.end);
-    const startHour = start.getHours() + start.getMinutes() / 60;
-    const endHour = end.getHours() + end.getMinutes() / 60;
+    const startHour =
+      Number(formatInTz(start, "H", AR_TZ)) + Number(formatInTz(start, "m", AR_TZ)) / 60;
+    const endHour =
+      Number(formatInTz(end, "H", AR_TZ)) + Number(formatInTz(end, "m", AR_TZ)) / 60;
     const duration = endHour - startHour;
     
     return {
@@ -89,7 +91,10 @@ export function AppointmentCalendar({
           
           {days.map((day, index) => {
             const dayEvents = getEventsForDay(day);
-            const isCurrentMonth = day.getMonth() === currentDate.getMonth();
+            const isCurrentMonth =
+              formatInTz(day, "yyyy-MM", AR_TZ) === formatInTz(currentDate, "yyyy-MM", AR_TZ);
+            const isCurrentDay =
+              formatInTz(day, "yyyy-MM-dd", AR_TZ) === formatInTz(new Date(), "yyyy-MM-dd", AR_TZ);
             
             return (
               <div
@@ -98,12 +103,20 @@ export function AppointmentCalendar({
                   "bg-background min-h-[120px] p-2 cursor-pointer hover:bg-muted/50 transition-colors",
                   !isCurrentMonth && "opacity-50"
                 )}
+                role="gridcell"
+                tabIndex={0}
                 onClick={() => selectDate(day)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    selectDate(day);
+                  }
+                }}
               >
                 <div
                   className={cn(
                     "text-sm font-medium mb-1",
-                    isToday(day) && "bg-success text-success-foreground rounded-full w-7 h-7 flex items-center justify-center"
+                    isCurrentDay && "bg-success text-success-foreground rounded-full w-7 h-7 flex items-center justify-center"
                   )}
                 >
                   {formatInTz(day, "d", AR_TZ)}
@@ -113,6 +126,8 @@ export function AppointmentCalendar({
                     <div
                       key={event.id}
                       className="text-xs p-1 rounded truncate"
+                      role="button"
+                      tabIndex={0}
                       style={{
                         backgroundColor: `color-mix(in srgb, ${APPOINTMENT_STATUS_COLORS[event.status]} 20%, transparent)`,
                         color: APPOINTMENT_STATUS_COLORS[event.status],
@@ -120,6 +135,13 @@ export function AppointmentCalendar({
                       onClick={(e) => {
                         e.stopPropagation();
                         onAppointmentClick?.(appointments.find((a) => a.id === event.id)!);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onAppointmentClick?.(appointments.find((a) => a.id === event.id)!);
+                        }
                       }}
                     >
                       {formatInTz(new Date(event.start), "HH:mm", AR_TZ)} {event.patientName}
@@ -143,6 +165,7 @@ export function AppointmentCalendar({
     const dayEvents = getEventsForDay(currentDate);
     
     return (
+      <>
       <div className="space-y-4">
         <CalendarToolbar
           title={title}
@@ -163,12 +186,11 @@ export function AppointmentCalendar({
             <div className="p-2 flex items-center gap-2">
               <Button
                 size="sm"
-                onClick={() => {
-                  const now = new Date();
-                  setSelectedSlot({
-                    start: now,
-                    end: addHours(now, 1),
-                  });
+                 onClick={() => {
+                   setSelectedSlot({
+                     start: setMinutes(setHours(startOfDay(currentDate), 9), 0),
+                     end: setMinutes(setHours(startOfDay(currentDate), 10), 0),
+                   });
                   setModalOpen(true);
                 }}
               >
@@ -186,17 +208,25 @@ export function AppointmentCalendar({
                 style={{ top: `${(hour - 8) * 60}px`, height: "60px" }}
               >
                 <div className="border-r pr-2 text-right text-xs text-muted-foreground pt-1">
-                  {formatInTz(setHours(new Date(), hour), "HH:mm", AR_TZ)}
+                 {`${hour.toString().padStart(2, "0")}:00`}
                 </div>
                 <div
-                  className="border-l cursor-pointer hover:bg-muted/30"
+                 className="border-l cursor-pointer hover:bg-muted/30"
+                  role="button"
+                  tabIndex={0}
                   onClick={(e) => {
                     const rect = (e.target as HTMLElement).getBoundingClientRect();
                     const y = e.clientY - rect.top;
                     const clickedHour = Math.floor(y / 60);
-                    handleCellClick(currentDate, 8 + clickedHour);
-                  }}
-                />
+                   handleCellClick(currentDate, 8 + clickedHour);
+                   }}
+                   onKeyDown={(event) => {
+                     if (event.key === "Enter" || event.key === " ") {
+                       event.preventDefault();
+                       handleCellClick(currentDate, hour);
+                     }
+                   }}
+                 />
               </div>
             ))}
             
@@ -205,14 +235,22 @@ export function AppointmentCalendar({
               return (
                 <div
                   key={event.id}
-                  className="absolute left-[80px] right-0 rounded-md p-2 cursor-pointer transition-transform hover:scale-[1.02] shadow-sm"
+                   className="absolute left-[80px] right-0 rounded-md p-2 cursor-pointer transition-transform hover:scale-[1.02] shadow-sm"
+                   role="button"
+                   tabIndex={0}
                   style={{
                     top: pos.top,
                     height: pos.height,
                     backgroundColor: `color-mix(in srgb, ${APPOINTMENT_STATUS_COLORS[event.status]} 15%, transparent)`,
                     borderLeft: `3px solid ${APPOINTMENT_STATUS_COLORS[event.status]}`,
                   }}
-                  onClick={() => onAppointmentClick?.(appointments.find((a) => a.id === event.id)!)}
+                   onClick={() => onAppointmentClick?.(appointments.find((a) => a.id === event.id)!)}
+                   onKeyDown={(e) => {
+                     if (e.key === "Enter" || e.key === " ") {
+                       e.preventDefault();
+                       onAppointmentClick?.(appointments.find((a) => a.id === event.id)!);
+                     }
+                   }}
                 >
                   <div className="flex items-start justify-between">
                     <div>
@@ -234,6 +272,15 @@ export function AppointmentCalendar({
           </div>
         </div>
       </div>
+      <AppointmentModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        initialData={selectedSlot ? { startTime: selectedSlot.start, endTime: selectedSlot.end } : undefined}
+        onSuccess={() => {
+          setSelectedSlot(null);
+        }}
+      />
+      </>
     );
   }
 
@@ -257,9 +304,17 @@ export function AppointmentCalendar({
               key={day.toISOString()}
               className={cn(
                 "p-2 text-center cursor-pointer hover:bg-muted",
-                isToday(day) && "bg-primary/10"
-              )}
-              onClick={() => selectDate(day)}
+                 formatInTz(day, "yyyy-MM-dd", AR_TZ) === formatInTz(new Date(), "yyyy-MM-dd", AR_TZ) && "bg-primary/10"
+                 )}
+                 role="button"
+                 tabIndex={0}
+                 onClick={() => selectDate(day)}
+                 onKeyDown={(event) => {
+                   if (event.key === "Enter" || event.key === " ") {
+                     event.preventDefault();
+                     selectDate(day);
+                   }
+                 }}
             >
               <div className="text-xs text-muted-foreground">
                 {formatInTz(day, "EEE", AR_TZ)}
@@ -267,7 +322,7 @@ export function AppointmentCalendar({
               <div
                 className={cn(
                   "text-lg font-semibold",
-                  isToday(day) && "bg-success text-success-foreground rounded-full w-8 h-8 flex items-center justify-center mx-auto"
+                   formatInTz(day, "yyyy-MM-dd", AR_TZ) === formatInTz(new Date(), "yyyy-MM-dd", AR_TZ) && "bg-success text-success-foreground rounded-full w-8 h-8 flex items-center justify-center mx-auto"
                 )}
               >
                 {formatInTz(day, "d", AR_TZ)}
@@ -283,12 +338,12 @@ export function AppointmentCalendar({
               className="grid grid-cols-[60px_repeat(7,1fr)] min-h-[60px]"
             >
               <div className="border-r border-t p-1 text-xs text-muted-foreground text-right pr-2">
-                {formatInTz(setHours(new Date(), hour), "HH:mm", AR_TZ)}
+                 {`${hour.toString().padStart(2, "0")}:00`}
               </div>
               {days.map((day, dayIndex) => {
                 const dayEvents = getEventsForDay(day).filter((event) => {
-                  const eventStart = new Date(event.start);
-                  return eventStart.getHours() === hour;
+                    const eventStart = new Date(event.start);
+                   return Number(formatInTz(eventStart, "H", AR_TZ)) === hour;
                 });
                 
                 return (
@@ -304,13 +359,15 @@ export function AppointmentCalendar({
                   >
                     {dayEvents.map((event) => {
                       const pos = getEventPosition(event);
-                      const startMinutes = new Date(event.start).getMinutes();
+                       const startMinutes = Number(formatInTz(new Date(event.start), "m", AR_TZ));
                       const offsetTop = startMinutes;
                       
                       return (
-                        <div
-                          key={event.id}
-                          className="absolute left-1 right-1 rounded p-1 text-xs cursor-pointer transition-transform hover:scale-[1.02] shadow-sm overflow-hidden"
+                           <div
+                             key={event.id}
+                             className="absolute left-1 right-1 rounded p-1 text-xs cursor-pointer transition-transform hover:scale-[1.02] shadow-sm overflow-hidden"
+                             role="button"
+                             tabIndex={0}
                           style={{
                             top: `calc(${(hour - 8) * 60}px + ${offsetTop}px)`,
                             height: pos.height,
@@ -318,10 +375,17 @@ export function AppointmentCalendar({
 
                             borderLeft: `2px solid ${APPOINTMENT_STATUS_COLORS[event.status]}`,
                           }}
-                          onClick={(e) => {
+                           onClick={(e) => {
                             e.stopPropagation();
                             onAppointmentClick?.(appointments.find((a) => a.id === event.id)!);
-                          }}
+                           }}
+                           onKeyDown={(e) => {
+                             if (e.key === "Enter" || e.key === " ") {
+                               e.preventDefault();
+                               e.stopPropagation();
+                               onAppointmentClick?.(appointments.find((a) => a.id === event.id)!);
+                             }
+                           }}
                         >
                           <div className="font-medium truncate">{event.patientName}</div>
                           <div className="text-muted-foreground truncate">

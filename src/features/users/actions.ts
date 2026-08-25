@@ -3,11 +3,12 @@
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { requirePermission, validateInput } from "@/lib/action-helpers";
+import { contactUserSelect } from "@/lib/prisma-selects";
 import { z } from "zod";
 
 const createUserSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  email: z.string().email("Email inválido"),
+  email: z.string().trim().toLowerCase().email("Email inválido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
   role: z.enum(["ADMIN", "SPECIALIST", "RECEPTIONIST", "PATIENT"], "Rol inválido"),
 });
@@ -37,23 +38,32 @@ export async function createUserAction(data: {
   role: string;
 }) {
   await requirePermission("manage:users");
-  validateInput(createUserSchema, data);
+  const parsedData = validateInput(createUserSchema, data);
 
-  if (data.role === "ADMIN") {
+  if (parsedData.role === "ADMIN") {
     throw new Error("Solo puede existir un administrador");
   }
+  if (parsedData.role === "SPECIALIST") {
+    throw new Error("Los especialistas deben crearse desde la sección Especialistas");
+  }
 
-  const existing = await db.user.findUnique({ where: { email: data.email } });
+  const existing = await db.user.findUnique({ where: { email: parsedData.email } });
   if (existing) throw new Error("El email ya está registrado");
 
-  const hashedPassword = await bcrypt.hash(data.password, 12);
+  const hashedPassword = await bcrypt.hash(parsedData.password, 12);
 
   return db.user.create({
     data: {
-      name: data.name,
-      email: data.email,
+      name: parsedData.name,
+      email: parsedData.email,
       password: hashedPassword,
-      role: data.role,
+      role: parsedData.role,
+      ...(parsedData.role === "PATIENT" ? { patient: { create: {} } } : {}),
+    },
+    select: {
+      ...contactUserSelect,
+      role: true,
+      createdAt: true,
     },
   });
 }

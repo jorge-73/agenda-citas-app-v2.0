@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { Schedule } from "../types";
 import { startOfDay, endOfDay } from "date-fns";
+import { publicUserSelect } from "@/lib/prisma-selects";
 
 export const scheduleService = {
   async create(specialistId: string, dayOfWeek: number, startTime: string, endTime: string) {
@@ -58,7 +59,7 @@ export const scheduleService = {
       include: {
         specialist: {
           include: {
-            user: true,
+            user: { select: publicUserSelect },
           },
         },
       },

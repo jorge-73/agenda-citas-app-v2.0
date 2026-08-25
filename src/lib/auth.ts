@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "./db";
 import type { UserRole } from "@/types";
+import { checkRateLimit, getRequestRateLimitKey } from "./rate-limit";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
@@ -20,8 +21,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
+        const email = String(credentials.email).trim().toLowerCase();
+        const rateKey = await getRequestRateLimitKey(email, "login");
+        const rateCheck = await checkRateLimit(rateKey, 5, 60_000);
+        if (!rateCheck.allowed) return null;
+
         const user = await db.user.findUnique({
-          where: { email: credentials.email as string },
+          where: { email },
         });
 
         if (!user || !user.password) {
@@ -65,12 +71,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       }
       const userId = token.id as string | undefined;
-      if (userId && !(token.timezone as string | undefined)) {
-        const pref = await db.userPreference.findUnique({
-          where: { userId },
-          select: { timezone: true },
+      if (userId) {
+        const currentUser = await db.user.findUnique({
+          where: { id: userId },
+          select: { role: true },
         });
-        token.timezone = pref?.timezone || null;
+        if (!currentUser) return null;
+        token.role = currentUser.role;
+
+        if (!(token.timezone as string | undefined)) {
+          const pref = await db.userPreference.findUnique({
+            where: { userId },
+            select: { timezone: true },
+          });
+          token.timezone = pref?.timezone || null;
+        }
       }
       if (!(token.rememberMe as boolean | undefined) && token.iat) {
         const sevenDays = 7 * 24 * 60 * 60;

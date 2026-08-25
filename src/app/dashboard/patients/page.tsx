@@ -2,11 +2,12 @@ import { Suspense } from "react";
 import { db } from "@/lib/db";
 import { LoadingState } from "@/components/shared/loading-state";
 import { PatientsPageClient } from "./patients-page-client";
+import { contactUserSelect } from "@/lib/prisma-selects";
 
 async function getPatients() {
   return db.patient.findMany({
     include: {
-      user: true,
+      user: { select: contactUserSelect },
       appointments: {
         select: { id: true },
       },

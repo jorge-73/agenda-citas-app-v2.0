@@ -35,28 +35,29 @@ export default function AppointmentsPage() {
   const role = useAuthStore((s) => s.user?.role);
   const isPatient = role === "PATIENT";
 
-  const fetchAppointments = useCallback(() => {
+  const fetchAppointments = useCallback(async () => {
     const hasFilters = filters.status || filters.specialistId || filters.dateFrom || filters.dateTo;
-    if (hasFilters) {
-      getFilteredAppointmentsAction({
-        status: filters.status as AppointmentStatus | undefined,
-        specialistId: filters.specialistId,
-        startDate: filters.dateFrom,
-        endDate: filters.dateTo,
-      }).then((data) => {
-        setAppointments(data);
-        setIsLoading(false);
-      });
-    } else {
-      getAppointmentsByMonth(currentDate.getFullYear(), currentDate.getMonth()).then((data) => {
-        setAppointments(data);
-        setIsLoading(false);
-      });
+    setIsLoading(true);
+    try {
+      const data = hasFilters
+        ? await getFilteredAppointmentsAction({
+            status: filters.status as AppointmentStatus | undefined,
+            specialistId: filters.specialistId,
+            startDate: filters.dateFrom,
+            endDate: filters.dateTo,
+          })
+        : await getAppointmentsByMonth(currentDate.getFullYear(), currentDate.getMonth());
+      setAppointments(data);
+    } catch {
+      toast.error("Error al cargar las citas");
+    } finally {
+      setIsLoading(false);
     }
   }, [filters, currentDate]);
 
   useEffect(() => {
-    fetchAppointments();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchAppointments();
   }, [fetchAppointments]);
 
   const handleFilterChange = (newFilters: AppointmentFiltersState) => {
@@ -76,7 +77,7 @@ export default function AppointmentsPage() {
   const handleDelete = async (id: string) => {
     try {
       await deleteAppointment(id);
-      toast.success("Cita eliminada correctamente");
+      toast.success("Cita cancelada o eliminada correctamente");
       setModalOpen(false);
       fetchAppointments();
     } catch {

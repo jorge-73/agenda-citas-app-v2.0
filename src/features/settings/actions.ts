@@ -2,6 +2,16 @@
 
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { isValidTimeZone } from "@/lib/date-utils";
+import { z } from "zod";
+
+const preferencesSchema = z.object({
+  emailNotifications: z.boolean().optional(),
+  appointmentReminders: z.boolean().optional(),
+  newBookingAlerts: z.boolean().optional(),
+  weeklyReport: z.boolean().optional(),
+  timezone: z.string().refine(isValidTimeZone, "Zona horaria inválida").optional(),
+});
 
 export async function getProfileAction() {
   const session = await auth();
@@ -34,13 +44,15 @@ export async function updatePreferencesAction(data: {
 }) {
   const session = await auth();
   if (!session?.user?.id) return { error: "No autorizado" };
+  const parsed = preferencesSchema.safeParse(data);
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message || "Datos inválidos" };
 
   await db.userPreference.upsert({
     where: { userId: session.user.id },
-    update: data,
+    update: parsed.data,
     create: {
       userId: session.user.id,
-      ...data,
+      ...parsed.data,
     },
   });
 

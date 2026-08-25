@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ArrowLeft, Stethoscope, Phone, Calendar, FileText, Clock, DollarSign, Award, Activity, User, BadgeCheck, BadgeX } from "lucide-react";
+import { contactUserSelect } from "@/lib/prisma-selects";
 
 const DAY_LABELS: Record<number, string> = {
   0: "Domingo", 1: "Lunes", 2: "Martes", 3: "Miércoles",
@@ -21,7 +22,7 @@ export default async function SpecialistDetailPage({
   const specialist = await db.specialist.findUnique({
     where: { id },
     include: {
-      user: true,
+      user: { select: contactUserSelect },
       schedules: {
         where: { isActive: true },
         orderBy: { dayOfWeek: "asc" },
@@ -29,7 +30,7 @@ export default async function SpecialistDetailPage({
       appointments: {
         include: {
           patient: {
-            include: { user: true },
+            include: { user: { select: contactUserSelect } },
           },
         },
         orderBy: { startTime: "desc" },

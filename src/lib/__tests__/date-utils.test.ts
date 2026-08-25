@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { toUTC, fromUTC, formatInTz, isSameDayTz, AR_TZ } from "../date-utils";
+import {
+  toUTC,
+  fromUTC,
+  formatInTz,
+  isSameDayTz,
+  zonedDateTimeToUTC,
+  getZonedDayRange,
+  AR_TZ,
+} from "../date-utils";
 
 describe("date-utils (America/Argentina/Buenos_Aires, UTC-3)", () => {
   it("AR_TZ is Buenos Aires", () => {
@@ -62,6 +70,25 @@ describe("date-utils (America/Argentina/Buenos_Aires, UTC-3)", () => {
     const a = new Date(Date.UTC(2024, 0, 15, 2, 0));
     const b = new Date(Date.UTC(2024, 0, 16, 2, 0));
     expect(isSameDayTz(a, b)).toBe(false);
+  });
+
+  it("isSameDayTz handles the Argentina midnight boundary", () => {
+    const beforeMidnight = new Date(Date.UTC(2024, 0, 15, 2, 59));
+    const afterMidnight = new Date(Date.UTC(2024, 0, 15, 3, 1));
+
+    expect(isSameDayTz(beforeMidnight, afterMidnight)).toBe(false);
+  });
+
+  it("converts explicit wall-clock booking times without depending on server timezone", () => {
+    const utc = zonedDateTimeToUTC("2024-01-15", "10:30");
+    expect(utc.toISOString()).toBe("2024-01-15T13:30:00.000Z");
+  });
+
+  it("builds UTC day boundaries from an Argentina calendar day", () => {
+    const { start, end } = getZonedDayRange(new Date(Date.UTC(2024, 0, 15, 13, 30)));
+
+    expect(start.toISOString()).toBe("2024-01-15T03:00:00.000Z");
+    expect(end.toISOString()).toBe("2024-01-16T02:59:59.999Z");
   });
 
   it("toUTC with explicit timezone param", () => {

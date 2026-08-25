@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 import { MAX_LIMIT } from "@/lib/constants";
+import { contactUserSelect } from "@/lib/prisma-selects";
 import { PatientFilters, CreatePatientInput, UpdatePatientInput } from "../types";
 
 export const patientService = {
@@ -8,7 +9,7 @@ export const patientService = {
     return db.patient.create({
       data: input,
       include: {
-        user: true,
+        user: { select: contactUserSelect },
       },
     });
   },
@@ -22,7 +23,7 @@ export const patientService = {
         updatedAt: new Date(),
       },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
       },
     });
   },
@@ -37,12 +38,12 @@ export const patientService = {
     return db.patient.findUnique({
       where: { id },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
         appointments: {
           include: {
             specialist: {
               include: {
-                user: true,
+                user: { select: contactUserSelect },
               },
             },
           },
@@ -79,7 +80,7 @@ export const patientService = {
       db.patient.findMany({
         where,
         include: {
-          user: true,
+          user: { select: contactUserSelect },
           appointments: {
             select: { id: true },
           },
@@ -113,7 +114,7 @@ export const patientService = {
         ],
       },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
       },
       take: Math.min(limit, MAX_LIMIT),
     });
@@ -123,7 +124,7 @@ export const patientService = {
     return db.patient.findUnique({
       where: { userId },
       include: {
-        user: true,
+        user: { select: contactUserSelect },
       },
     });
   },
@@ -134,7 +135,7 @@ export const patientService = {
       include: {
         specialist: {
           include: {
-            user: true,
+            user: { select: contactUserSelect },
           },
         },
       },

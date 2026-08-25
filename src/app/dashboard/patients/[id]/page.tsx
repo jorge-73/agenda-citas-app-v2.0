@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ArrowLeft, User, Phone, Calendar, FileText, Activity, Stethoscope, Clock, Building2, HeartPulse } from "lucide-react";
+import { contactUserSelect } from "@/lib/prisma-selects";
 
 export default async function PatientDetailPage({
   params,
@@ -16,11 +17,11 @@ export default async function PatientDetailPage({
   const patient = await db.patient.findUnique({
     where: { id },
     include: {
-      user: true,
+      user: { select: contactUserSelect },
       appointments: {
         include: {
           specialist: {
-            include: { user: true },
+            include: { user: { select: contactUserSelect } },
           },
         },
         orderBy: { startTime: "desc" },

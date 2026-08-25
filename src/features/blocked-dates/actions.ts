@@ -1,13 +1,15 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { startOfDay, endOfDay } from "date-fns";
+import { formatInTz, getZonedDayRange, zonedDateTimeToUTC, AR_TZ } from "@/lib/date-utils";
 import { requirePermission, validateInput } from "@/lib/action-helpers";
-import { toUTC, AR_TZ } from "@/lib/date-utils";
 import { z } from "zod";
 
 const blockedDateSchema = z.object({
-  date: z.date().refine((d) => endOfDay(d) > new Date(), "La fecha debe ser futura"),
+  date: z.date().refine(
+    (d) => getZonedDayRange(d, AR_TZ).end > new Date(),
+    "La fecha debe ser futura"
+  ),
   reason: z.string().optional(),
   isRecurring: z.boolean().optional(),
 });
@@ -27,9 +29,10 @@ export async function createBlockedDateAction(data: {
   await requirePermission("manage:blocked-dates");
   validateInput(blockedDateSchema, data);
 
-  const utcDate = startOfDay(toUTC(data.date, AR_TZ));
+  const dateKey = formatInTz(data.date, "yyyy-MM-dd", AR_TZ);
+  const utcDate = zonedDateTimeToUTC(dateKey, "00:00", AR_TZ);
+  const { end: dayEnd } = getZonedDayRange(data.date, AR_TZ);
   const dayStart = utcDate;
-  const dayEnd = endOfDay(utcDate);
 
   const existing = await db.blockedDate.findFirst({
     where: {

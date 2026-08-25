@@ -228,7 +228,7 @@ export function BookingWizard() {
         time: selectedTime,
       });
 
-      router.push(`/booking/confirmation?id=${booking.id}`);
+       router.push(`/booking/confirmation?token=${encodeURIComponent(booking.confirmationToken)}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error al crear la reserva");
     } finally {
