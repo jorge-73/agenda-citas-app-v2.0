@@ -21,7 +21,7 @@ Sistema profesional de gestión de citas médicas construido con Next.js 16.2.6,
 - **Asistente virtual** global (IA) con contexto por rol y página, sin datos médicos
 - **Diseño premium** con animaciones Framer Motion, glass effect y gradientes
 - **Responsive** para todos los dispositivos
-- **TypeScript** estricto con validaciones Zod (+130 tests unitarios)
+- **TypeScript** estricto con validaciones Zod (+150 tests unitarios)
 
 ## 🛠️ Tech Stack
 
@@ -95,7 +95,7 @@ src/
 │   ├── email.ts         # Resend REST API (reset password, confirmaciones)
 │   ├── export.ts        # Exportación CSV
 │   ├── permissions.ts   # RBAC con 4 roles y 17 permisos
-│   ├── rate-limit.ts    # Rate limiter in-memory (login, register, reset)
+│   ├── rate-limit.ts    # Rate limiter persistente (login, register, reset)
 │   ├── date-utils.ts    # Utilidades timezone (toUTC, fromUTC, formatInTz)
 │   ├── constants.ts     # Constantes (MAX_LIMIT, PHONE_REGEX, TIME_REGEX)
 │   ├── action-helpers.ts# Helpers para server actions (requireAuth, requirePermission)
@@ -103,6 +103,7 @@ src/
 ├── store/               # Zustand stores (auth, ui, chatbot)
 ├── schemas/              # Zod schemas de autenticación
 ├── types/               # TypeScript types y augmentación NextAuth
+├── scripts/              # Mantenimiento puntual de datos
 └── prisma/              # Schema, seed y migraciones
     ├── schema.prisma
     ├── seed.ts
@@ -180,19 +181,10 @@ Abrir [http://localhost:3000](http://localhost:3000)
 
 ## 👤 Usuarios de Prueba
 
-| Rol | Email | Contraseña |
-|-----|-------|------------|
-| Admin | admin@citamed.com | admin123 |
-| Med. General | dr.juan.perez@citamed.com | doctor123 |
-| Cardióloga | dra.laura.martinez@citamed.com | doctor123 |
-| Pediatra | dr.carlos.gomez@citamed.com | doctor123 |
-| Dermatóloga | dra.ana.rodriguez@citamed.com | doctor123 |
-| Traumatólogo | dr.pablo.fernandez@citamed.com | doctor123 |
-| Psicóloga | dra.sofia.lopez@citamed.com | doctor123 |
-| Recepcionista | recepcion@citamed.com | recep123 |
-| Paciente | paciente@test.com | paciente123 |
-
-> Todos los especialistas usan la misma contraseña `doctor123`.
+El seed crea usuarios de desarrollo con emails conocidos, pero toma sus contraseñas de
+`SEED_ADMIN_PASSWORD`, `SEED_SPECIALIST_PASSWORD`, `SEED_RECEPTIONIST_PASSWORD` y
+`SEED_PATIENT_PASSWORD`. Usa valores únicos de al menos 12 caracteres y nunca reutilices
+contraseñas de desarrollo en producción.
 
 ## 🗄️ Modelos de Base de Datos
 
@@ -207,6 +199,7 @@ Abrir [http://localhost:3000](http://localhost:3000)
 | Booking | Reservas públicas sin cuenta de usuario |
 | UserPreference | Preferencias de usuario (notificaciones, timezone) |
 | PasswordResetToken | Tokens para restablecimiento de contraseña |
+| RateLimit | Ventanas de rate limiting persistentes |
 
 ## 📝 Scripts Disponibles
 
@@ -219,6 +212,8 @@ npm run test           # Tests en watch mode
 npm run test:run       # Tests una sola vez (CI)
 npm run test:coverage  # Tests con reporte de cobertura
 npm run db:seed        # Ejecutar seed
+npm run db:backfill-bookings       # Auditar bookings confirmadas sin appointment
+npm run db:backfill-bookings -- --apply  # Aplicar el backfill auditado
 npm run db:studio      # Abrir Prisma Studio
 ```
 
@@ -237,8 +232,10 @@ npm run db:studio      # Abrir Prisma Studio
 4. Configurar Resend y agregar API Key en Vercel (`SMTP_PASSWORD`)
 5. Agregar `NEXTAUTH_SECRET` y `NEXTAUTH_URL` en Vercel
 6. Agregar `AI_API_KEY` en Vercel (asistente virtual; `AI_MODEL` y `AI_BASE_URL` opcionales)
-7. Ejecutar migraciones y seed contra Neon: `npx prisma db push && npm run db:seed`
-8. Hacer push a `main` — Vercel deploya automáticamente
+7. Ejecutar migraciones y seed contra Neon: `npx prisma migrate deploy && npm run db:seed`
+8. Auditar bookings confirmadas sin appointment: `npm run db:backfill-bookings`
+9. Aplicar el backfill auditado: `npm run db:backfill-bookings -- --apply`
+10. Hacer push a `main` — Vercel deploya automáticamente
 
 ### Variables de Entorno en Vercel
 
@@ -256,7 +253,7 @@ npm run db:studio      # Abrir Prisma Studio
 
 > **Nota**: El plan gratuito de Resend solo envía a direcciones verificadas. Para enviar a cualquier destinatario, verificar un dominio propio.
 >
-> **Nota**: El rate limiter es in-memory (local). En producción con múltiples instancias serverless, considerar migrar a Redis/Upstash para escalar.
+> **Nota**: El rate limiter usa PostgreSQL para compartir límites entre instancias serverless. Si la tabla `RateLimit` no existe, las acciones protegidas fallan de forma segura hasta aplicar las migraciones.
 
 ## 🤖 Asistente Virtual (IA)
 

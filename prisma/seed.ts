@@ -6,13 +6,20 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Starting seed...");
 
-  const hp = (s: string) => bcrypt.hash(s, 12);
+  const getSeedPassword = (name: string) => {
+    const password = process.env[name];
+    if (!password || password.length < 12) {
+      throw new Error(`${name} debe existir y tener al menos 12 caracteres`);
+    }
+    return password;
+  };
+  const hp = (name: string) => bcrypt.hash(getSeedPassword(name), 12);
 
   // ── Users ──
-  const adminPw = await hp("admin123");
+  const adminPw = await hp("SEED_ADMIN_PASSWORD");
   const admin = await prisma.user.upsert({
     where: { email: "admin@citamed.com" },
-    update: {},
+    update: { password: adminPw, role: "ADMIN", name: "Administrador" },
     create: {
       email: "admin@citamed.com",
       name: "Administrador",
@@ -22,7 +29,7 @@ async function main() {
   });
   console.log("✅ Admin:", admin.email);
 
-  const docPw = await hp("doctor123");
+  const docPw = await hp("SEED_SPECIALIST_PASSWORD");
   type SpecDef = { name: string; specialty: string; license: string; bio: string; price: number };
 
   const specialists: SpecDef[] = [
@@ -40,7 +47,7 @@ async function main() {
     const email = `${spec.name.toLowerCase().replace(/\s+/g, ".").replace("dr.", "dr").replace("dra.", "dra")}@citamed.com`;
     const user = await prisma.user.upsert({
       where: { email },
-      update: {},
+      update: { password: docPw, role: "SPECIALIST", name: spec.name },
       create: {
         email,
         name: spec.name,
@@ -84,10 +91,10 @@ async function main() {
   }
 
   // ── Receptionist ──
-  const recPw = await hp("recep123");
+  const recPw = await hp("SEED_RECEPTIONIST_PASSWORD");
   const receptionist = await prisma.user.upsert({
     where: { email: "recepcion@citamed.com" },
-    update: {},
+    update: { password: recPw, role: "RECEPTIONIST", name: "María González" },
     create: {
       email: "recepcion@citamed.com",
       name: "María González",
@@ -98,10 +105,10 @@ async function main() {
   console.log("✅ Receptionist:", receptionist.email);
 
   // ── Patient ──
-  const patPw = await hp("paciente123");
+  const patPw = await hp("SEED_PATIENT_PASSWORD");
   const patientUser = await prisma.user.upsert({
     where: { email: "paciente@test.com" },
-    update: {},
+    update: { password: patPw, role: "PATIENT", name: "Pedro Test" },
     create: {
       email: "paciente@test.com",
       name: "Pedro Test",
@@ -164,16 +171,7 @@ async function main() {
     console.log(`   Booking tomorrow ${10 + i}:00 → ${createdSpecialists[i].name}`);
   }
 
-  console.log("\n📋 Login credentials:");
-  console.log("   Admin:          admin@citamed.com / admin123");
-  console.log("   Doctor (Gen):   dr.juan.perez@citamed.com / doctor123");
-  console.log("   Doctor (Card):  dra.laura.martinez@citamed.com / doctor123");
-  console.log("   Doctor (Pedi):  dr.carlos.gomez@citamed.com / doctor123");
-  console.log("   Doctor (Derma): dra.ana.rodriguez@citamed.com / doctor123");
-  console.log("   Doctor (Traum): dr.pablo.fernandez@citamed.com / doctor123");
-  console.log("   Doctor (Psic):  dra.sofia.lopez@citamed.com / doctor123");
-  console.log("   Recepcionista:  recepcion@citamed.com / recep123");
-  console.log("   Paciente:       paciente@test.com / paciente123");
+  console.log("\n📋 Usuarios seed creados. Las contraseñas se tomaron de las variables SEED_*.");
 
   console.log("\n✨ Seed completed!");
 }
